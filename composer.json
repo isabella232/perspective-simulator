@@ -1,0 +1,11 @@
+{
+    "name": "Perspective/Simulator",
+    "description": "Perspective simulator.",
+    "autoload": {
+        "psr-4": {"PerspectiveSimulator\\": "src/"},
+        "files": ["autoload.php"]
+    },
+    "require": {
+        "php": ">=7.1.0"
+    }
+}
