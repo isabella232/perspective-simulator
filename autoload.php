@@ -15,6 +15,20 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
          */
         public static function load($class)
         {
+            if (substr($class, -4) === '\API' && substr_count($class, '\\') === 1) {
+                $project = substr($class, 0, strpos($class, '\\'));
+                $file = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/API.php';
+                include $file;
+                return true;
+            }
+
+            if (substr($class, -10) === '\APIRouter' && substr_count($class, '\\') === 1) {
+                $project = substr($class, 0, strpos($class, '\\'));
+                $file = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/APIRouter.php';
+                include $file;
+                return true;
+            }
+
             if (strpos($class, '\DataRecordType\\') !== false) {
                 $type = substr($class, (strrpos($class, '\\') + 1));
                 if ($type === 'DataRecord') {
