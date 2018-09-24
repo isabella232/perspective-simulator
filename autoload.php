@@ -29,18 +29,6 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 return true;
             }
 
-            if (strpos($class, '\CustomTypes\DataRecord\\') !== false) {
-                $type = substr($class, (strrpos($class, '\\') + 1));
-                if ($type === 'DataRecord') {
-                    return false;
-                }
-
-                $project = substr($class, 0, strpos($class, '\\'));
-                $file = dirname(dirname(dirname(__DIR__))).'/Projects/'.$project.'/CustomTypes/DataRecord/'.$type.'.php';
-                include $file;
-                return true;
-            }
-
             return false;
 
         }//end load()
