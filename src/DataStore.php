@@ -16,9 +16,14 @@ class DataStore
         $this->project = $project;
 
         if (Bootstrap::isWriteEnabled() === true) {
-            $dir = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$code;
-            if (is_dir($dir) === false) {
-                mkdir($dir);
+            $storageDir = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage';
+            if (is_dir($storageDir) === false) {
+                mkdir($storageDir);
+            }
+
+            $storeDir = $storageDir.'/'.$code;
+            if (is_dir($storeDir) === false) {
+                mkdir($storeDir);
             }
         }
 
