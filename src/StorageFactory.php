@@ -10,10 +10,10 @@ class StorageFactory
         'user' => [],
     ];
 
-    public static function createDataStore(string $code)
+    public static function createDataStore(string $code, string $project)
     {
         if (isset(self::$stores['data'][$code]) === false) {
-            self::$stores['data'][$code] = new DataStore($code);
+            self::$stores['data'][$code] = new DataStore($code, $project);
         }
     }
 

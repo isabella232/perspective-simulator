@@ -3,6 +3,9 @@ namespace PerspectiveSimulator;
 
 class Bootstrap {
 
+    private static $readEnabled  = true;
+    private static $writeEnabled = true;
+
 
     public static function load($project)
     {
@@ -25,7 +28,7 @@ class Bootstrap {
             }
 
             $storeName = strtolower(substr($file, 0, -5));
-            StorageFactory::createDataStore($storeName);
+            StorageFactory::createDataStore($storeName, $project);
         }
 
         // Add data record properties.
@@ -43,6 +46,31 @@ class Bootstrap {
         }
 
     }//end load()
+
+    public static function isReadEnabled()
+    {
+        return self::$readEnabled;
+    }
+    public static function disableRead()
+    {
+        self::$readEnabled = false;
+    }
+    public static function enableRead()
+    {
+        self::$readEnabled = true;
+    }
+    public static function isWriteEnabled()
+    {
+        return self::$writeEnabled;
+    }
+    public static function disableWrite()
+    {
+        self::$writeEnabled = false;
+    }
+    public static function enableWrite()
+    {
+        self::$writeEnabled = true;
+    }
 
 
 }//end class

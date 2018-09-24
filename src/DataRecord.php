@@ -6,12 +6,18 @@ class DataRecord
 
     private $id = '';
     private $store = '';
-    private $props = [];
+    private $project = '';
+    private $properties = [];
 
 
-    final public function __construct(DataStore $store, string $id) {
+    final public function __construct(DataStore $store, string $id, string $project) {
         $this->store = $store;
         $this->id = $id;
+        $this->project = $project;
+
+        if ($this->load() === false) {
+            $this->save();
+        }
     }
 
 
@@ -33,7 +39,7 @@ class DataRecord
             throw new \Exception("Property \"$propertyCode\" does not exist");
         }
 
-        return $this->props[$propertyCode];
+        return $this->properties[$propertyCode];
     }
 
 
@@ -53,7 +59,9 @@ class DataRecord
             $this->store->setUniqueDataRecord($propertyCode, $value, $this);
         }
 
-        $this->props[$propertyCode] = $value;
+        $this->properties[$propertyCode] = $value;
+
+        $this->save();
     }
 
     final public function getChildren($depth=null)
@@ -61,6 +69,45 @@ class DataRecord
         return $this->store->getChildren($this->id, $depth);
 
     }
+
+
+
+    final public function save()
+    {
+        if (Bootstrap::isWriteEnabled() === false) {
+            return false;
+        }
+
+        $record = [
+            'id' => $this->id,
+            'type' => get_class($this),
+            'properties' => $this->properties,
+        ];
+
+        $storeCode = $this->store->getCode();
+        $filePath = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$storeCode.'/'.$this->id.'.json';
+
+        file_put_contents($filePath, json_encode($record));
+        return true;
+    }
+
+    final public function load()
+    {
+        if (Bootstrap::isReadEnabled() === false) {
+            return false;
+        }
+
+        $storeCode = $this->store->getCode();
+        $filePath  = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$storeCode.'/'.$this->id.'.json';
+        if (is_file($filePath) === false) {
+            return false;
+        }
+
+        $data = json_decode(file_get_contents($filePath), true);
+        $this->properties = $data['properties'];
+        return true;
+
+    }//end load()
 
 
 }//end class
