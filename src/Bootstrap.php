@@ -8,6 +8,10 @@ class Bootstrap {
     {
         $projectDir = dirname(dirname(dirname(dirname(__DIR__)))).'/Projects/'.$project;
 
+        // Register an autoloader for the project.
+        $loader = require dirname(dirname(dirname(__DIR__))).'/autoload.php';
+        $loader->addPsr4('Commenting\\', $projectDir);
+
         // Add data stores.
         $files = scandir($projectDir.'/Stores/Data');
         foreach ($files as $file) {
