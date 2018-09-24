@@ -12,6 +12,9 @@ class Bootstrap {
         $loader = require dirname(dirname(dirname(__DIR__))).'/autoload.php';
         $loader->addPsr4('Commenting\\', $projectDir);
 
+        class_alias('PerspectiveSimulator\StorageFactory', $project.'\API\StorageFactory');
+        class_alias('PerspectiveSimulator\DataRecord', $project.'\CustomTypes\DataRecord\DataRecord');
+
         // Add data stores.
         $files = scandir($projectDir.'/Stores/Data');
         foreach ($files as $file) {
