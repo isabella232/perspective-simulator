@@ -29,7 +29,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 return true;
             }
 
-            if (strpos($class, '\DataRecordType\\') !== false) {
+            if (strpos($class, '\CustomTypes\DataRecord\\') !== false) {
                 $type = substr($class, (strrpos($class, '\\') + 1));
                 if ($type === 'DataRecord') {
                     return false;
