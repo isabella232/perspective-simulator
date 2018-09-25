@@ -15,7 +15,7 @@ class Bootstrap {
         $loader = require dirname(dirname(dirname(__DIR__))).'/autoload.php';
         $loader->addPsr4('Commenting\\', $projectDir);
 
-        class_alias('PerspectiveSimulator\StorageFactory', $project.'\API\StorageFactory');
+        class_alias('PerspectiveSimulator\StorageFactory', $project.'\API\Operations\StorageFactory');
         class_alias('PerspectiveSimulator\DataRecord', $project.'\CustomTypes\Data\DataRecord');
 
         // Add data stores.
