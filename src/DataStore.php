@@ -39,7 +39,7 @@ class DataStore
         } else {
             $trace   = debug_backtrace();
             $project = substr($trace[1]['class'], 0, strpos($trace[1]['class'], '\\'));
-            $type = $project.'\CustomTypes\DataRecord\\'.$type;
+            $type = $project.'\CustomTypes\Data\\'.$type;
         }
 
         if ($parent !== null && isset($this->records[$parent]) === false) {
