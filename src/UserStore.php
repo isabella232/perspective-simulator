@@ -1,20 +1,21 @@
 <?php
 namespace PerspectiveSimulator;
 
-class DataStore
+class UserStore
 {
     private $code = '';
     private $project = '';
     private $records = [];
     private $numRecords = 1;
     private $uniqueMap = [];
+    private $usernameMap = [];
 
 
     function __construct($code, $project)
     {
         $this->code = $code;
         $this->project = $project;
-
+/*
         if (Bootstrap::isWriteEnabled() === true) {
             $storageDir = dirname(__DIR__, 4).'/simulator/'.$this->project.'/storage';
             if (is_dir($storageDir) === false) {
@@ -28,42 +29,48 @@ class DataStore
         }
 
         $this->load();
-
+*/
     }//end __construct()
 
 
-    final public function createDataRecord(string $type=null, string $parent=null)
+
+    final public function createUser(string $username, $groupid=[])
     {
-        if ($type === null) {
-            $type = 'PerspectiveSimulator\DataRecord';
-        } else {
-            $trace   = debug_backtrace();
-            $project = substr($trace[1]['class'], 0, strpos($trace[1]['class'], '\\'));
-            $type = $project.'\CustomTypes\Data\\'.$type;
-        }
-
-        if ($parent !== null && isset($this->records[$parent]) === false) {
-            throw new \Exception("Parent \"$parent\" does not exist");
-        }
-
         $recordid = $this->numRecords++.'.1';
-        $record   = new $type($this, $recordid, $this->project);
+        $record   = new User($this, $recordid, $this->project);
 
         $this->records[$recordid] = [
             'object'   => $record,
-            'depth'    => 1,
-            'children' => [],
+            //'depth'    => 1,
+            //'children' => [],
         ];
 
-        if ($parent !== null) {
-            $this->records[$parent]['children'][$recordid] = $record;
-            $this->records[$recordid]['depth'] += $this->records[$parent]['depth'];
-        }
+        $this->usernameMap[$username] = $record;
 
-        $this->save();
+        //if ($parent !== null) {
+        //    $this->records[$parent]['children'][$recordid] = $record;
+        //    $this->records[$recordid]['depth'] += $this->records[$parent]['depth'];
+        //}
+
+        //$this->save();
 
         return $record;
     }
+
+
+    final public function getUserByUsername(string $username)
+    {
+        if (isset($this->usernameMap[$username]) === false) {
+            return null;
+        }
+
+        return $this->usernameMap[$username];
+
+    }//end getUserByUsername()
+
+
+
+/*
 
 
     final public function getDataRecord(string $recordid)
@@ -200,6 +207,6 @@ class DataStore
         return true;
 
     }//end load()
-
+*/
 
 }//end class

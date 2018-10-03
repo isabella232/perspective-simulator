@@ -17,6 +17,13 @@ class StorageFactory
         }
     }
 
+    public static function createUserStore(string $code, string $project)
+    {
+        if (isset(self::$stores['user'][$code]) === false) {
+            self::$stores['user'][$code] = new UserStore($code, $project);
+        }
+    }
+
     public static function createDataRecordProperty(string $code, string $type, $default=null)
     {
         self::$props['data'][$code] = [
@@ -25,9 +32,22 @@ class StorageFactory
         ];
     }
 
+    public static function createUserProperty(string $code, string $type, $default=null)
+    {
+        self::$props['user'][$code] = [
+            'type'    => $type,
+            'default' => $default,
+        ];
+    }
+
     public static function getDataRecordProperty(string $code)
     {
         return self::$props['data'][$code] ?? null;
+    }
+
+    public static function getUserProperty(string $code)
+    {
+        return self::$props['user'][$code] ?? null;
     }
 
 
@@ -43,5 +63,14 @@ class StorageFactory
         }
 
         return self::$stores['data'][$code];
+    }
+
+    public static function getUserStore(string $code)
+    {
+        if (isset(self::$stores['user'][$code]) === false) {
+            throw new \Exception("User store \"$code\" does not exist");
+        }
+
+        return self::$stores['user'][$code];
     }
 }

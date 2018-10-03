@@ -9,30 +9,36 @@ class Bootstrap {
 
     public static function load($project)
     {
-        $projectDir = dirname(dirname(dirname(dirname(__DIR__)))).'/Projects/'.$project;
+        $projectDir = dirname(__DIR__, 4).'/Projects/'.$project;
 
         // Register an autoloader for the project.
-        $loader = require dirname(dirname(dirname(__DIR__))).'/autoload.php';
+        $loader = require dirname(__DIR__, 3).'/autoload.php';
         $loader->addPsr4('Commenting\\', $projectDir);
 
         class_alias('PerspectiveSimulator\StorageFactory', $project.'\API\Operations\StorageFactory');
+        class_alias('PerspectiveSimulator\Request', $project.'\API\Operations\Request');
+
+        class_alias('PerspectiveSimulator\StorageFactory', 'StorageFactory');
+        class_alias('PerspectiveSimulator\Request', 'Request');
+
         class_alias('PerspectiveSimulator\DataRecord', $project.'\CustomTypes\Data\DataRecord');
 
         // Add data stores.
-        $files = scandir($projectDir.'/Stores/Data');
-        foreach ($files as $file) {
-            if ($file[0] === '.'
-                || substr($file, -5) !== '.json'
-            ) {
-                continue;
-            }
-
-            $storeName = strtolower(substr($file, 0, -5));
+        $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
+        foreach ($dirs as $dir) {
+            $storeName = strtolower(basename($dir));
             StorageFactory::createDataStore($storeName, $project);
         }
 
+        // Add user stores.
+        $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
+        foreach ($dirs as $dir) {
+            $storeName = strtolower(basename($dir));
+            StorageFactory::createUserStore($storeName, $project);
+        }
+
         // Add data record properties.
-        $files = scandir($projectDir.'/Properties/DataRecord');
+        $files = scandir($projectDir.'/Properties/Data');
         foreach ($files as $file) {
             if ($file[0] === '.'
                 || substr($file, -5) !== '.json'
@@ -41,9 +47,13 @@ class Bootstrap {
             }
 
             $propName = strtolower(substr($file, 0, -5));
-            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/DataRecord/'.$file), true);
+            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/Data/'.$file), true);
             StorageFactory::createDataRecordProperty($propName, $propInfo['type']);
         }
+
+        // Add default user properties.
+        StorageFactory::createUserProperty('__first-name__', 'text');
+        StorageFactory::createUserProperty('__last-name__', 'text');
 
     }//end load()
 
