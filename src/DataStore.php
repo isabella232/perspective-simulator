@@ -38,8 +38,15 @@ class DataStore
             $type = 'PerspectiveSimulator\DataRecord';
         } else {
             $trace   = debug_backtrace();
-            $project = substr($trace[1]['class'], 0, strpos($trace[1]['class'], '\\'));
-            $type = $project.'\CustomTypes\Data\\'.$type;
+            foreach ($trace as $id => $data) {
+                if ($id === 0 || isset($data['class']) === false) {
+                    continue;
+                }
+
+                $project = substr($data['class'], 0, strpos($data['class'], '\\'));
+                $type = $project.'\CustomTypes\Data\\'.$type;
+                break;
+            }
         }
 
         if ($parent !== null && isset($this->records[$parent]) === false) {
