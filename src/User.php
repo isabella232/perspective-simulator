@@ -1,59 +1,154 @@
 <?php
+/**
+ * User class for Perspective Simulator.
+ *
+ * @package    Perspective
+ * @subpackage Simulator
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
+ */
+
 namespace PerspectiveSimulator;
 
+use \PerspectiveSimulator\Storage\StorageFactory;
+
+/**
+ * User class.
+ */
 class User
 {
 
+    /**
+     * The userid.
+     *
+     * @var string
+     */
     private $id = '';
+
+    /**
+     * The store the user record belongs to.
+     *
+     * @var object
+     */
     private $store = '';
+
+    /**
+     * The project the user record belongs to.
+     *
+     * @var string
+     */
     private $project = '';
+
+    /**
+     * Array of user properties attached to the record.
+     *
+     * @var array
+     */
     private $properties = [];
 
-
-    final public function __construct(UserStore $store, string $id, string $project) {
-        $this->store = $store;
-        $this->id = $id;
-        $this->project = $project;
-
-        #if ($this->load() === false) {
-        #    $this->save();
-        #}
-    }
+    /**
+     * The username of the user.
+     *
+     * @var string
+     */
+    private $username = '';
 
 
+    /**
+     * Creates a new user record in the user store.
+     *
+     * @param object $store     The store the user record belongs to.
+     * @param string $id        The id of the record.
+     * @param string $project   The project the user record belongs to.
+     * @param string $username  The user name of the user.
+     * @param string $firstName The users first name.
+     * @param string $lastName  The users last name.
+     *
+     * @return object|null
+     */
+    final public function __construct(
+        \PerspectiveSimulator\StorageType\UserStore $store,
+        string $id,
+        string $project,
+        string $username,
+        string $firstName,
+        string $lastName
+    ) {
+        $this->store    = $store;
+        $this->id       = $id;
+        $this->project  = $project;
+        $this->username = $username;
+
+        $this->setFirstName($firstName);
+        $this->setLastName($lastName);
+
+    }//end __construct()
+
+
+    /**
+     * Gets the userid.
+     *
+     * @return string
+     */
     final public function getId()
     {
         return $this->id;
-    }
 
+    }//end getId()
+
+
+    /**
+     * Gets the user store.
+     *
+     * @return object
+     */
     final public function getStorage()
     {
         return $this->store;
-    }
+
+    }//end getStorage()
 
 
+    /**
+     * Gets a users property value.
+     *
+     * @param string $propertyCode The property to get the value of.
+     *
+     * @return mixed
+     * @throws \Exception When the propertyCode doesn't exist.
+     */
     final public function getValue(string $propertyCode)
     {
         $prop = StorageFactory::getUserProperty($propertyCode);
         if ($prop === null) {
-            throw new \Exception("Property \"$propertyCode\" does not exist");
+            throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
 
         return $this->properties[$propertyCode];
-    }
+
+    }//end getValue()
 
 
+    /**
+     * Sets the users property value.
+     *
+     * @param string $propertyCode The property to set the value of.
+     * @param mixed  $value        The property value to set.
+     *
+     * @return void
+     * @throws \Exception When the propertyCode doesn't exist or the value isn't unique.
+     */
     final public function setValue(string $propertyCode, $value)
     {
         $prop = StorageFactory::getUserProperty($propertyCode);
         if ($prop === null) {
-            throw new \Exception("Property \"$propertyCode\" does not exist");
+            throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
 
         if ($prop['type'] === 'unique') {
             $current = $this->store->getUniqueUserRecord($propertyCode, $value);
             if ($current !== null) {
-                throw new \Exception("Unique value \"$value\" is already in use");
+                throw new \Exception('Unique value "'.$value.'" is already in use');
             }
 
             $this->store->setUniqueDataRecord($propertyCode, $value, $this);
@@ -61,53 +156,71 @@ class User
 
         $this->properties[$propertyCode] = $value;
 
-        //$this->save();
-    }
-/*
-    final public function getChildren($depth=null)
+    }//end setValue()
+
+
+    /**
+     * Sets the users first name.
+     *
+     * @param string $firstName The users first name.
+     *
+     * @return void
+     */
+    final public function setFirstName(string $firstName)
     {
-        return $this->store->getChildren($this->id, $depth);
+        $this->setValue('__first-name__', $firstName);
 
-    }
+    }//end setFirstName()
 
 
-
-    final public function save()
+    /**
+     * Sets the users last name.
+     *
+     * @param string $lastName The users last name.
+     *
+     * @return void
+     */
+    final public function setLastName(string $lastName)
     {
-        if (Bootstrap::isWriteEnabled() === false) {
-            return false;
-        }
+        $this->setValue('__last-name__', $lastName);
 
-        $record = [
-            'id' => $this->id,
-            'type' => get_class($this),
-            'properties' => $this->properties,
-        ];
+    }//end setLastName()
 
-        $storeCode = $this->store->getCode();
-        $filePath = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$storeCode.'/'.$this->id.'.json';
 
-        file_put_contents($filePath, json_encode($record));
-        return true;
-    }
-
-    final public function load()
+    /**
+     * Sets the users first name.
+     *
+     * @return string
+     */
+    final public function getFirstName()
     {
-        if (Bootstrap::isReadEnabled() === false) {
-            return false;
-        }
+        return $this->getValue('__first-name__');
 
-        $storeCode = $this->store->getCode();
-        $filePath  = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$storeCode.'/'.$this->id.'.json';
-        if (is_file($filePath) === false) {
-            return false;
-        }
+    }//end getFirstName()
 
-        $data = json_decode(file_get_contents($filePath), true);
-        $this->properties = $data['properties'];
-        return true;
 
-    }//end load()
-*/
+    /**
+     * Sets the users first name.
+     *
+     * @return string
+     */
+    final public function getLastName()
+    {
+        return $this->getValue('__last-name__');
+
+    }//end getLastName()
+
+
+    /**
+     * Sets the users first name.
+     *
+     * @return string
+     */
+    final public function getUsername()
+    {
+        return $this->username;
+
+    }//end getUsername()
+
 
 }//end class

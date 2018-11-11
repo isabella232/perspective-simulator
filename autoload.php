@@ -15,17 +15,29 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
          */
         public static function load($class)
         {
+            $ds   = DIRECTORY_SEPARATOR;
+            $path = false;
             if (substr($class, -4) === '\API' && substr_count($class, '\\') === 1) {
                 $project = substr($class, 0, strpos($class, '\\'));
-                $file = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/API.php';
-                include $file;
-                return true;
+                $path    = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/API.php';
             }
 
             if (substr($class, -10) === '\APIRouter' && substr_count($class, '\\') === 1) {
                 $project = substr($class, 0, strpos($class, '\\'));
-                $file = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/APIRouter.php';
-                include $file;
+                $path    = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/APIRouter.php';
+            }
+
+            if (substr($class, 0, 21) === 'PerspectiveSimulator\\') {
+                $parts = explode('\\', $class);
+                if ($parts[1] === 'StorageType') {
+                    $path = __DIR__.$ds.'src'.$ds.'Storage'.$ds.'Types'.$ds.$parts[2].'.php';
+                } else {
+                    $path = __DIR__.$ds.'src'.$ds.substr(str_replace('\\', $ds, $class), 21).'.php';
+                }
+            }
+
+            if ($path !== false && is_file($path) === true) {
+                include $path;
                 return true;
             }
 

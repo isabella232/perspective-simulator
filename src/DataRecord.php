@@ -1,36 +1,56 @@
 <?php
+/**
+ * User class for Perspective Simulator.
+ *
+ * @package    Perspective
+ * @subpackage Simulator
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
+ */
+
 namespace PerspectiveSimulator;
+
+use \PerspectiveSimulator\Storage\StorageFactory;
 
 class DataRecord
 {
 
     private $id = '';
+
     private $store = '';
+
     private $project = '';
+
     private $properties = [];
+
     private $references = [];
 
 
-    final public function __construct(DataStore $store, string $id, string $project) {
-        $this->store = $store;
-        $this->id = $id;
+    final public function __construct(\PerspectiveSimulator\StorageType\DataStore $store, string $id, string $project)
+    {
+        $this->store   = $store;
+        $this->id      = $id;
         $this->project = $project;
 
         if ($this->load() === false) {
             $this->save();
         }
-    }
+
+    }//end __construct()
 
 
     final public function getId()
     {
         return $this->id;
-    }
+
+    }//end getId()
+
 
     final public function getStorage()
     {
         return $this->store;
-    }
+
+    }//end getStorage()
 
 
     final public function getValue(string $propertyCode)
@@ -45,7 +65,8 @@ class DataRecord
         }
 
         return $prop['default'];
-    }
+
+    }//end getValue()
 
 
     final public function setValue(string $propertyCode, $value)
@@ -67,13 +88,15 @@ class DataRecord
         $this->properties[$propertyCode] = $value;
 
         $this->save();
-    }
+
+    }//end setValue()
+
 
     final public function getChildren($depth=null)
     {
         return $this->store->getChildren($this->id, $depth);
 
-    }
+    }//end getChildren()
 
 
     final public function getReference(string $code)
@@ -90,7 +113,9 @@ class DataRecord
         } else {
             return $ids;
         }
-    }
+
+    }//end getReference()
+
 
     final public function addReference(string $code, $objects)
     {
@@ -109,7 +134,9 @@ class DataRecord
             $id = $object->getId();
             $this->references[$code][$id] = true;
         }
-    }
+
+    }//end addReference()
+
 
     final public function setReference(string $code, $objects)
     {
@@ -121,7 +148,8 @@ class DataRecord
         }
 
         $this->addReference($code, $objects);
-    }
+
+    }//end setReference()
 
 
     final public function save()
@@ -131,17 +159,20 @@ class DataRecord
         }
 
         $record = [
-            'id' => $this->id,
-            'type' => get_class($this),
+            'id'         => $this->id,
+            'type'       => get_class($this),
             'properties' => $this->properties,
         ];
 
-        $storeCode = $this->store->getCode();
-        $filePath = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$storeCode.'/'.$this->id.'.json';
+        $storeCode  = $this->store->getCode();
+        $storageDir = Bootstrap::getStorageDir($this->project);
+        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
 
         file_put_contents($filePath, json_encode($record));
         return true;
-    }
+
+    }//end save()
+
 
     final public function load()
     {
@@ -149,13 +180,14 @@ class DataRecord
             return false;
         }
 
-        $storeCode = $this->store->getCode();
-        $filePath  = dirname(dirname(dirname(dirname(__DIR__)))).'/simulator/'.$this->project.'/storage/'.$storeCode.'/'.$this->id.'.json';
+        $storeCode  = $this->store->getCode();
+        $storageDir = Bootstrap::getStorageDir($this->project);
+        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
         if (is_file($filePath) === false) {
             return false;
         }
 
-        $data = json_decode(file_get_contents($filePath), true);
+        $data             = json_decode(file_get_contents($filePath), true);
         $this->properties = $data['properties'];
         return true;
 

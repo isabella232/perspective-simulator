@@ -1,25 +1,59 @@
 <?php
+/**
+ * Bootstrap class for Perspective Simulator.
+ *
+ * @package    Perspective
+ * @subpackage Simulator
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
+ */
+
 namespace PerspectiveSimulator;
 
-class Bootstrap {
+use PerspectiveSimulator\Storage\StorageFactory;
 
-    private static $readEnabled  = true;
+/**
+ * Bootstrap class
+ */
+class Bootstrap
+{
+
+    /**
+     * Read enabled flag.
+     *
+     * @var boolean
+     */
+    private static $readEnabled = true;
+
+    /**
+     * Write enabled flag.
+     *
+     * @var boolean
+     */
     private static $writeEnabled = true;
 
 
-    public static function load($project)
+    /**
+     * Loads classes for the project.
+     *
+     * @param string $project The namesapce of the Project.
+     *
+     * @return void
+     */
+    public static function load(string $project)
     {
         $projectDir = dirname(__DIR__, 4).'/Projects/'.$project;
 
         // Register an autoloader for the project.
-        $loader = require dirname(__DIR__, 3).'/autoload.php';
-        $loader->addPsr4('Commenting\\', $projectDir);
+        $loader = include dirname(__DIR__, 3).'/autoload.php';
+        $loader->addPsr4($project.'\\', $projectDir);
 
-        class_alias('PerspectiveSimulator\StorageFactory', $project.'\API\Operations\StorageFactory');
+        class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
         class_alias('PerspectiveSimulator\Request', $project.'\API\Operations\Request');
 
-        class_alias('PerspectiveSimulator\StorageFactory', 'StorageFactory');
-        class_alias('PerspectiveSimulator\Request', 'Request');
+        class_alias('PerspectiveSimulator\Authentication', '\Authentication');
+        class_alias('PerspectiveSimulator\Storage\StorageFactory', '\StorageFactory');
+        class_alias('PerspectiveSimulator\Request', '\Request');
 
         class_alias('PerspectiveSimulator\DataRecord', $project.'\CustomTypes\Data\DataRecord');
 
@@ -55,32 +89,114 @@ class Bootstrap {
         StorageFactory::createUserProperty('__first-name__', 'text');
         StorageFactory::createUserProperty('__last-name__', 'text');
 
+        $storageDir = self::getStorageDir($project);
+        if (is_dir($storageDir) === false) {
+            mkdir($storageDir, 0777, true);
+        }
+
     }//end load()
 
+
+    /**
+     * Gets the read enabled flag.
+     *
+     * @return boolean
+     */
     public static function isReadEnabled()
     {
         return self::$readEnabled;
-    }
+
+    }//end isReadEnabled()
+
+
+    /**
+     * Disables read of data written to file system.
+     *
+     * @return void
+     */
     public static function disableRead()
     {
         self::$readEnabled = false;
-    }
+
+    }//end disableRead()
+
+
+    /**
+     * Enables read of data written to file system.
+     *
+     * @return void
+     */
     public static function enableRead()
     {
         self::$readEnabled = true;
-    }
+
+    }//end enableRead()
+
+
+    /**
+     * Gets the is write enabled flag.
+     *
+     * @return boolean
+     */
     public static function isWriteEnabled()
     {
         return self::$writeEnabled;
-    }
+
+    }//end isWriteEnabled()
+
+
+    /**
+     * Disables writing of data to filesystem.
+     *
+     * @return void
+     */
     public static function disableWrite()
     {
         self::$writeEnabled = false;
-    }
+
+    }//end disableWrite()
+
+
+    /**
+     * Enables writing of data to filesystem.
+     *
+     * @return void
+     */
     public static function enableWrite()
     {
         self::$writeEnabled = true;
-    }
+
+    }//end enableWrite()
+
+
+    /**
+     * Gets the storage directory.
+     *
+     * @return string
+     */
+    public static function getSimulatorDir()
+    {
+        return dirname(__DIR__, 4).'/simulator';
+
+    }//end getStorageDir()
+
+
+    /**
+     * Gets the storage directory.
+     *
+     * @param string $project The project code we are getting the directory for.
+     *
+     * @return mixed
+     */
+    public static function getStorageDir(string $project)
+    {
+        if (self::isReadEnabled() === false && self::isWriteEnabled() === false) {
+            return null;
+        }
+
+        return self::getSimulatorDir().'/'.$project.'/storage';
+
+    }//end getStorageDir()
 
 
 }//end class
