@@ -82,7 +82,9 @@ trait RecordTrait
     final public function getReference(string $referenceid)
     {
         if ($this->validateReference($referenceid) === false) {
-            throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
+            // TODO: add flag for validation to throw error or not???
+            // throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
+            return null;
         }
 
         if (isset($this->references[$referenceid]) === false) {
@@ -112,13 +114,12 @@ trait RecordTrait
      */
     final public function addReference(string $referenceid, $objects)
     {
-        if ($this->validateReference($referenceid) === false) {
-            throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
-        }
-
-        // TODO: set reference on other side.
         if (is_array($objects) === false) {
             $objects = [$objects];
+        }
+
+        if ($this->validateReference($referenceid, $objects) === false) {
+            throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
         }
 
         if (isset($this->references[$referenceid]) === false) {
@@ -128,6 +129,10 @@ trait RecordTrait
         foreach ($objects as $object) {
             $id = $object->getId();
             $this->references[$referenceid][$id] = true;
+
+            if ($object->getReference($referenceid) === null) {
+                $object->addReference($referenceid, [$this]);
+            }
         }
 
         $this->save();
@@ -165,18 +170,21 @@ trait RecordTrait
      */
     final public function deleteReference(string $referenceid, $objects)
     {
-        if ($this->validateReference($referenceid) === false) {
-            throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
-        }
-
-        // TODO: Delete reference on other side.
         if (is_array($objects) === false) {
             $objects = [$objects];
+        }
+
+        if ($this->validateReference($referenceid, $objects) === false) {
+            throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
         }
 
         foreach ($objects as $object) {
             $id = $object->getId();
             unset($this->references[$referenceid][$id]);
+
+            if ($object->getReference($referenceid) !== null) {
+                $object->deleteReference($referenceid, [$this]);
+            }
         }
 
         if (count($this->references) === 0) {
@@ -192,18 +200,32 @@ trait RecordTrait
      * Validates if the reference can be set.
      *
      * @param string $referenceid The id of the reference we are trying to set.
+     * @param array  $objects     The objects we are setting the reference against, used if we are setting the reference
+     *                            for the other side.
      *
      * @return boolean.
      */
-    final private function validateReference(string $referenceid)
+    final public function validateReference(string $referenceid, array $objects=[])
     {
-        $valid = false;
-        $code  = $this->store->getCode();
+        $valid     = false;
+        $code      = $this->store->getCode();
+        $storeType = $this->store->getType();
 
         $storageDir = Bootstrap::getProjectDir();
-        $filePath   = $storageDir.'/Stores/Data/'.$code.'/'.$referenceid.'.json';
+        $filePath   = $storageDir.'/Stores/'.$storeType.'/'.$code.'/'.$referenceid.'.json';
         if (file_exists($filePath) === true) {
             $valid = true;
+        }
+
+        if ($valid === false && empty($objects) === false) {
+            // Must be validating the reverse reference so check the objects to see if its valid.
+            foreach ($objects as $object) {
+                $objectValid = $object->validateReference($referenceid);
+                if ($objectValid === true) {
+                    $valid = true;
+                    break;
+                }
+            }
         }
 
         return $valid;
@@ -259,6 +281,7 @@ trait RecordTrait
 
         $data             = json_decode(file_get_contents($filePath), true);
         $this->properties = $data['properties'];
+        $this->references = $data['references'];
         return true;
 
     }//end load()

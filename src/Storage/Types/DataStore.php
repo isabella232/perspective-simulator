@@ -35,6 +35,7 @@ class DataStore
     public function __construct(string $code)
     {
         $this->code = $code;
+        $this->type = 'Data';
 
         if (Bootstrap::isWriteEnabled() === true) {
             $storageDir = Bootstrap::getStorageDir();

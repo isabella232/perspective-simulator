@@ -19,6 +19,13 @@ trait StoreTrait
 {
 
     /**
+     * The type of the record store.
+     *
+     * @var string
+     */
+    private $type = '';
+
+    /**
      * The code of the record store.
      *
      * @var string
@@ -45,6 +52,19 @@ trait StoreTrait
      * @var array
      */
     private $uniqueMap = [];
+
+
+
+    /**
+     * Gets the Stores type.
+     *
+     * @return string
+     */
+    final public function getType()
+    {
+        return $this->type;
+
+    }//end getCode()
 
 
     /**

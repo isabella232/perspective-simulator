@@ -41,7 +41,8 @@ class UserStore
      */
     public function __construct(string $code)
     {
-        $this->code    = $code;
+        $this->code = $code;
+        $this->type = 'User';
 
         if (Bootstrap::isWriteEnabled() === true) {
             $storageDir = Bootstrap::getStorageDir();
