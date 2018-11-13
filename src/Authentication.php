@@ -10,6 +10,8 @@
 
 namespace PerspectiveSimulator;
 
+use PerspectiveSimulator\Storage\StorageFactory;
+
 /**
  * Authentication class.
  */
@@ -17,11 +19,11 @@ class Authentication
 {
 
     /**
-     * The current userid.
+     * The current user.
      *
-     * @var string
+     * @var object
      */
-    private static $userid = null;
+    private static $user = null;
 
     /**
      * Logged in flag.
@@ -38,23 +40,12 @@ class Authentication
      */
     final public static function getCurrentUser()
     {
-        $userid = self::getCurrentUserid();
-        if ($userid === null) {
+        $user = self::getCurrentUserid();
+        if ($user === null) {
             return null;
         }
 
-        $userStore = StorageFactory::getUserStore($userid);
-        if (empty($userStore) === true) {
-            return null;
-        }
-
-        $userStoreObject = StorageFactory::getUserStore($userStore['code']);
-        if ($userStoreObject === null) {
-            return null;
-        }
-
-        $userObject = $userStoreObject->getUser($userid);
-        return $userObject;
+        return self::$user;
 
     }//end getCurrentUser()
 
@@ -66,7 +57,11 @@ class Authentication
      */
     final public static function getCurrentUserid()
     {
-        return self::$userid;
+        if (self::$user === null) {
+            return null;
+        }
+
+        return self::$user->getId();
 
     }//end getCurrentUserid()
 
@@ -78,9 +73,9 @@ class Authentication
      *
      * @return void
      */
-    final public static function login(\PerspectiveSimulator\User $user)
+    final public static function login(\PerspectiveSimulator\RecordType\User $user)
     {
-        self::$userid   = $user->getId();
+        self::$user     = $user;
         self::$loggedIn = true;
 
     }//end login()
@@ -105,7 +100,7 @@ class Authentication
      */
     final public static function logoutUser()
     {
-        self::$userid   = null;
+        self::$user     = null;
         self::$loggedIn = false;
         return true;
 

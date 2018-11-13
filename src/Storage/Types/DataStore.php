@@ -24,14 +24,21 @@ class DataStore
 
     use StoreTrait;
 
-    public function __construct($code, $project)
+
+    /**
+     * Constructor for DataStore Class.
+     *
+     * @param string $code    The name of the user store.
+     *
+     * @return void
+     */
+    public function __construct(string $code)
     {
-        $this->code    = $code;
-        $this->project = $project;
+        $this->code = $code;
 
         if (Bootstrap::isWriteEnabled() === true) {
-            $storageDir = Bootstrap::getStorageDir($project);
-            $storeDir = $storageDir.'/'.$code;
+            $storageDir = Bootstrap::getStorageDir();
+            $storeDir   = $storageDir.'/'.$code;
             if (is_dir($storeDir) === false) {
                 mkdir($storeDir);
             }
@@ -47,34 +54,26 @@ class DataStore
      *
      * @param string $type   The custom data type to apply to the new record.
      *                       If NULL, no custom data type will be applied.
-     * @param string $parent The ID of the parent data record under which the new data record will be created.
-     *                       If NULL, the data record will be created at the top level of the tree
+     * @param string $parent The ID of the parent data record under which the new data record will be created
+     *                       If NULL, the data record will be created at the top level of the tree.
      *
      * @return object
+     * @throws \Exception When parent doesn't exist.
      */
     final public function createDataRecord(string $type=null, string $parent=null)
     {
         if ($type === null) {
             $type = 'PerspectiveSimulator\DataRecord';
         } else {
-            $trace = debug_backtrace();
-            foreach ($trace as $id => $data) {
-                if ($id === 0 || isset($data['class']) === false) {
-                    continue;
-                }
-
-                $project = substr($data['class'], 0, strpos($data['class'], '\\'));
-                $type    = $project.'\CustomTypes\Data\\'.$type;
-                break;
-            }
+            $type = $GLOBALS['project'].'\CustomTypes\Data\\'.$type;
         }
 
         if ($parent !== null && isset($this->records[$parent]) === false) {
-            throw new \Exception("Parent \"$parent\" does not exist");
+            throw new \Exception('Parent "'.$parent.'" does not exist');
         }
 
-        $recordid = $this->numRecords++.'.1';
-        $record   = new $type($this, $recordid, $this->project);
+        $recordid = ($this->numRecords++).'.1';
+        $record   = new $type($this, $recordid);
 
         $this->records[$recordid] = [
             'object'   => $record,
@@ -103,7 +102,7 @@ class DataStore
      */
     final public function getDataRecord(string $recordid)
     {
-        return $this->records[$recordid]['object'] ?? null;
+        return ($this->records[$recordid]['object'] ?? null);
 
     }//end getDataRecord()
 
@@ -118,7 +117,7 @@ class DataStore
      */
     final public function getUniqueDataRecord(string $propertyCode, string $value)
     {
-        return $this->uniqueMap[$propertyCode][$value] ?? null;
+        return ($this->uniqueMap[$propertyCode][$value] ?? null);
 
     }//end getUniqueDataRecord()
 
@@ -128,7 +127,7 @@ class DataStore
      *
      * @param string $propertyCode The ID of the unique property.
      * @param string $value        The value of the unique property.
-     * @param string $record       The record to store.
+     * @param mixed  $record       The record to store.
      *
      * @return void
      */

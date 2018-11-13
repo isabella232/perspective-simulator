@@ -19,41 +19,39 @@ trait StoreTrait
 {
 
     /**
-     * The code of the user store.
+     * The code of the record store.
      *
      * @var string
      */
     private $code = '';
 
     /**
-     * The project code.
-     *
-     * @var string
-     */
-    private $project = '';
-
-    /**
-     * Array of all the user records.
+     * Array of all the records.
      *
      * @var array
      */
     private $records = [];
 
     /**
-     * Counter of users.
+     * Counter of records.
      *
      * @var integer
      */
     private $numRecords = 1;
 
     /**
-     * Map of unique users.
+     * Map of unique records.
      *
      * @var array
      */
     private $uniqueMap = [];
 
 
+    /**
+     * Gets the Stores code.
+     *
+     * @return string
+     */
     final public function getCode()
     {
         return $this->code;
@@ -61,6 +59,11 @@ trait StoreTrait
     }//end getCode()
 
 
+    /**
+     * Save the store as a json object.
+     *
+     * @return boolean
+     */
     final public function save()
     {
         if (Bootstrap::isWriteEnabled() === false) {
@@ -74,8 +77,8 @@ trait StoreTrait
 
         foreach ($this->records as $recordid => $data) {
             $store['records'][$recordid] = [
-                'depth'    => $data['depth'],
-                'children' => array_keys($data['children']),
+                'depth'    => ($data['depth'] ?? null),
+                'children' => (array_keys($data['children']) ?? []),
             ];
         }
 
@@ -86,21 +89,26 @@ trait StoreTrait
             }
         }
 
-        $storageDir = Bootstrap::getStorageDir($this->project);
+        $storageDir = Bootstrap::getStorageDir();
         $filePath   = $storageDir.'/'.$this->code.'/store.json';
-        file_put_contents($filePath, json_encode($store));
+        file_put_contents($filePath, json_encode($store, JSON_PRETTY_PRINT));
         return true;
 
     }//end save()
 
 
+    /**
+     * Loads the Stores cache.
+     *
+     * @return boolean
+     */
     public function load()
     {
         if (Bootstrap::isReadEnabled() === false) {
             return false;
         }
 
-        $storageDir = Bootstrap::getStorageDir($this->project);
+        $storageDir = Bootstrap::getStorageDir();
         $filePath   = $storageDir.'/'.$this->code.'/store.json';
 
         if (is_file($filePath) === false) {
@@ -113,7 +121,7 @@ trait StoreTrait
             $recordPath     = dirname($filePath).'/'.$recordid.'.json';
             $recordData     = json_decode(file_get_contents($recordPath), true);
             $type           = $recordData['type'];
-            $data['object'] = new $type($this, $recordid, $this->project);
+            $data['object'] = new $type($this, $recordid);
             $this->records[$recordid] = $data;
 
             $baseRecordid     = (int) substr($recordid, 0, -2);

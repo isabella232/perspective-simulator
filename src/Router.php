@@ -1,13 +1,22 @@
 <?php
-namespace PerspectiveSimulator;
+/**
+ * Router for Perspective Simulator.
+ *
+ * @package    Perspective
+ * @subpackage Simulator
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
+ */
 
-include dirname(dirname(dirname(__DIR__))).'/autoload.php';
+namespace PerspectiveSimulator\Requests;
+
+include dirname(__DIR__, 3).'/autoload.php';
 
 $path    = trim($_SERVER['REQUEST_URI'], '/');
 $project = strtolower(substr($path, 0, strpos($path, '/')));
-$path    = substr($path, (strpos($path, '/') +1));
+$path    = substr($path, (strpos($path, '/') + 1));
 $type    = strtolower(substr($path, 0, strpos($path, '/')));
-$path    = substr($path, (strpos($path, '/') +1));
+$path    = substr($path, (strpos($path, '/') + 1));
 
 \PerspectiveSimulator\Bootstrap::load($project);
 
@@ -16,7 +25,7 @@ switch ($type) {
         $queryParams = [];
         parse_str(($_SERVER['QUERY_STRING'] ?? ''), $queryParams);
 
-        $method = strtolower($_SERVER['REQUEST_METHOD'] ?? '');
+        $method = strtolower(($_SERVER['REQUEST_METHOD'] ?? ''));
 
         $class = $project.'\APIRouter';
         $class::process($path, $method, $queryParams);

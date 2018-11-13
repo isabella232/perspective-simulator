@@ -42,7 +42,7 @@ class API
     {
         return dirname(__DIR__, 4).'/projects/'.$project.'/API';
 
-    }
+    }//end getAPIPath()
 
 
     /**
@@ -52,6 +52,7 @@ class API
      * @param string $action  The action we want to perform.
      *
      * @return string
+     * @throws \Exception When the API operation doesn't exist.
      */
     public static function getAPIFunction(string $project, string $action)
     {
@@ -68,35 +69,14 @@ class API
 
 
     /**
-     * Bake all API Function calls and router.
-     *
-     * @return void
-     */
-    public static function installAPI()
-    {
-        $projectPath = dirname(__DIR__, 4).'/Projects/';
-        $projectDirs = scandir($projectPath);
-        foreach ($projectDirs as $project) {
-            $path = $projectPath.$project;
-            if (is_dir($path) === true && $project[0] !== '.') {
-                self::importYAMLSpec($project);
-            }
-        }
-
-        return true;
-
-    }//end installAPI()
-
-
-
-    /**
      * Import YAML spec.
      *
-     * @param string  $project The project we are using.
+     * @param string $project The project we are using.
      *
-     * @return void
+     * @return boolean
+     * @throws \Exception When unable to get API Paths.
      */
-    private static function importYAMLSpec(string $project)
+    public static function installAPI(string $project)
     {
         $yaml = file_get_contents(self::getAPIPath($project).'/api.yaml');
         ini_set('yaml.decode_php', 0);
@@ -140,8 +120,8 @@ class API
                         'parameters'  => $parameters,
                     ];
                 }//end if
-            }
-        }
+            }//end foreach
+        }//end foreach
 
         // Bake the simulator router and API functions.
         self::bakeRouter($apis, $project);
@@ -149,7 +129,7 @@ class API
 
         return true;
 
-    }//end importYAMLSpec()
+    }//end installAPI()
 
 
     /**
@@ -160,9 +140,9 @@ class API
      *
      * @return string
      */
-    private static function printCode($level, $line)
+    private static function printCode(int $level, string $line)
     {
-        $indent = function($lvl) {
+        $indent = function ($lvl) {
             return str_repeat(' ', ($lvl * 4));
         };
 
@@ -182,7 +162,7 @@ class API
     private static function bakeRouter(array $apis, string $project)
     {
         $router  = self::printCode(0, '<?php');
-        $router .= self::printCode(0, 'namespace '.$project);
+        $router .= self::printCode(0, 'namespace '.$project.';');
         $router .= self::printCode(0, '');
         $router .= self::printCode(0, 'class APIRouter {');
         $router .= self::printCode(0, '');
@@ -197,6 +177,7 @@ class API
             if ($method === 'get') {
                 $case .= ' case \'head\':';
             }
+
             $router .= self::printCode(3, $case);
 
             foreach ($paths as $id => $api) {
@@ -240,7 +221,7 @@ class API
                     }
                 } else {
                     $router .= self::printCode(4, 'if ($path === \''.$api['path'].'\') {');
-                }
+                }//end if
 
                 $queryParams = ($allParams['query'] ?? []);
                 foreach ($queryParams as $param) {
@@ -270,14 +251,17 @@ class API
                 $router .= self::printCode(5, '];');
                 $router .= self::printCode(5, 'break;');
                 $router .= self::printCode(4, '}');
-            }// end foreach
+            }//end foreach
         }//end foreach
 
         $router .= self::printCode(2, '}//end switch');
         $router .= self::printCode(0, '');
         $router .= self::printCode(2, 'if ($operationid !== null) {');
         $router .= self::printCode(3, '$requestBody = file_get_contents(\'php://input\');');
-        $router .= self::printCode(3, '$contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? \'\');');
+        $router .= self::printCode(
+            3,
+            '$contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? \'\');'
+        );
         $router .= self::printCode(3, 'if (strpos($contentType, \'application/json\') !== false) {');
         $router .= self::printCode(4, '$requestBody = json_decode($requestBody, true);');
         $router .= self::printCode(3, '}');
@@ -298,7 +282,7 @@ class API
         $routerFile = Bootstrap::getSimulatorDir().'/'.$project.'/APIRouter.php';
         file_put_contents($routerFile, $router);
 
-    }//end printCode()
+    }//end bakeRouter()
 
 
     /**
@@ -312,7 +296,7 @@ class API
     private static function bakeAPIFunctions(array $apis, string $project)
     {
         $function  = self::printCode(0, '<?php');
-        $function .= self::printCode(0, 'namespace '.$project);
+        $function .= self::printCode(0, 'namespace '.$project.';');
         $function .= self::printCode(0, '');
         $function .= self::printCode(0, 'class API');
         $function .= self::printCode(0, '{');
@@ -322,8 +306,8 @@ class API
         foreach ($apis as $method => $paths) {
             foreach ($paths as $id => $api) {
                 $functionSignature = 'public function '.$api['operationid'].'(';
-                $arguments = [];
-                $allParams = [];
+                $arguments         = [];
+                $allParams         = [];
                 foreach ($api['parameters'] as $param) {
                     $allParams[$param['in']][$param['name']] = $param;
                 }
@@ -351,7 +335,7 @@ class API
                 }
 
                 if ($api['http_method'] !== 'get') {
-                    $arguments[] = '$requestBod=null';
+                    $arguments[] = '$requestBody=null';
                 }
 
                 $functionSignature .= implode(',', $arguments);
@@ -359,7 +343,10 @@ class API
 
                 $function .= self::printCode(1, $functionSignature);
                 $function .= self::printCode(1, '{');
-                $function .= self::printCode(2, '$content = \PerspectiveSimulator\API::getAPIFunction(__NAMESPACE__, \''.$api['operationid'].'\');');
+                $function .= self::printCode(
+                    2,
+                    '$content = \PerspectiveSimulator\API::getAPIFunction(__NAMESPACE__, \''.$api['operationid'].'\');'
+                );
                 $function .= self::printCode(2, 'return eval($content);');
                 $function .= self::printCode(1, '}');
                 $function .= self::printCode(0, '');
@@ -372,7 +359,7 @@ class API
         $functionFile = Bootstrap::getSimulatorDir().'/'.$project.'/API.php';
         file_put_contents($functionFile, $function);
 
-    }//end printCode()
+    }//end bakeAPIFunctions()
 
 
 }//end class

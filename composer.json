@@ -7,9 +7,5 @@
     },
     "require": {
         "php": ">=7.1.0"
-    },
-    "scripts": {
-        "post-install-cmd": ["PerspectiveSimulator\\API::installAPI"],
-        "post-update-cmd": ["PerspectiveSimulator\\API::installAPI"]
     }
 }

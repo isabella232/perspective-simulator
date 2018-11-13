@@ -8,9 +8,13 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator;
+namespace PerspectiveSimulator\RecordType;
 
+require_once dirname(__FILE__, 2).'/RecordTrait.inc';
+
+use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Storage\StorageFactory;
+use \PerspectiveSimulator\Record\RecordTrait as RecordTrait;
 
 /**
  * User class.
@@ -18,33 +22,7 @@ use \PerspectiveSimulator\Storage\StorageFactory;
 class User
 {
 
-    /**
-     * The userid.
-     *
-     * @var string
-     */
-    private $id = '';
-
-    /**
-     * The store the user record belongs to.
-     *
-     * @var object
-     */
-    private $store = '';
-
-    /**
-     * The project the user record belongs to.
-     *
-     * @var string
-     */
-    private $project = '';
-
-    /**
-     * Array of user properties attached to the record.
-     *
-     * @var array
-     */
-    private $properties = [];
+    use RecordTrait;
 
     /**
      * The username of the user.
@@ -59,7 +37,6 @@ class User
      *
      * @param object $store     The store the user record belongs to.
      * @param string $id        The id of the record.
-     * @param string $project   The project the user record belongs to.
      * @param string $username  The user name of the user.
      * @param string $firstName The users first name.
      * @param string $lastName  The users last name.
@@ -69,44 +46,22 @@ class User
     final public function __construct(
         \PerspectiveSimulator\StorageType\UserStore $store,
         string $id,
-        string $project,
         string $username,
         string $firstName,
         string $lastName
     ) {
         $this->store    = $store;
         $this->id       = $id;
-        $this->project  = $project;
         $this->username = $username;
 
-        $this->setFirstName($firstName);
-        $this->setLastName($lastName);
+        if ($this->load() === false) {
+            $this->setFirstName($firstName);
+            $this->setLastName($lastName);
+
+            $this->save();
+        }
 
     }//end __construct()
-
-
-    /**
-     * Gets the userid.
-     *
-     * @return string
-     */
-    final public function getId()
-    {
-        return $this->id;
-
-    }//end getId()
-
-
-    /**
-     * Gets the user store.
-     *
-     * @return object
-     */
-    final public function getStorage()
-    {
-        return $this->store;
-
-    }//end getStorage()
 
 
     /**
@@ -155,6 +110,8 @@ class User
         }
 
         $this->properties[$propertyCode] = $value;
+
+        $this->save();
 
     }//end setValue()
 

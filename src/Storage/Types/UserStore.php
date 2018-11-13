@@ -13,7 +13,7 @@ namespace PerspectiveSimulator\StorageType;
 require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
-use \PerspectiveSimulator\User;
+use \PerspectiveSimulator\RecordType\User;
 use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 
 /**
@@ -36,18 +36,16 @@ class UserStore
      * Constructs a new user store.
      *
      * @param string $code    The name of the user store.
-     * @param string $project The project the user store belongs to.
      *
      * @return void
      */
-    public function __construct(string $code, string $project)
+    public function __construct(string $code)
     {
         $this->code    = $code;
-        $this->project = $project;
 
         if (Bootstrap::isWriteEnabled() === true) {
-            $storageDir = Bootstrap::getStorageDir($project);
-            $storeDir = $storageDir.'/'.$code;
+            $storageDir = Bootstrap::getStorageDir();
+            $storeDir   = $storageDir.'/'.$code;
             if (is_dir($storeDir) === false) {
                 mkdir($storeDir);
             }
@@ -75,7 +73,7 @@ class UserStore
         array $groups=[]
     ) {
         $recordid = ($this->numRecords++).'.1';
-        $record   = new User($this, $recordid, $this->project, $username, $firstName, $lastName);
+        $record   = new User($this, $recordid, $username, $firstName, $lastName);
 
         $this->records[$recordid] = ['object' => $record];
 

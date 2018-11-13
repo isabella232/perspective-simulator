@@ -19,18 +19,20 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
             $path = false;
             if (substr($class, -4) === '\API' && substr_count($class, '\\') === 1) {
                 $project = substr($class, 0, strpos($class, '\\'));
-                $path    = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/API.php';
+                $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/API.php';
             }
 
             if (substr($class, -10) === '\APIRouter' && substr_count($class, '\\') === 1) {
                 $project = substr($class, 0, strpos($class, '\\'));
-                $path    = dirname(dirname(dirname(__DIR__))).'/simulator/'.$project.'/APIRouter.php';
+                $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/APIRouter.php';
             }
 
             if (substr($class, 0, 21) === 'PerspectiveSimulator\\') {
                 $parts = explode('\\', $class);
                 if ($parts[1] === 'StorageType') {
                     $path = __DIR__.$ds.'src'.$ds.'Storage'.$ds.'Types'.$ds.$parts[2].'.php';
+                } else  if ($parts[1] === 'RecordType') {
+                    $path = __DIR__.$ds.'src'.$ds.'Record'.$ds.'Types'.$ds.$parts[2].'.php';
                 } else {
                     $path = __DIR__.$ds.'src'.$ds.substr(str_replace('\\', $ds, $class), 21).'.php';
                 }

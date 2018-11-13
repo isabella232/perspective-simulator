@@ -42,20 +42,22 @@ class Bootstrap
      */
     public static function load(string $project)
     {
-        $projectDir = dirname(__DIR__, 4).'/Projects/'.$project;
+        $project            = ucfirst($project);
+        $GLOBALS['project'] = $project;
+        $projectDir = dirname(__DIR__, 4).'/projects/'.$project;
 
         // Register an autoloader for the project.
         $loader = include dirname(__DIR__, 3).'/autoload.php';
         $loader->addPsr4($project.'\\', $projectDir);
 
         class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
-        class_alias('PerspectiveSimulator\Request', $project.'\API\Operations\Request');
+        class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
+        class_alias('PerspectiveSimulator\RecordType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
 
         class_alias('PerspectiveSimulator\Authentication', '\Authentication');
         class_alias('PerspectiveSimulator\Storage\StorageFactory', '\StorageFactory');
-        class_alias('PerspectiveSimulator\Request', '\Request');
-
-        class_alias('PerspectiveSimulator\DataRecord', $project.'\CustomTypes\Data\DataRecord');
+        class_alias('PerspectiveSimulator\Requests\Request', '\Request');
+        class_alias('PerspectiveSimulator\Requests\Session', '\Session');
 
         // Add data stores.
         $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
@@ -88,11 +90,6 @@ class Bootstrap
         // Add default user properties.
         StorageFactory::createUserProperty('__first-name__', 'text');
         StorageFactory::createUserProperty('__last-name__', 'text');
-
-        $storageDir = self::getStorageDir($project);
-        if (is_dir($storageDir) === false) {
-            mkdir($storageDir, 0777, true);
-        }
 
     }//end load()
 
@@ -178,7 +175,7 @@ class Bootstrap
     {
         return dirname(__DIR__, 4).'/simulator';
 
-    }//end getStorageDir()
+    }//end getSimulatorDir()
 
 
     /**
@@ -188,8 +185,12 @@ class Bootstrap
      *
      * @return mixed
      */
-    public static function getStorageDir(string $project)
+    public static function getStorageDir(string $project=null)
     {
+        if ($project === null) {
+            $project = $GLOBALS['project'];
+        }
+
         if (self::isReadEnabled() === false && self::isWriteEnabled() === false) {
             return null;
         }
@@ -197,6 +198,57 @@ class Bootstrap
         return self::getSimulatorDir().'/'.$project.'/storage';
 
     }//end getStorageDir()
+
+
+    /**
+     * Gets the project directory.
+     *
+     * @param string $project The project code we are getting the directory for.
+     *
+     * @return mixed
+     */
+    public static function getProjectDir(string $project=null)
+    {
+        if ($project === null) {
+            $project = $GLOBALS['project'];
+        }
+
+        return dirname(__DIR__, 4).'/projects/'.$project;
+
+    }//end getProjectDir()
+
+
+    /**
+     * Installs the simulator for us.
+     *
+     * @return void
+     */
+    public static function install()
+    {
+        $simulatorDir = self::getSimulatorDir();
+        if (is_dir($simulatorDir) === false) {
+            mkdir($simulatorDir);
+        }
+
+        $projectPath = dirname(__DIR__, 4).'/projects/';
+        $projectDirs = scandir($projectPath);
+        foreach ($projectDirs as $project) {
+            $path = $projectPath.$project;
+            if (is_dir($path) === true && $project[0] !== '.') {
+                if (is_dir($simulatorDir.'/'.$project) === false) {
+                    mkdir($simulatorDir.'/'.$project);
+                }
+
+                $storageDir = self::getStorageDir($project);
+                if (is_dir($storageDir) === false) {
+                    mkdir($storageDir);
+                }
+
+                API::installAPI($project);
+            }
+        }
+
+    }//end install()
 
 
 }//end class
