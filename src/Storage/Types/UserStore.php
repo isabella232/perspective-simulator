@@ -115,7 +115,7 @@ class UserStore
             return null;
         }
 
-        return $this->records[$userid];
+        return $this->records[$userid]['object'];
 
     }//end getUser()
 

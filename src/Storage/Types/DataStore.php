@@ -64,7 +64,7 @@ class DataStore
     final public function createDataRecord(string $type=null, string $parent=null)
     {
         if ($type === null) {
-            $type = 'PerspectiveSimulator\DataRecord';
+            $type = 'PerspectiveSimulator\RecordType\DataRecord';
         } else {
             $type = $GLOBALS['project'].'\CustomTypes\Data\\'.$type;
         }
