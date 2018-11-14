@@ -8,13 +8,14 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator;
+namespace PerspectiveSimulator\Requests;
 
-include dirname(__DIR__, 3).'/autoload.php';
+include dirname(__DIR__, 4).'/autoload.php';
+
+$path = $_SERVER['REQUEST_URI'];
 
 if (isset($_SERVER['QUERY_STRING']) === true) {
-    $path = str_replace('?'.$_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
-     // Remove the trailing slash if there is one.
+    $path = str_replace('?'.$_SERVER['QUERY_STRING'], '', $path);
 }
 
 $path    = trim($path, '/');

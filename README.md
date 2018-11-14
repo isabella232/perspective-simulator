@@ -21,5 +21,5 @@ $ php example.php
 
 To start the web server:
 ```
-php -S localhost:8000 vendor/Perspective/Simulator/src/Router.php
+php -S localhost:8000 vendor/Perspective/Simulator/src/Requests/Router.php
 ```
