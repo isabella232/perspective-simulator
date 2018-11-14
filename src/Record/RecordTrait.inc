@@ -11,6 +11,7 @@
 namespace PerspectiveSimulator\Record;
 
 use \PerspectiveSimulator\Bootstrap;
+use \PerspectiveSimulator\Libs;
 
 /**
  * StoreTrait Trait.
@@ -271,7 +272,7 @@ trait RecordTrait
         if ($valid === false && empty($objects) === false) {
             // Must be validating the reverse reference so check the objects to see if its valid.
             foreach ($objects as $object) {
-                $objectValid = $object->validateReference($referenceid);
+                $objectValid = $object->validateReference($referenceid, [$this]);
                 if ($objectValid === true) {
                     $valid = true;
                     break;
@@ -345,7 +346,7 @@ trait RecordTrait
         $storageDir = Bootstrap::getStorageDir();
         $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
 
-        file_put_contents($filePath, json_encode($record, JSON_PRETTY_PRINT));
+        file_put_contents($filePath, Libs\Util::jsonEncode($record));
         return true;
 
     }//end save()
@@ -369,7 +370,7 @@ trait RecordTrait
             return false;
         }
 
-        $data             = json_decode(file_get_contents($filePath), true);
+        $data             = Libs\Util::jsonDecode(file_get_contents($filePath));
         $this->properties = $data['properties'];
         $this->references = $data['references'];
         return true;

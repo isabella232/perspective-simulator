@@ -10,7 +10,8 @@
 
 namespace PerspectiveSimulator;
 
-use PerspectiveSimulator\Storage\StorageFactory;
+use \PerspectiveSimulator\Storage\StorageFactory;
+use \PerspectiveSimulator\Libs;
 
 /**
  * Bootstrap class
@@ -238,6 +239,12 @@ class Bootstrap
                 if (is_dir($simulatorDir.'/'.$project) === false) {
                     mkdir($simulatorDir.'/'.$project);
                 }
+
+                $projectKey = Authentication::generateSecretKey();
+                file_put_contents(
+                    $simulatorDir.'/'.$project.'/authentication.json',
+                    Libs\Util::jsonEncode(['secretKey' => $projectKey])
+                );
 
                 $storageDir = self::getStorageDir($project);
                 if (is_dir($storageDir) === false) {

@@ -11,6 +11,7 @@
 namespace PerspectiveSimulator\Storage;
 
 use \PerspectiveSimulator\Bootstrap;
+use \PerspectiveSimulator\Libs;
 
 /**
  * StoreTrait Trait.
@@ -111,7 +112,7 @@ trait StoreTrait
 
         $storageDir = Bootstrap::getStorageDir();
         $filePath   = $storageDir.'/'.$this->code.'/store.json';
-        file_put_contents($filePath, json_encode($store, JSON_PRETTY_PRINT));
+        file_put_contents($filePath, Libs\Util::jsonEncode($store));
         return true;
 
     }//end save()
@@ -135,7 +136,7 @@ trait StoreTrait
             return false;
         }
 
-        $store = json_decode(file_get_contents($filePath), true);
+        $store = Libs\Util::jsonDecode(file_get_contents($filePath));
 
         foreach ($store['records'] as $recordid => $data) {
             $recordPath     = dirname($filePath).'/'.$recordid.'.json';

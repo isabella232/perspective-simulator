@@ -32,6 +32,13 @@ class Authentication
      */
     private static $loggedIn = false;
 
+    /**
+     * Secret Key.
+     *
+     * @var string
+     */
+    private static $secretKey = null;
+
 
     /**
      * Gets the current user object.
@@ -105,6 +112,45 @@ class Authentication
         return true;
 
     }//end logoutUser()
+
+
+    /**
+     * Generates the secret key.
+     *
+     * @return string
+     */
+    public static function generateSecretKey()
+    {
+        // Check if the key exists in file and return that instead or generating a new one.
+        if (isset($GLOBALS['project']) === true) {
+            $authFile = Bootstrap::getSimulatorDir().'/'.$GLOBALS['project'].'/authentication.json';
+            if (file_exists($authFile) === true) {
+                $keys            = json_decode(file_get_contents($authFile), true);
+                self::$secretKey = $keys['secretKey'];
+                return self::$secretKey;
+            }
+        }
+
+        $uid = strtoupper(md5(uniqid(random_int(0, 2147483647), true)));
+        return substr($uid, 0, 32);
+
+    }//end generateSecretKey()
+
+
+    /**
+     * Gets the secret key/Generates if it doesn't exist.
+     *
+     * @return string
+     */
+    public static function getSecretKey()
+    {
+        if (self::$secretKey === null) {
+            self::$secretKey = self::generateSecretKey();
+        }
+
+        return self::$secretKey;
+
+    }//end getSecretKey()
 
 
 }//end class
