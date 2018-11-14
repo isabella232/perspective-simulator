@@ -38,7 +38,7 @@ class API
      *
      * @return string
      */
-    private static function getAPIPath(string $project)
+    public static function getAPIPath(string $project)
     {
         return dirname(__DIR__, 4).'/projects/'.$project.'/API';
 
@@ -115,6 +115,7 @@ class API
 
                     $apis[$httpMethod][] = [
                         'path'        => $path,
+                        'description' => $operationSettings['description'],
                         'http_method' => $httpMethod,
                         'operationid' => $operationSettings['operationId'],
                         'parameters'  => $parameters,
@@ -312,6 +313,14 @@ class API
                     $allParams[$param['in']][$param['name']] = $param;
                 }
 
+                try {
+                    // Check function file exists.
+                    self::getAPIFunction($project, $api['operationid']);
+                } catch (\Exception $e) {
+                    // Add new operation file.
+                    self::generateAPIFunction($project, $api, $allParams);
+                }
+
                 $pathParams = ($allParams['path'] ?? []);
                 if (empty($pathParams) === false) {
                     foreach ($pathParams as $param) {
@@ -360,6 +369,44 @@ class API
         file_put_contents($functionFile, $function);
 
     }//end bakeAPIFunctions()
+
+
+    /**
+     * Generates the boilerplate API function file.
+     *
+     * @param string $project   The project we are currently installing.
+     * @param array  $api       The api details for the new opperation.
+     * @param array  $allParams All the API paramters, in order.
+     *
+     * @return void
+     */
+    private static function generateAPIFunction(string $project, array $api, array $allParams)
+    {
+        $functionContent  = self::printCode(0, '<?php');
+        $functionContent .= self::printCode(0, '/**');
+        $functionContent .= self::printCode(0, ' * API stub for the '.$api['operationid'].'() operation.');
+        $functionContent .= self::printCode(0, ' *');
+        $functionContent .= self::printCode(0, ' * '.$api['description']);
+        $functionContent .= self::printCode(0, ' *');
+
+        foreach ($allParams as $type => $params) {
+            foreach ($params as $param) {
+                $paramCommement   = ' * @param '.$param['schema']['type'].' $'.$param['name'].' '.$param['description'];
+                $functionContent .= self::printCode(0, $paramCommement);
+            }
+        }
+
+        if ($api['http_method'] !== 'get') {
+            $functionContent .= self::printCode(0, ' * @param array $requestBody');
+        }
+
+        $functionContent .= self::printCode(0, ' */');
+        $functionContent .= self::printCode(0, '');
+
+        $file = self::getAPIPath($project).'/Operations/'.$api['operationid'].'.php';
+        file_put_contents($file, $functionContent);
+
+    }//end generateAPIFunction()
 
 
 }//end class
