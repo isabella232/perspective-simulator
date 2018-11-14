@@ -31,8 +31,8 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 $parts = explode('\\', $class);
                 if ($parts[1] === 'StorageType') {
                     $path = __DIR__.$ds.'src'.$ds.'Storage'.$ds.'Types'.$ds.$parts[2].'.php';
-                } else  if ($parts[1] === 'RecordType') {
-                    $path = __DIR__.$ds.'src'.$ds.'Record'.$ds.'Types'.$ds.$parts[2].'.php';
+                } else  if ($parts[1] === 'ObjectType') {
+                    $path = __DIR__.$ds.'src'.$ds.'Objects'.$ds.'Types'.$ds.$parts[2].'.php';
                 }
             }
 

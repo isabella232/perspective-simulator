@@ -13,7 +13,7 @@ namespace PerspectiveSimulator\StorageType;
 require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
-use \PerspectiveSimulator\RecordType\User;
+use \PerspectiveSimulator\ObjectType\User;
 use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 
 /**

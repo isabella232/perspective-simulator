@@ -100,6 +100,7 @@ trait StoreTrait
             $store['records'][$recordid] = [
                 'depth'    => ($data['depth'] ?? null),
                 'children' => (array_keys($data['children']) ?? []),
+                'parent'   => ($data['parent'] ?? null),
             ];
         }
 
@@ -156,6 +157,7 @@ trait StoreTrait
             }
 
             $this->records[$recordid]['children'] = $children;
+            $this->records[$recordid]['parent']   = $data['parent'];
         }
 
         foreach ($store['uniqueMap'] as $propid => $values) {

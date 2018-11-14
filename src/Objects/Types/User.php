@@ -8,13 +8,13 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\RecordType;
+namespace PerspectiveSimulator\ObjectType;
 
-require_once dirname(__FILE__, 2).'/RecordTrait.inc';
+require_once dirname(__FILE__, 2).'/ObjectTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Storage\StorageFactory;
-use \PerspectiveSimulator\Record\RecordTrait as RecordTrait;
+use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
 
 /**
  * User class.
@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Record\RecordTrait as RecordTrait;
 class User
 {
 
-    use RecordTrait;
+    use ObjectTrait;
 
     /**
      * The username of the user.

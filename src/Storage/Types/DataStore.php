@@ -13,7 +13,7 @@ namespace PerspectiveSimulator\StorageType;
 require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
-use \PerspectiveSimulator\DataRecord;
+use \PerspectiveSimulator\ObjectType\DataRecord;
 use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 
 /**
@@ -64,7 +64,7 @@ class DataStore
     final public function createDataRecord(string $type=null, string $parent=null)
     {
         if ($type === null) {
-            $type = 'PerspectiveSimulator\RecordType\DataRecord';
+            $type = 'PerspectiveSimulator\ObjectType\DataRecord';
         } else {
             $type = $GLOBALS['project'].'\CustomTypes\Data\\'.$type;
         }
@@ -80,6 +80,7 @@ class DataStore
             'object'   => $record,
             'depth'    => 1,
             'children' => [],
+            'parent'   => $parent,
         ];
 
         if ($parent !== null) {
@@ -177,6 +178,46 @@ class DataStore
         return $children;
 
     }//end getChildren()
+
+
+    /**
+     * Returns a flat list of data record's parents.
+     *
+     * @param string  $recordid The ID of the data record.
+     * @param integer $depth The max depth.
+     *
+     * @return array
+     */
+    final public function getParents(string $recordid, $depth=null)
+    {
+        if (isset($this->records[$recordid]) === false) {
+            return [];
+        }
+
+        if ($depth !== null) {
+            if ($depth === 0) {
+                return [];
+            }
+
+            $depth--;
+        }
+
+        $parents = [];
+        if ($this->records[$recordid]['parent'] !== null) {
+            $parentid = $this->records[$recordid]['parent'];
+            $parents[$parentid] = [
+                'depth'   => $this->records[$parentid]['depth'],
+                'parents' => [],
+            ];
+
+            if ($depth !== 0) {
+                $parents[$parentid]['parents'] = $this->getParents($parentid, $depth);
+            }
+        }
+
+        return $parents;
+
+    }//end getParents()
 
 
 }//end class

@@ -108,8 +108,9 @@ class API
 
                     // Respect order of parameters.
                     foreach ($allParams as $params) {
-                        foreach ($params as $param) {
-                            $parameters[] = $param;
+                        foreach ($params as &$param) {
+                            $param['__php_name__'] = self::getParamCamelCase($param['name']);
+                            $parameters[]          = $param;
                         }
                     }
 
@@ -308,6 +309,8 @@ class API
             foreach ($paths as $id => $api) {
                 $functionSignature = 'public function '.$api['operationid'].'(';
                 $arguments         = [];
+                $requiredArgs      = [];
+                $optionalArgs      = [];
                 $allParams         = [];
                 foreach ($api['parameters'] as $param) {
                     $allParams[$param['in']][$param['name']] = $param;
@@ -324,30 +327,67 @@ class API
                 $pathParams = ($allParams['path'] ?? []);
                 if (empty($pathParams) === false) {
                     foreach ($pathParams as $param) {
-                        $arguments[] = '$'.$param['name'];
+                        if ($param['required'] === true) {
+                            $requiredArgs[] = '$'.$param['__php_name__'];
+                        } else {
+                            $default = ($param['schema']['default'] ?? null);
+                            if (is_scalar($default) === true) {
+                                $optionalArgs[] = '$'.$param['__php_name__'].' = '.var_export($default, true);
+                            } else {
+                                $optionalArgs[] = '$'.$param['__php_name__'].' = null';
+                            }
+                        }
                     }
                 }
 
                 $queryParams = ($allParams['query'] ?? []);
                 foreach ($queryParams as $param) {
-                    $arguments[] = '$'.$param['name'];
+                    if ($param['required'] === true) {
+                        $requiredArgs[] = '$'.$param['__php_name__'];
+                    } else {
+                        $default = ($param['schema']['default'] ?? null);
+                        if (is_scalar($default) === true) {
+                            $optionalArgs[] = '$'.$param['__php_name__'].' = '.var_export($default, true);
+                        } else {
+                            $optionalArgs[] = '$'.$param['__php_name__'].' = null';
+                        }
+                    }
                 }
 
                 $headerParams = ($allParams['header'] ?? []);
                 foreach ($headerParams as $param) {
-                    $arguments[] = '$'.$param['name'];
+                    if ($param['required'] === true) {
+                        $requiredArgs[] = '$'.$param['__php_name__'];
+                    } else {
+                        $default = ($param['schema']['default'] ?? null);
+                        if (is_scalar($default) === true) {
+                            $optionalArgs[] = '$'.$param['__php_name__'].' = '.var_export($default, true);
+                        } else {
+                            $optionalArgs[] = '$'.$param['__php_name__'].' = null';
+                        }
+                    }
                 }
 
                 $cookieParams = ($allParams['cookie'] ?? []);
                 foreach ($cookieParams as $param) {
-                    $arguments[] = '$'.$param['name'];
+                    if ($param['required'] === true) {
+                        $requiredArgs[] = '$'.$param['__php_name__'];
+                    } else {
+                        $default = ($param['schema']['default'] ?? null);
+                        if (is_scalar($default) === true) {
+                            $optionalArgs[] = '$'.$param['__php_name__'].' = '.var_export($default, true);
+                        } else {
+                            $optionalArgs[] = '$'.$param['__php_name__'].' = null';
+                        }
+                    }
                 }
 
+                $arguments = array_merge($requiredArgs, $optionalArgs);
                 if ($api['http_method'] !== 'get') {
-                    $arguments[] = '$requestBody=null';
+                    $arguments[] = '$requestBody = null';
                 }
 
-                $functionSignature .= implode(',', $arguments);
+                $functionSignature .= implode(', ', $arguments);
                 $functionSignature .= ')';
 
                 $function .= self::printCode(1, $functionSignature);
@@ -407,6 +447,40 @@ class API
         file_put_contents($file, $functionContent);
 
     }//end generateAPIFunction()
+
+
+    /**
+     * Camel case a parameter name.
+     *
+     * @param string $paramName The parameter name.
+     *
+     * @return string
+     */
+    private static function getParamCamelCase($paramName)
+    {
+        $paramName = str_replace(' ', '_', $paramName);
+        $paramName = str_replace('-', '_', $paramName);
+        $parts     = explode('_', $paramName);
+        if (count($parts) === 1) {
+            if (strtoupper($parts[0]) === $parts[0]) {
+                $parts[0] = strtolower($parts[0]);
+            } else {
+                $parts[0] = lcfirst($parts[0]);
+            }
+        } else {
+            foreach ($parts as $idx => $part) {
+                if ($idx === 0) {
+                    $parts[$idx] = strtolower($part);
+                } else {
+                    $parts[$idx] = ucfirst(strtolower($part));
+                }
+            }
+        }
+
+        $paramName = implode('', $parts);
+        return $paramName;
+
+    }//end getParamCamelCase()
 
 
 }//end class

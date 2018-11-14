@@ -8,13 +8,13 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\RecordType;
+namespace PerspectiveSimulator\ObjectType;
 
-require_once dirname(__FILE__, 2).'/RecordTrait.inc';
+require_once dirname(__FILE__, 2).'/ObjectTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Storage\StorageFactory;
-use \PerspectiveSimulator\Record\RecordTrait as RecordTrait;
+use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
 
 /**
  * DataRecord Class
@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Record\RecordTrait as RecordTrait;
 class DataRecord
 {
 
-    use RecordTrait;
+    use ObjectTrait;
 
 
     /**
@@ -131,6 +131,23 @@ class DataRecord
     final public function getChildren(int $depth=null)
     {
         return $this->store->getChildren($this->id, $depth);
+
+    }//end getChildren()
+
+
+    /**
+     * Gets the list of parents for the data record.
+     *
+     * @param integer $depth How many levels of parents should be returned. For example, a depth of 1 will only return
+     *                       direct parent of the given data record, while a depth of 2 will return direct parent
+     *                       and their parent as well. If NULL, all data records under the current data record will be
+     *                       returned regardless of depth.
+     *
+     * @return array
+     */
+    final public function getParents(int $depth=null)
+    {
+        return $this->store->getParents($this->id, $depth);
 
     }//end getChildren()
 

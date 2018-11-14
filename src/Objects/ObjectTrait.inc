@@ -8,7 +8,7 @@
  * @copyright  2010 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\Record;
+namespace PerspectiveSimulator\Objects;
 
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
@@ -16,7 +16,7 @@ use \PerspectiveSimulator\Libs;
 /**
  * StoreTrait Trait.
  */
-trait RecordTrait
+trait ObjectTrait
 {
 
     /**
@@ -302,9 +302,9 @@ trait RecordTrait
             throw new \Exception(_('Invalid referenced object: is not an object'));
         }
 
-        if ($object instanceof \PerspectiveSimulator\RecordType\User) {
+        if ($object instanceof \PerspectiveSimulator\ObjectType\User) {
             $storageClass = 'UserStore';
-        } else if ($object instanceof \PerspectiveSimulator\RecordType\DataRecord) {
+        } else if ($object instanceof \PerspectiveSimulator\ObjectType\DataRecord) {
             $storageClass = 'DataStore';
         } else {
             throw new \Exception(
