@@ -19,21 +19,21 @@ trait ObjectTrait
 {
 
     /**
-     * The data record id.
+     * The record id.
      *
      * @var string
      */
     private $id = '';
 
     /**
-     * The store the data record belongs to.
+     * The store the record belongs to.
      *
      * @var object
      */
     private $store = '';
 
     /**
-     * Array of data record properties attached to the record.
+     * Array of record properties attached to the record.
      *
      * @var array
      */
@@ -41,7 +41,7 @@ trait ObjectTrait
 
 
     /**
-     * Gets the internal ID of the data record.
+     * Gets the internal ID of the record.
      *
      * @return string
      */
@@ -53,7 +53,7 @@ trait ObjectTrait
 
 
     /**
-     * Gets the data store that the data record is contained within.
+     * Gets the store that the record is contained within.
      *
      * @return object
      */

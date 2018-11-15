@@ -18,7 +18,7 @@ class Session
 
 
     /**
-     * Gets the "session" data for a key
+     * Gets the session data for a key
      *
      * @param string $key The key we want the data from.
      *
@@ -36,7 +36,7 @@ class Session
 
 
     /**
-     * Sests the "session" data for a key
+     * Sests the session data for a key
      *
      * @param string $key   The key we want to store the data against.
      * @param mixed  $value The data we want to store in the session.

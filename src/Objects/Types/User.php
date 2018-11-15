@@ -239,7 +239,7 @@ class User
 
 
     /**
-     * Save Data Record to file for cache.
+     * Save User to file for cache.
      *
      * @return boolean
      */
@@ -269,7 +269,7 @@ class User
 
 
     /**
-     * Load Data Record to file for cache.
+     * Load User to file for cache.
      *
      * @return boolean
      */
