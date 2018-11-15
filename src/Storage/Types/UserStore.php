@@ -120,4 +120,16 @@ class UserStore
     }//end getUser()
 
 
+    /**
+     * Gets the records for the store.
+     *
+     * @return array
+     */
+    final public function getUsers()
+    {
+        return $this->records;
+
+    }//end getUsers()
+
+
 }//end class

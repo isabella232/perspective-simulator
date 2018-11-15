@@ -10,11 +10,14 @@
 
 namespace PerspectiveSimulator\ObjectType;
 
-require_once dirname(__FILE__, 2).'/ObjectTrait.inc';
+require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
+require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
+use  \PerspectiveSimulator\Libs;
 use \PerspectiveSimulator\Storage\StorageFactory;
-use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
+use \PerspectiveSimulator\Objects\AspectedObjectTrait as AspectedObjectTrait;
+use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
 
 /**
  * DataRecord Class
@@ -22,7 +25,9 @@ use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
 class DataRecord
 {
 
-    use ObjectTrait;
+    use AspectedObjectTrait;
+
+    use ReferenceObjectTrait;
 
 
     /**
@@ -150,6 +155,62 @@ class DataRecord
         return $this->store->getParents($this->id, $depth);
 
     }//end getChildren()
+
+
+    /**
+     * Save Data Record to file for cache.
+     *
+     * @return boolean
+     */
+    public function save()
+    {
+        if (Bootstrap::isWriteEnabled() === false) {
+            return false;
+        }
+
+        $record = [
+            'id'         => $this->id,
+            'type'       => get_class($this),
+            'properties' => $this->properties,
+            'references' => $this->references,
+            'aspect'     => $this->aspect,
+        ];
+
+        $storeCode  = $this->store->getCode();
+        $storageDir = Bootstrap::getStorageDir();
+        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
+
+        file_put_contents($filePath, Libs\Util::jsonEncode($record));
+        return true;
+
+    }//end save()
+
+
+    /**
+     * Load Data Record to file for cache.
+     *
+     * @return boolean
+     */
+    public function load()
+    {
+        if (Bootstrap::isReadEnabled() === false) {
+            return false;
+        }
+
+        $storeCode  = $this->store->getCode();
+        $storageDir = Bootstrap::getStorageDir();
+        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
+        if (is_file($filePath) === false) {
+            return false;
+        }
+
+        $data             = Libs\Util::jsonDecode(file_get_contents($filePath));
+        $this->properties = $data['properties'];
+        $this->references = $data['references'];
+        $this->aspect     = $data['aspect'];
+        return true;
+
+    }//end load()
 
 
 }//end class
