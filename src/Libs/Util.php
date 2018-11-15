@@ -18,13 +18,14 @@ use PerspectiveSimulator\Storage\StorageFactory;
 class Util
 {
 
+
     /**
      * Prints data in JSON format.
      *
      * @param mixed   $value   The value we want in JSON format.
      * @param integer $options Bitmask of JSON_* constants.
      *
-     * @return void
+     * @return string
      */
     public static function jsonEncode($value, int $options=128)
     {
@@ -41,7 +42,7 @@ class Util
      *
      * @return mixed
      */
-    public static function jsonDecode($value, $assoc=true)
+    public static function jsonDecode($value, bool $assoc=true)
     {
         return json_decode($value, $assoc);
 

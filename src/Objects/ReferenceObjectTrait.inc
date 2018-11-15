@@ -70,7 +70,6 @@ trait ReferenceObjectTrait
 
         if ($this->validateReference($referenceid, $objects) === false) {
             return;
-            // throw new \Exception(_('Invalid reference "'.$referenceid.'"'));
         }
 
         if (isset($this->references[$referenceid]) === false) {
@@ -151,6 +150,7 @@ trait ReferenceObjectTrait
      *                            for the other side.
      *
      * @return boolean.
+     * @throws \Exception When reference is invalid.
      */
     final public function validateReference(string $referenceid, array $objects=[])
     {

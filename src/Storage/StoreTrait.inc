@@ -55,7 +55,6 @@ trait StoreTrait
     private $uniqueMap = [];
 
 
-
     /**
      * Gets the Stores type.
      *
@@ -65,7 +64,7 @@ trait StoreTrait
     {
         return $this->type;
 
-    }//end getCode()
+    }//end getType()
 
 
     /**
@@ -101,6 +100,7 @@ trait StoreTrait
             if (isset($data['children']) === true) {
                 $children = (array_keys($data['children']) ?? []);
             }
+
             $store['records'][$recordid] = [
                 'depth'    => ($data['depth'] ?? null),
                 'children' => $children,
@@ -144,9 +144,9 @@ trait StoreTrait
         $store = Libs\Util::jsonDecode(file_get_contents($filePath));
 
         foreach ($store['records'] as $recordid => $data) {
-            $recordPath     = dirname($filePath).'/'.$recordid.'.json';
-            $recordData     = json_decode(file_get_contents($recordPath), true);
-            $type           = $recordData['type'];
+            $recordPath = dirname($filePath).'/'.$recordid.'.json';
+            $recordData = json_decode(file_get_contents($recordPath), true);
+            $type       = $recordData['type'];
             if ($type === 'PerspectiveSimulator\ObjectType\User') {
                 $data['object'] = new $type(
                     $this,
@@ -163,7 +163,7 @@ trait StoreTrait
 
             $baseRecordid     = (int) substr($recordid, 0, -2);
             $this->numRecords = max($this->numRecords, $baseRecordid);
-        }
+        }//end foreach
 
         foreach ($store['records'] as $recordid => $data) {
             $children = [];

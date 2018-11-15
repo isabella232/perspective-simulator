@@ -32,7 +32,7 @@ class Session
 
         return $_SESSION[$key];
 
-    }//end inAuthor()
+    }//end getvalue()
 
 
     /**

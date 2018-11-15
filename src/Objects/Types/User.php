@@ -36,7 +36,6 @@ class User
      */
     private $username = '';
 
-
     /**
      * The groups of the user.
      *

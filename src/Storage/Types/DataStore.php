@@ -28,7 +28,7 @@ class DataStore
     /**
      * Constructor for DataStore Class.
      *
-     * @param string $code    The name of the user store.
+     * @param string $code The name of the user store.
      *
      * @return void
      */
@@ -184,11 +184,11 @@ class DataStore
      * Returns a flat list of data record's parents.
      *
      * @param string  $recordid The ID of the data record.
-     * @param integer $depth The max depth.
+     * @param integer $depth    The max depth.
      *
      * @return array
      */
-    final public function getParents(string $recordid, $depth=null)
+    final public function getParents(string $recordid, int $depth=null)
     {
         if (isset($this->records[$recordid]) === false) {
             return [];
@@ -204,7 +204,7 @@ class DataStore
 
         $parents = [];
         if ($this->records[$recordid]['parent'] !== null) {
-            $parentid = $this->records[$recordid]['parent'];
+            $parentid           = $this->records[$recordid]['parent'];
             $parents[$parentid] = [
                 'depth'   => $this->records[$parentid]['depth'],
                 'parents' => [],

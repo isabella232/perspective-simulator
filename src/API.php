@@ -456,7 +456,7 @@ class API
      *
      * @return string
      */
-    private static function getParamCamelCase($paramName)
+    private static function getParamCamelCase(string $paramName)
     {
         $paramName = str_replace(' ', '_', $paramName);
         $paramName = str_replace('-', '_', $paramName);

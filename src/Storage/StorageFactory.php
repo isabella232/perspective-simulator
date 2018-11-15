@@ -41,7 +41,7 @@ class StorageFactory
     /**
      * Creates a new Data Store.
      *
-     * @param string $name    The name of the user store.
+     * @param string $name The name of the user store.
      *
      * @return void
      */
@@ -57,7 +57,7 @@ class StorageFactory
     /**
      * Creates a new User Store.
      *
-     * @param string $name    The name of the user store.
+     * @param string $name The name of the user store.
      *
      * @return void
      */

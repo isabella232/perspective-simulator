@@ -35,7 +35,7 @@ class UserStore
     /**
      * Constructs a new user store.
      *
-     * @param string $code    The name of the user store.
+     * @param string $code The name of the user store.
      *
      * @return void
      */

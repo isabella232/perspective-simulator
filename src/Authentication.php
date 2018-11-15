@@ -134,7 +134,7 @@ class Authentication
 
         return true;
 
-    }//end logoutUser()
+    }//end logout()
 
 
     /**

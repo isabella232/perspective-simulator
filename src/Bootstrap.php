@@ -47,7 +47,7 @@ class Bootstrap
 
         $project            = ucfirst($project);
         $GLOBALS['project'] = $project;
-        $projectDir = dirname(__DIR__, 4).'/projects/'.$project;
+        $projectDir         = dirname(__DIR__, 4).'/projects/'.$project;
 
         // Register an autoloader for the project.
         $loader = include dirname(__DIR__, 3).'/autoload.php';
@@ -255,7 +255,7 @@ class Bootstrap
 
                 API::installAPI($project);
             }
-        }
+        }//end foreach
 
     }//end install()
 

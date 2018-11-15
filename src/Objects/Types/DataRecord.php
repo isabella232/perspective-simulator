@@ -14,7 +14,7 @@ require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
-use  \PerspectiveSimulator\Libs;
+use \PerspectiveSimulator\Libs;
 use \PerspectiveSimulator\Storage\StorageFactory;
 use \PerspectiveSimulator\Objects\AspectedObjectTrait as AspectedObjectTrait;
 use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
@@ -33,8 +33,8 @@ class DataRecord
     /**
      * Construct function for Data Record.
      *
-     * @param object $store   The store the data record belongs to.
-     * @param string $id      The id of the data record.
+     * @param object $store The store the data record belongs to.
+     * @param string $id    The id of the data record.
      *
      * @return void
      */
@@ -48,6 +48,7 @@ class DataRecord
         }
 
     }//end __construct()
+
 
     /**
      * Gets a data record property value.
@@ -154,7 +155,7 @@ class DataRecord
     {
         return $this->store->getParents($this->id, $depth);
 
-    }//end getChildren()
+    }//end getParents()
 
 
     /**
