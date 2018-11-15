@@ -144,18 +144,27 @@ class Authentication
      */
     public static function generateSecretKey()
     {
+        $simulatorDir = Bootstrap::getSimulatorDir();
+
         // Check if the key exists in file and return that instead or generating a new one.
-        if (isset($GLOBALS['project']) === true) {
-            $authFile = Bootstrap::getSimulatorDir().'/'.$GLOBALS['project'].'/authentication.json';
-            if (file_exists($authFile) === true) {
-                $keys            = json_decode(file_get_contents($authFile), true);
-                self::$secretKey = $keys['secretKey'];
-                return self::$secretKey;
-            }
+        $authFile = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
+        if (Bootstrap::isReadEnabled() === true && file_exists($authFile) === true) {
+            $keys            = json_decode(file_get_contents($authFile), true);
+            self::$secretKey = $keys['secretKey'];
+            return self::$secretKey;
         }
 
-        $uid = strtoupper(md5(uniqid(random_int(0, 2147483647), true)));
-        return substr($uid, 0, 32);
+        $uid        = strtoupper(md5(uniqid(random_int(0, 2147483647), true)));
+        $projectKey = substr($uid, 0, 32);
+
+        if (Bootstrap::isWriteEnabled() === true) {
+            file_put_contents(
+                $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json',
+                Libs\Util::jsonEncode(['secretKey' => $projectKey])
+            );
+        }
+
+        return $projectKey;
 
     }//end generateSecretKey()
 

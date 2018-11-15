@@ -236,6 +236,8 @@ class Bootstrap
         $projectPath = dirname(__DIR__, 4).'/projects/';
         $projectDirs = scandir($projectPath);
         foreach ($projectDirs as $project) {
+            $GLOBALS['project'] = $project;
+
             $path = $projectPath.$project;
             if (is_dir($path) === true && $project[0] !== '.') {
                 if (is_dir($simulatorDir.'/'.$project) === false) {
@@ -243,10 +245,6 @@ class Bootstrap
                 }
 
                 $projectKey = Authentication::generateSecretKey();
-                file_put_contents(
-                    $simulatorDir.'/'.$project.'/authentication.json',
-                    Libs\Util::jsonEncode(['secretKey' => $projectKey])
-                );
 
                 $storageDir = self::getStorageDir($project);
                 if (is_dir($storageDir) === false) {
