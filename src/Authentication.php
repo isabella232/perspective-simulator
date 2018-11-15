@@ -11,6 +11,7 @@
 namespace PerspectiveSimulator;
 
 use PerspectiveSimulator\Storage\StorageFactory;
+use PerspectiveSimulator\Libs;
 
 /**
  * Authentication class.
@@ -102,7 +103,7 @@ class Authentication
 
 
     /**
-     * Login.
+     * Checks if the user is logged in.
      *
      * @return boolean
      */
@@ -149,7 +150,7 @@ class Authentication
         // Check if the key exists in file and return that instead or generating a new one.
         $authFile = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
         if (Bootstrap::isReadEnabled() === true && file_exists($authFile) === true) {
-            $keys            = json_decode(file_get_contents($authFile), true);
+            $keys            = Libs\Util::jsonDecode(file_get_contents($authFile));
             self::$secretKey = $keys['secretKey'];
             return self::$secretKey;
         }
@@ -164,20 +165,32 @@ class Authentication
             );
         }
 
+        self::$secretKey = $projectKey;
+
         return $projectKey;
 
     }//end generateSecretKey()
 
 
     /**
-     * Gets the secret key/Generates if it doesn't exist.
+     * Gets the secret key.
      *
-     * @return string
+     * @return string | null
      */
     public static function getSecretKey()
     {
         if (self::$secretKey === null) {
-            self::$secretKey = self::generateSecretKey();
+            if (Bootstrap::isReadEnabled() === true ) {
+                $simulatorDir = Bootstrap::getSimulatorDir();
+                $authFile     = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
+                if (file_exists($authFile) === true) {
+                    $keys            = Libs\Util::jsonDecode(file_get_contents($authFile));
+                    self::$secretKey = $keys['secretKey'];
+                    return self::$secretKey;
+                }
+            }
+
+            return null;
         }
 
         return self::$secretKey;
