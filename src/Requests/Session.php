@@ -16,12 +16,6 @@ namespace PerspectiveSimulator\Requests;
 class Session
 {
 
-    /**
-     * Array of the session.
-     *
-     * @var array
-     */
-    private $session = [];
 
     /**
      * Gets the "session" data for a key
@@ -32,11 +26,11 @@ class Session
      */
     public static function getvalue(string $key)
     {
-        if (isset($session[$key]) === false) {
+        if (isset($_SESSION[$key]) === false) {
             return null;
         }
 
-        return $session[$key];
+        return $_SESSION[$key];
 
     }//end inAuthor()
 
@@ -51,7 +45,7 @@ class Session
      */
     public static function setvalue(string $key, $value)
     {
-        $session[$key] = $value;
+        $_SESSION[$key] = $value;
 
     }//end setvalue()
 

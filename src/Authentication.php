@@ -64,8 +64,19 @@ class Authentication
      */
     final public static function getCurrentUserid()
     {
-        if (self::$user === null) {
+        if (self::$user === null && isset($_SESSION['user']) === false) {
             return null;
+        } else if (self::$user === null) {
+            if (isset($_SESSION['user']) === true) {
+                $store = StorageFactory::getUserStore($_SESSION['userStore']);
+                if ($store !== null) {
+                    self::$user = $store->getUser($_SESSION['user']);
+                }
+            }
+
+            if (self::$user === null) {
+                return null;
+            }
         }
 
         return self::$user->getId();
@@ -82,8 +93,10 @@ class Authentication
      */
     final public static function login(\PerspectiveSimulator\ObjectType\User $user)
     {
-        self::$user     = $user;
-        self::$loggedIn = true;
+        self::$user            = $user;
+        self::$loggedIn        = true;
+        $_SESSION['user']      = $user->getId();
+        $_SESSION['userStore'] = $user->getStorage()->getCode();
 
     }//end login()
 
@@ -95,6 +108,11 @@ class Authentication
      */
     final public static function isLoggedIn()
     {
+        if (self::$loggedIn === false && isset($_SESSION['user']) === true) {
+            // User is loggedIn so we can reset the flag.
+            self::$loggedIn = true;
+        }
+
         return self::$loggedIn;
 
     }//end isLoggedIn()
@@ -105,10 +123,15 @@ class Authentication
      *
      * @return boolean
      */
-    final public static function logoutUser()
+    final public static function logout()
     {
         self::$user     = null;
         self::$loggedIn = false;
+
+        unset($_SESSION['user']);
+        unset($_SESSION['userStore']);
+        unset($_SESSION['moderator']);
+
         return true;
 
     }//end logoutUser()

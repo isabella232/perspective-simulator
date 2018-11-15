@@ -97,9 +97,13 @@ trait StoreTrait
         ];
 
         foreach ($this->records as $recordid => $data) {
+            $children = [];
+            if (isset($data['children']) === true) {
+                $children = (array_keys($data['children']) ?? []);
+            }
             $store['records'][$recordid] = [
                 'depth'    => ($data['depth'] ?? null),
-                'children' => (array_keys($data['children']) ?? []),
+                'children' => $children,
                 'parent'   => ($data['parent'] ?? null),
             ];
         }
@@ -143,7 +147,18 @@ trait StoreTrait
             $recordPath     = dirname($filePath).'/'.$recordid.'.json';
             $recordData     = json_decode(file_get_contents($recordPath), true);
             $type           = $recordData['type'];
-            $data['object'] = new $type($this, $recordid);
+            if ($type === 'PerspectiveSimulator\ObjectType\User') {
+                $data['object'] = new $type(
+                    $this,
+                    $recordid,
+                    $recordData['username'],
+                    $recordData['properties']['__first-name__'],
+                    $recordData['properties']['__last-name__']
+                );
+            } else {
+                $data['object'] = new $type($this, $recordid);
+            }
+
             $this->records[$recordid] = $data;
 
             $baseRecordid     = (int) substr($recordid, 0, -2);

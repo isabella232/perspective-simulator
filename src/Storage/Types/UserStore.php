@@ -52,6 +52,8 @@ class UserStore
             }
         }
 
+        $this->load();
+
     }//end __construct()
 
 
@@ -79,6 +81,9 @@ class UserStore
         $this->records[$recordid] = ['object' => $record];
 
         $this->usernameMap[$username] = $record;
+
+        $this->save();
+
         return $record;
 
     }//end createUser()

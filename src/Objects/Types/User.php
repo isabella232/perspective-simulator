@@ -256,6 +256,7 @@ class User
             'properties' => $this->properties,
             'references' => $this->references,
             'groups'     => $this->groups,
+            'username'   => $this->username,
         ];
 
         $storeCode  = $this->store->getCode();
@@ -290,6 +291,7 @@ class User
         $this->properties = $data['properties'];
         $this->references = $data['references'];
         $this->groups     = $data['groups'];
+        $this->username   = $data['username'];
         return true;
 
     }//end load()

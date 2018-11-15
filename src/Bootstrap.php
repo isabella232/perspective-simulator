@@ -43,6 +43,8 @@ class Bootstrap
      */
     public static function load(string $project)
     {
+        session_start();
+
         $project            = ucfirst($project);
         $GLOBALS['project'] = $project;
         $projectDir = dirname(__DIR__, 4).'/projects/'.$project;
