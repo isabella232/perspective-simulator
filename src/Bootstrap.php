@@ -212,7 +212,7 @@ class Bootstrap
     {
         $simulatorDir = Libs\FileSystem::getSimulatorDir();
         if (is_dir($simulatorDir) === false) {
-            mkdir($simulatorDir);
+            Libs\FileSystem::mkdir($simulatorDir);
         }
 
         $projectPath = Libs\FileSystem::getExportDir().'/projects/';
@@ -223,14 +223,14 @@ class Bootstrap
             $path = $projectPath.$project;
             if (is_dir($path) === true && $project[0] !== '.') {
                 if (is_dir($simulatorDir.'/'.$project) === false) {
-                    mkdir($simulatorDir.'/'.$project);
+                    Libs\FileSystem::mkdir($simulatorDir.'/'.$project);
                 }
 
                 $projectKey = Authentication::generateSecretKey();
 
                 $storageDir = Libs\FileSystem::getStorageDir($project);
                 if (is_dir($storageDir) === false) {
-                    mkdir($storageDir);
+                    Libs\FileSystem::mkdir($storageDir);
                 }
 
                 API::installAPI($project);

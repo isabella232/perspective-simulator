@@ -41,7 +41,7 @@ class DataStore
             $storageDir = \PerspectiveSimulator\Libs\FileSystem::getStorageDir();
             $storeDir   = $storageDir.'/'.$code;
             if (is_dir($storeDir) === false) {
-                mkdir($storeDir);
+                \PerspectiveSimulator\Libs\FileSystem::mkdir($storeDir);
             }
         }
 

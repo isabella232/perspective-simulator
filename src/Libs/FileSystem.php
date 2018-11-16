@@ -18,6 +18,30 @@ use PerspectiveSimulator\Bootstrap;
 class FileSystem
 {
 
+    /**
+     * The default directory umask.
+     *
+     * @var integer
+     */
+    private static $dirMask = 0700;
+
+
+    /**
+     * Create a directory in the file system.
+     *
+     * @param string  $pathname  The directory path.
+     * @param boolean $recursive Default to false.
+     *
+     * @return boolean
+     */
+    public static function mkdir(string $pathname, bool $recursive=false)
+    {
+        $pathname = rtrim($pathname, '/');
+        $ret      = mkdir($pathname, self::$dirMask, $recursive);
+        return $ret;
+
+    }//end mkdir()
+
 
     /**
      * Gets the export directory.
