@@ -63,7 +63,7 @@ class Deployment implements ObjectReadInterface, ObjectWriteInterface
             return false;
         }
 
-        $storageDir = Bootstrap::getSimulatorDir();
+        $storageDir = Libs\FileSystem::getSimulatorDir();
         $filePath   = $storageDir.'/'.$GLOBALS['project'].'/'.$this->id.'.json';
 
         $classVars = get_object_vars($this);
@@ -91,7 +91,7 @@ class Deployment implements ObjectReadInterface, ObjectWriteInterface
             return false;
         }
 
-        $storageDir = Bootstrap::getSimulatorDir();
+        $storageDir = Libs\FileSystem::getSimulatorDir();
         $filePath   = $storageDir.'/'.$GLOBALS['project'].'/'.$this->id.'.json';
         if (is_file($filePath) === false) {
             return false;

@@ -157,10 +157,10 @@ trait ReferenceObjectTrait
         $code      = $this->store->getCode();
         $storeType = $this->store->getType();
 
-        $storageDir = Bootstrap::getProjectDir();
+        $storageDir = \PerspectiveSimulator\Libs\FileSystem::getProjectDir();
         $filePath   = $storageDir.'/Stores/'.$storeType.'/'.$code.'/'.$referenceid.'.json';
         if (file_exists($filePath) === true) {
-            $reference   = json_decode(file_get_contents($filePath), true);
+            $reference   = \PerspectiveSimulator\Libs\Util::jsonDecode(file_get_contents($filePath));
             $sourceValue = [];
             $targetValue = [];
 

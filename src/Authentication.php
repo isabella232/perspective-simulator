@@ -145,7 +145,7 @@ class Authentication
      */
     public static function generateSecretKey()
     {
-        $simulatorDir = Bootstrap::getSimulatorDir();
+        $simulatorDir = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir();
 
         // Check if the key exists in file and return that instead or generating a new one.
         $authFile = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
@@ -181,7 +181,7 @@ class Authentication
     {
         if (self::$secretKey === null) {
             if (Bootstrap::isReadEnabled() === true ) {
-                $simulatorDir = Bootstrap::getSimulatorDir();
+                $simulatorDir = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir();
                 $authFile     = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
                 if (file_exists($authFile) === true) {
                     $keys            = Libs\Util::jsonDecode(file_get_contents($authFile));

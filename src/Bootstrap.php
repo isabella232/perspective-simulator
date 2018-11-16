@@ -47,7 +47,7 @@ class Bootstrap
 
         $project            = ucfirst($project);
         $GLOBALS['project'] = $project;
-        $projectDir         = Bootstrap::getProjectDir();
+        $projectDir         = Libs\FileSystem::getProjectDir();
 
         // Register an autoloader for the project.
         $loader = include dirname(__DIR__, 3).'/autoload.php';
@@ -77,45 +77,51 @@ class Bootstrap
         }
 
         // Add data record properties.
-        $files = scandir($projectDir.'/Properties/Data');
-        foreach ($files as $file) {
-            if ($file[0] === '.'
-                || substr($file, -5) !== '.json'
-            ) {
-                continue;
-            }
+        if (is_dir($projectDir.'/Properties/Data') === true) {
+            $files = scandir($projectDir.'/Properties/Data');
+            foreach ($files as $file) {
+                if ($file[0] === '.'
+                    || substr($file, -5) !== '.json'
+                ) {
+                    continue;
+                }
 
-            $propName = strtolower(substr($file, 0, -5));
-            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/Data/'.$file), true);
-            StorageFactory::createDataRecordProperty($propName, $propInfo['type']);
+                $propName = strtolower(substr($file, 0, -5));
+                $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Data/'.$file));
+                StorageFactory::createDataRecordProperty($propName, $propInfo['type']);
+            }
         }
 
         // Add project properties.
-        $files = scandir($projectDir.'/Properties/Project');
-        foreach ($files as $file) {
-            if ($file[0] === '.'
-                || substr($file, -5) !== '.json'
-            ) {
-                continue;
-            }
+        if (is_dir($projectDir.'/Properties/Project') === true) {
+            $files = scandir($projectDir.'/Properties/Project');
+            foreach ($files as $file) {
+                if ($file[0] === '.'
+                    || substr($file, -5) !== '.json'
+                ) {
+                    continue;
+                }
 
-            $propName = strtolower(substr($file, 0, -5));
-            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/Project/'.$file), true);
-            StorageFactory::createDeployementProperty($propName, $propInfo['type']);
+                $propName = strtolower(substr($file, 0, -5));
+                $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
+                StorageFactory::createDeployementProperty($propName, $propInfo['type']);
+            }
         }
 
         // Add user properties.
-        $files = scandir($projectDir.'/Properties/User');
-        foreach ($files as $file) {
-            if ($file[0] === '.'
-                || substr($file, -5) !== '.json'
-            ) {
-                continue;
-            }
+        if (is_dir($projectDir.'/Properties/User') === true) {
+            $files = scandir($projectDir.'/Properties/User');
+            foreach ($files as $file) {
+                if ($file[0] === '.'
+                    || substr($file, -5) !== '.json'
+                ) {
+                    continue;
+                }
 
-            $propName = strtolower(substr($file, 0, -5));
-            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/User/'.$file), true);
-            StorageFactory::createUserProperty($propName, $propInfo['type']);
+                $propName = strtolower(substr($file, 0, -5));
+                $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/User/'.$file));
+                StorageFactory::createUserProperty($propName, $propInfo['type']);
+            }
         }
 
         // Add default user properties.
@@ -198,70 +204,18 @@ class Bootstrap
 
 
     /**
-     * Gets the storage directory.
-     *
-     * @return string
-     */
-    public static function getSimulatorDir()
-    {
-        return dirname(__DIR__, 4).'/simulator';
-
-    }//end getSimulatorDir()
-
-
-    /**
-     * Gets the storage directory.
-     *
-     * @param string $project The project code we are getting the directory for.
-     *
-     * @return mixed
-     */
-    public static function getStorageDir(string $project=null)
-    {
-        if ($project === null) {
-            $project = $GLOBALS['project'];
-        }
-
-        if (self::isReadEnabled() === false && self::isWriteEnabled() === false) {
-            return null;
-        }
-
-        return self::getSimulatorDir().'/'.$project.'/storage';
-
-    }//end getStorageDir()
-
-
-    /**
-     * Gets the project directory.
-     *
-     * @param string $project The project code we are getting the directory for.
-     *
-     * @return mixed
-     */
-    public static function getProjectDir(string $project=null)
-    {
-        if ($project === null) {
-            $project = $GLOBALS['project'];
-        }
-
-        return dirname(__DIR__, 4).'/projects/'.$project;
-
-    }//end getProjectDir()
-
-
-    /**
      * Installs the simulator for us.
      *
      * @return void
      */
     public static function install()
     {
-        $simulatorDir = self::getSimulatorDir();
+        $simulatorDir = Libs\FileSystem::getSimulatorDir();
         if (is_dir($simulatorDir) === false) {
             mkdir($simulatorDir);
         }
 
-        $projectPath = dirname(__DIR__, 4).'/projects/';
+        $projectPath = Libs\FileSystem::getExportDir().'/projects/';
         $projectDirs = scandir($projectPath);
         foreach ($projectDirs as $project) {
             $GLOBALS['project'] = $project;
@@ -274,7 +228,7 @@ class Bootstrap
 
                 $projectKey = Authentication::generateSecretKey();
 
-                $storageDir = self::getStorageDir($project);
+                $storageDir = Libs\FileSystem::getStorageDir($project);
                 if (is_dir($storageDir) === false) {
                     mkdir($storageDir);
                 }

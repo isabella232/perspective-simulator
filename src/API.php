@@ -281,7 +281,7 @@ class API
         $router .= self::printCode(0, '');
         $router .= self::printCode(0, '}//end class');
 
-        $routerFile = Bootstrap::getSimulatorDir().'/'.$project.'/APIRouter.php';
+        $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/APIRouter.php';
         file_put_contents($routerFile, $router);
 
     }//end bakeRouter()
@@ -405,7 +405,7 @@ class API
 
         $function .= self::printCode(0, '}//end class');
 
-        $functionFile = Bootstrap::getSimulatorDir().'/'.$project.'/API.php';
+        $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/API.php';
         file_put_contents($functionFile, $function);
 
     }//end bakeAPIFunctions()

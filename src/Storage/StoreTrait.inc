@@ -115,7 +115,7 @@ trait StoreTrait
             }
         }
 
-        $storageDir = Bootstrap::getStorageDir();
+        $storageDir = Libs\FileSystem::getStorageDir();
         $filePath   = $storageDir.'/'.$this->code.'/store.json';
         file_put_contents($filePath, Libs\Util::jsonEncode($store));
         return true;
@@ -134,7 +134,7 @@ trait StoreTrait
             return false;
         }
 
-        $storageDir = Bootstrap::getStorageDir();
+        $storageDir = Libs\FileSystem::getStorageDir();
         $filePath   = $storageDir.'/'.$this->code.'/store.json';
 
         if (is_file($filePath) === false) {
@@ -145,7 +145,7 @@ trait StoreTrait
 
         foreach ($store['records'] as $recordid => $data) {
             $recordPath = dirname($filePath).'/'.$recordid.'.json';
-            $recordData = json_decode(file_get_contents($recordPath), true);
+            $recordData = Libs\Util::jsonDecode(file_get_contents($recordPath));
             $type       = $recordData['type'];
             if ($type === 'PerspectiveSimulator\ObjectType\User') {
                 $data['object'] = new $type(

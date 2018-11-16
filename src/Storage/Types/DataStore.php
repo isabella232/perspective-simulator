@@ -38,7 +38,7 @@ class DataStore
         $this->type = 'Data';
 
         if (Bootstrap::isWriteEnabled() === true) {
-            $storageDir = Bootstrap::getStorageDir();
+            $storageDir = \PerspectiveSimulator\Libs\FileSystem::getStorageDir();
             $storeDir   = $storageDir.'/'.$code;
             if (is_dir($storeDir) === false) {
                 mkdir($storeDir);

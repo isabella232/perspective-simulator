@@ -77,7 +77,7 @@ trait ObjectTrait
         }
 
         $storeCode  = $this->store->getCode();
-        $storageDir = Bootstrap::getStorageDir();
+        $storageDir = Libs\FileSystem::getStorageDir();
         $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
 
         $classVars = get_object_vars($this);
@@ -106,7 +106,7 @@ trait ObjectTrait
         }
 
         $storeCode  = $this->store->getCode();
-        $storageDir = Bootstrap::getStorageDir();
+        $storageDir = Libs\FileSystem::getStorageDir();
         $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
         if (is_file($filePath) === false) {
             return false;
