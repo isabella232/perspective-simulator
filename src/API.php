@@ -40,7 +40,7 @@ class API
      */
     public static function getAPIPath(string $project)
     {
-        return dirname(__DIR__, 4).'/projects/'.$project.'/API';
+        return \PerspectiveSimulator\Libs\FileSystem::getProjectDir($project).'/API';
 
     }//end getAPIPath()
 
