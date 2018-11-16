@@ -11,7 +11,6 @@
 namespace PerspectiveSimulator\Objects;
 
 use \PerspectiveSimulator\Bootstrap;
-use \PerspectiveSimulator\Libs;
 
 /**
  * ReferenceObjectTrait Trait.

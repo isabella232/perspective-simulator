@@ -11,6 +11,7 @@
 namespace PerspectiveSimulator\Objects;
 
 use \PerspectiveSimulator\Bootstrap;
+use \PerspectiveSimulator\Libs;
 
 /**
  * StoreTrait Trait.
@@ -62,6 +63,64 @@ trait ObjectTrait
         return $this->store;
 
     }//end getStorage()
+
+
+    /**
+     * Save file for cache.
+     *
+     * @return boolean
+     */
+    public function save()
+    {
+        if (Bootstrap::isWriteEnabled() === false) {
+            return false;
+        }
+
+        $storeCode  = $this->store->getCode();
+        $storageDir = Bootstrap::getStorageDir();
+        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
+
+        $classVars = get_object_vars($this);
+        $record    = ['type' => get_class($this)];
+
+        unset($classVars['store']);
+        foreach ($classVars as $prop => $value) {
+            $record[$prop] = $value;
+        }
+
+        file_put_contents($filePath, Libs\Util::jsonEncode($record));
+        return true;
+
+    }//end save()
+
+
+    /**
+     * Loads from file cache.
+     *
+     * @return boolean
+     */
+    public function load()
+    {
+        if (Bootstrap::isReadEnabled() === false) {
+            return false;
+        }
+
+        $storeCode  = $this->store->getCode();
+        $storageDir = Bootstrap::getStorageDir();
+        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
+        if (is_file($filePath) === false) {
+            return false;
+        }
+
+        $data = Libs\Util::jsonDecode(file_get_contents($filePath));
+
+        foreach ($data as $prop => $value) {
+            $this->$prop = $value;
+        }
+
+        return true;
+
+    }//end load()
 
 
 }

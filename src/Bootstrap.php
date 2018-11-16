@@ -47,7 +47,7 @@ class Bootstrap
 
         $project            = ucfirst($project);
         $GLOBALS['project'] = $project;
-        $projectDir         = dirname(__DIR__, 4).'/projects/'.$project;
+        $projectDir         = Bootstrap::getProjectDir();
 
         // Register an autoloader for the project.
         $loader = include dirname(__DIR__, 3).'/autoload.php';
@@ -88,6 +88,34 @@ class Bootstrap
             $propName = strtolower(substr($file, 0, -5));
             $propInfo = json_decode(file_get_contents($projectDir.'/Properties/Data/'.$file), true);
             StorageFactory::createDataRecordProperty($propName, $propInfo['type']);
+        }
+
+        // Add project properties.
+        $files = scandir($projectDir.'/Properties/Project');
+        foreach ($files as $file) {
+            if ($file[0] === '.'
+                || substr($file, -5) !== '.json'
+            ) {
+                continue;
+            }
+
+            $propName = strtolower(substr($file, 0, -5));
+            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/Project/'.$file), true);
+            StorageFactory::createDeployementProperty($propName, $propInfo['type']);
+        }
+
+        // Add user properties.
+        $files = scandir($projectDir.'/Properties/User');
+        foreach ($files as $file) {
+            if ($file[0] === '.'
+                || substr($file, -5) !== '.json'
+            ) {
+                continue;
+            }
+
+            $propName = strtolower(substr($file, 0, -5));
+            $propInfo = json_decode(file_get_contents($projectDir.'/Properties/User/'.$file), true);
+            StorageFactory::createUserProperty($propName, $propInfo['type']);
         }
 
         // Add default user properties.

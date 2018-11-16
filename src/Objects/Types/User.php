@@ -12,17 +12,19 @@ namespace PerspectiveSimulator\ObjectType;
 
 require_once dirname(__FILE__, 2).'/ObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
+require_once dirname(__FILE__, 2).'/ObjectReadInterface.inc';
+require_once dirname(__FILE__, 2).'/ObjectWriteInterface.inc';
 
-use \PerspectiveSimulator\Bootstrap;
-use \PerspectiveSimulator\Libs;
-use \PerspectiveSimulator\Storage\StorageFactory;
+use \PerspectiveSimulator\Storage;
 use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
 use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
+use \PerspectiveSimulator\Objects\ObjectReadInterface as ObjectReadInterface;
+use \PerspectiveSimulator\Objects\ObjectWriteInterface as ObjectWriteInterface;
 
 /**
  * User class.
  */
-class User
+class User implements ObjectReadInterface, ObjectWriteInterface
 {
 
     use ObjectTrait;
@@ -86,7 +88,13 @@ class User
      */
     final public function getValue(string $propertyCode)
     {
-        $prop = StorageFactory::getUserProperty($propertyCode);
+        $typeName = Storage\StorageManager::getStoreType($this);
+        if ($typeName === null) {
+            throw new \Exception('Invalid property type');
+        }
+
+        $functionName = 'get'.$typeName.'Property';
+        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
@@ -107,7 +115,13 @@ class User
      */
     final public function setValue(string $propertyCode, $value)
     {
-        $prop = StorageFactory::getUserProperty($propertyCode);
+        $typeName = Storage\StorageManager::getStoreType($this);
+        if ($typeName === null) {
+            throw new \Exception('Invalid property type');
+        }
+
+        $functionName = 'get'.$typeName.'Property';
+        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
@@ -239,61 +253,79 @@ class User
 
 
     /**
-     * Save User to file for cache.
+     * Deletes the set value of a given property for a given data record in a given aspect.
      *
-     * @return boolean
+     * @param string $propertyCode The property code that the value is being deleted from.
+     *
+     * @return void
+     * @throws \Exception When the propertyCode doesn't exist.
      */
-    public function save()
+    final public function deleteValue(string $propertyCode)
     {
-        if (Bootstrap::isWriteEnabled() === false) {
-            return false;
+        if (isset($this->properties[$propertyCode]) === true) {
+            unset($this->properties[$propertyCode]);
+            $this->save();
         }
 
-        $record = [
-            'id'         => $this->id,
-            'type'       => get_class($this),
-            'properties' => $this->properties,
-            'references' => $this->references,
-            'groups'     => $this->groups,
-            'username'   => $this->username,
-        ];
-
-        $storeCode  = $this->store->getCode();
-        $storageDir = Bootstrap::getStorageDir();
-        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
-
-        file_put_contents($filePath, Libs\Util::jsonEncode($record));
-        return true;
-
-    }//end save()
+    }//end deleteValue()
 
 
     /**
-     * Load User to file for cache.
+     * Gets the shadow value of a given property for a given page in a given aspect.
      *
-     * @return boolean
+     * This method can also be used to retrieve multiple shadow values for multiple pages and so has a number of return
+     * value formats.
+     *
+     * @param string $propertyCode The property code that is being retrieved.
+     * @param string $shadowid     The shadow ID that the value is being retrieved from. If passing an array, the array
+     *                             must be a single-dimensional list of shadow IDs. If NULL, all values with a shadow ID
+     *                             will be returned for all passed page IDs. i.e., no shadow ID filtering will take place.
+     *
+     * @return mixed
+     * @throws InvalidDataException When propertyid is not known.
      */
-    public function load()
+    final public function getShadowValue(string $propertyCode, string $shadowid=null)
     {
-        if (Bootstrap::isReadEnabled() === false) {
-            return false;
-        }
+        // TODO: Implement this.
 
-        $storeCode  = $this->store->getCode();
-        $storageDir = Bootstrap::getStorageDir();
-        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
-        if (is_file($filePath) === false) {
-            return false;
-        }
+    }//end getShadowValue()
 
-        $data             = Libs\Util::jsonDecode(file_get_contents($filePath));
-        $this->properties = $data['properties'];
-        $this->references = $data['references'];
-        $this->groups     = $data['groups'];
-        $this->username   = $data['username'];
-        return true;
 
-    }//end load()
+    /**
+     * Sets the shadow value of a given property for a given data record in a given aspect.
+     *
+     * @param string $propertyCode The property code that the value is being set on.
+     * @param string $shadowid     The shadow ID to associate with the value.
+     * @param mixed  $value        The value to set into the property. The data type of the value must match the expected
+     *                             data type of the property.
+     * @param array  $aspect       The aspect defines a specific variation of the property value to set.
+     *
+     * @return void
+     * @throws InvalidDataException Thrown when propertyid is unknown.
+     * @throws ReadOnlyException    When request is in read only mode.
+     */
+    final public function setShadowValue(string $propertyCode, string $shadowid, $value)
+    {
+        // TODO: implement this.
+
+    }//end setShadowValue()
+
+
+    /**
+     * Deletes the shadow value of a given property for a given data record in a given aspect.
+     *
+     * @param string $propertyCode The property code that the value is being deleted from.
+     * @param string $shadowid     The shadow ID associated with the value.
+     *
+     * @return void
+     * @throws InvalidDataException When the propertyid is not known.
+     * @throws ReadOnlyException    When request is in read only mode.
+     */
+    final public function deleteShadowValue(string $propertyCode, string $shadowid)
+    {
+        // TODO: implement this.
+
+    }//end deleteShadowValue()
 
 
 }//end class

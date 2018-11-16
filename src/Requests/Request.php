@@ -29,4 +29,23 @@ class Request
     }//end inAuthor()
 
 
+    /**
+     * Returns the current deployment object.
+     *
+     * @return object
+     * @throws \Exception When fails to create new deployment object.
+     */
+    public static function getDeployment()
+    {
+        try {
+            $deploymentObject = new \PerspectiveSimulator\ObjectType\Deployment($GLOBALS['project']);
+        } catch (\Exception $e) {
+            throw new \Exception(_('Unable to create new deployment object'));
+        }
+
+        return $deploymentObject;
+
+    }//end getDeployment()
+
+
 }//end class

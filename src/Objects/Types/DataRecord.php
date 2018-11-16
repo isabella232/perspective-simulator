@@ -11,21 +11,26 @@
 namespace PerspectiveSimulator\ObjectType;
 
 require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
+require_once dirname(__FILE__, 2).'/AspectedObjectWriteTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
+require_once dirname(__FILE__, 2).'/ObjectReadInterface.inc';
+require_once dirname(__FILE__, 2).'/ObjectWriteInterface.inc';
 
-use \PerspectiveSimulator\Bootstrap;
-use \PerspectiveSimulator\Libs;
-use \PerspectiveSimulator\Storage\StorageFactory;
 use \PerspectiveSimulator\Objects\AspectedObjectTrait as AspectedObjectTrait;
+use \PerspectiveSimulator\Objects\AspectedObjectWriteTrait as AspectedObjectWriteTrait;
 use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
+use \PerspectiveSimulator\Objects\ObjectReadInterface as ObjectReadInterface;
+use \PerspectiveSimulator\Objects\ObjectWriteInterface as ObjectWriteInterface;
 
 /**
  * DataRecord Class
  */
-class DataRecord
+class DataRecord implements ObjectReadInterface, ObjectWriteInterface
 {
 
     use AspectedObjectTrait;
+
+    use AspectedObjectWriteTrait;
 
     use ReferenceObjectTrait;
 
@@ -48,80 +53,6 @@ class DataRecord
         }
 
     }//end __construct()
-
-
-    /**
-     * Gets a data record property value.
-     *
-     * @param string $propertyCode The property to get the value of.
-     *
-     * @return mixed
-     * @throws \Exception When the propertyCode doesn't exist.
-     */
-    final public function getValue(string $propertyCode)
-    {
-        $prop = StorageFactory::getDataRecordProperty($propertyCode);
-        if ($prop === null) {
-            throw new \Exception('Property "'.$propertyCode.'" does not exist');
-        }
-
-        if (isset($this->properties[$propertyCode]) === true) {
-            return $this->properties[$propertyCode];
-        }
-
-        return $prop['default'];
-
-    }//end getValue()
-
-
-    /**
-     * Sets the data record property value.
-     *
-     * @param string $propertyCode The property to set the value of.
-     * @param mixed  $value        The property value to set.
-     *
-     * @return void
-     * @throws \Exception When the propertyCode doesn't exist or the value isn't unique.
-     */
-    final public function setValue(string $propertyCode, $value)
-    {
-        $prop = StorageFactory::getDataRecordProperty($propertyCode);
-        if ($prop === null) {
-            throw new \Exception('Property "'.$propertyCode.'" does not exist');
-        }
-
-        if ($prop['type'] === 'unique') {
-            $current = $this->store->getUniqueDataRecord($propertyCode, $value);
-            if ($current !== null) {
-                throw new \Exception('Unique value "'.$value.'" is already in use');
-            }
-
-            $this->store->setUniqueDataRecord($propertyCode, $value, $this);
-        }
-
-        $this->properties[$propertyCode] = $value;
-
-        $this->save();
-
-    }//end setValue()
-
-
-    /**
-     * Deletes a data record property value.
-     *
-     * @param string $propertyCode The property to get the value of.
-     *
-     * @return mixed
-     * @throws \Exception When the propertyCode doesn't exist.
-     */
-    final public function deleteValue(string $propertyCode)
-    {
-        if (isset($this->properties[$propertyCode]) === true) {
-            unset($this->properties[$propertyCode]);
-            $this->save();
-        }
-
-    }//end deleteValue()
 
 
     /**
@@ -156,62 +87,6 @@ class DataRecord
         return $this->store->getParents($this->id, $depth);
 
     }//end getParents()
-
-
-    /**
-     * Save Data Record to file for cache.
-     *
-     * @return boolean
-     */
-    public function save()
-    {
-        if (Bootstrap::isWriteEnabled() === false) {
-            return false;
-        }
-
-        $record = [
-            'id'         => $this->id,
-            'type'       => get_class($this),
-            'properties' => $this->properties,
-            'references' => $this->references,
-            'aspect'     => $this->aspect,
-        ];
-
-        $storeCode  = $this->store->getCode();
-        $storageDir = Bootstrap::getStorageDir();
-        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
-
-        file_put_contents($filePath, Libs\Util::jsonEncode($record));
-        return true;
-
-    }//end save()
-
-
-    /**
-     * Load Data Record to file for cache.
-     *
-     * @return boolean
-     */
-    public function load()
-    {
-        if (Bootstrap::isReadEnabled() === false) {
-            return false;
-        }
-
-        $storeCode  = $this->store->getCode();
-        $storageDir = Bootstrap::getStorageDir();
-        $filePath   = $storageDir.'/'.$storeCode.'/'.$this->id.'.json';
-        if (is_file($filePath) === false) {
-            return false;
-        }
-
-        $data             = Libs\Util::jsonDecode(file_get_contents($filePath));
-        $this->properties = $data['properties'];
-        $this->references = $data['references'];
-        $this->aspect     = $data['aspect'];
-        return true;
-
-    }//end load()
 
 
 }//end class

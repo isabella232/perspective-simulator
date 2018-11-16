@@ -32,9 +32,10 @@ class StorageFactory
      * @var array
      */
     private static $props = [
-        'page' => [],
-        'data' => [],
-        'user' => [],
+        'page'    => [],
+        'data'    => [],
+        'user'    => [],
+        'project' => [],
     ];
 
 
@@ -109,6 +110,25 @@ class StorageFactory
 
 
     /**
+     * Creates a deployment (project) property
+     *
+     * @param string $code    The property code.
+     * @param string $type    The type of user property.
+     * @param mixed  $default The default value.
+     *
+     * @return void
+     */
+    public static function createDeployementProperty(string $code, string $type, $default=null)
+    {
+        self::$props['project'][$code] = [
+            'type'    => $type,
+            'default' => $default,
+        ];
+
+    }//end createDeployementProperty()
+
+
+    /**
      * Retrieves a data record property.
      *
      * @param string $code The code of the data record property.
@@ -134,6 +154,20 @@ class StorageFactory
         return (self::$props['user'][$code] ?? null);
 
     }//end getUserProperty()
+
+
+    /**
+     * Retrieves a user property.
+     *
+     * @param string $code The code of the user property.
+     *
+     * @return mixed.
+     */
+    public static function getDeploymentProperty(string $code)
+    {
+        return (self::$props['project'][$code] ?? null);
+
+    }//end getDeploymentProperty()
 
 
     /**
