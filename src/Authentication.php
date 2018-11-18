@@ -10,6 +10,7 @@
 
 namespace PerspectiveSimulator;
 
+use PerspectiveSimulator\Requests\Session;
 use PerspectiveSimulator\Storage\StorageFactory;
 use PerspectiveSimulator\Libs;
 
@@ -96,8 +97,8 @@ class Authentication
     {
         self::$user            = $user;
         self::$loggedIn        = true;
-        $_SESSION['user']      = $user->getId();
-        $_SESSION['userStore'] = $user->getStorage()->getCode();
+        Session::setValue('user', $user->getId());
+        Session::setValue('userStore', $user->getStorage()->getCode());
 
     }//end login()
 
@@ -132,6 +133,7 @@ class Authentication
         unset($_SESSION['user']);
         unset($_SESSION['userStore']);
         unset($_SESSION['moderator']);
+        Session::save();
 
         return true;
 
