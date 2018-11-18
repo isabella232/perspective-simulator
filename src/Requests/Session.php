@@ -10,11 +10,56 @@
 
 namespace PerspectiveSimulator\Requests;
 
+use \PerspectiveSimulator\Bootstrap;
+use \PerspectiveSimulator\Libs;
+
 /**
  * Request Class
  */
 class Session
 {
+
+
+    /**
+     * Loads the session.
+     *
+     * @return boolean
+     */
+    public static function load()
+    {
+        if (Bootstrap::isReadEnabled() === false) {
+            return false;
+        }
+
+        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/session.json';
+        if (file_exists($filePath) === true) {
+            $_SESSION = Libs\Util::jsonDecode(file_get_contents($filePath));
+        } else {
+            $_SESSION = [];
+        }
+
+        return true;
+
+    }//end load()
+
+
+    /**
+     * Saves the session.
+     *
+     * @return boolean
+     */
+    public static function save()
+    {
+        if (Bootstrap::isWriteEnabled() === false) {
+            return false;
+        }
+
+        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/session.json';
+        file_put_contents($filePath, Libs\Util::jsonEncode($_SESSION));
+
+        return true;
+
+    }//end load()
 
 
     /**
@@ -46,6 +91,7 @@ class Session
     public static function setvalue(string $key, $value)
     {
         $_SESSION[$key] = $value;
+        self::save();
 
     }//end setvalue()
 

@@ -43,8 +43,6 @@ class Bootstrap
      */
     public static function load(string $project)
     {
-        session_start();
-
         $project            = ucfirst($project);
         $GLOBALS['project'] = $project;
         $projectDir         = Libs\FileSystem::getProjectDir();
@@ -127,6 +125,8 @@ class Bootstrap
         // Add default user properties.
         StorageFactory::createUserProperty('__first-name__', 'text');
         StorageFactory::createUserProperty('__last-name__', 'text');
+
+        \PerspectiveSimulator\Requests\Session::load();
 
     }//end load()
 
