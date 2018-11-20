@@ -24,7 +24,7 @@ abstract class SimulatorTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public static function setUpBeforeClass()
+    final public static function setUpBeforeClass()
     {
         $calledClass = get_called_class();
         $classParts  = explode('\\', $calledClass);
@@ -41,7 +41,7 @@ abstract class SimulatorTest extends \PHPUnit\Framework\TestCase
      *
      * @return string
      */
-    public function getSecretKey()
+    final public function getSecretKey()
     {
         return \PerspectiveSimulator\Authentication::getSecretKey();
 
