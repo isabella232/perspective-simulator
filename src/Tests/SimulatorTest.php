@@ -15,7 +15,7 @@ use \PerspectiveSimulator\Bootstrap;
 /**
  * SimulatorTest class
  */
-class SimulatorTest extends \PHPUnit\Framework\TestCase
+abstract class SimulatorTest extends \PHPUnit\Framework\TestCase
 {
 
 
@@ -45,7 +45,7 @@ class SimulatorTest extends \PHPUnit\Framework\TestCase
     {
         return \PerspectiveSimulator\Authentication::getSecretKey();
 
-    }
+    }//end getSecretKey()
 
 
 }//end class
