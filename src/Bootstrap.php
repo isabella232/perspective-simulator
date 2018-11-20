@@ -59,6 +59,7 @@ class Bootstrap
         class_alias('PerspectiveSimulator\Storage\StorageFactory', '\StorageFactory');
         class_alias('PerspectiveSimulator\Requests\Request', '\Request');
         class_alias('PerspectiveSimulator\Requests\Session', '\Session');
+        class_alias('PerspectiveSimulator\Queue\Queue', '\Queue');
 
         // Add data stores.
         $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
@@ -234,6 +235,7 @@ class Bootstrap
                 }
 
                 API::installAPI($project);
+                \PerspectiveSimulator\Queue\Queue::installQueues($project);
             }
         }//end foreach
 

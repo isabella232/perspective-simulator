@@ -49,4 +49,23 @@ class Util
     }//end jsonDecode()
 
 
+    /**
+     * Fromats code lines.
+     *
+     * @param integer $level The indentation level.
+     * @param string  $line  The line of code.
+     *
+     * @return string
+     */
+    public static function printCode(int $level, string $line)
+    {
+        $indent = function ($lvl) {
+            return str_repeat(' ', ($lvl * 4));
+        };
+
+        return $indent($level).$line."\n";
+
+    }//end printCode()
+
+
 }//end class

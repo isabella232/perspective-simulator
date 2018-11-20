@@ -10,6 +10,7 @@
 
 namespace PerspectiveSimulator;
 
+use \PerspectiveSimulator\Libs\Util;
 
 /**
  * API class
@@ -135,25 +136,6 @@ class API
 
 
     /**
-     * Fromats code lines.
-     *
-     * @param integer $level The indentation level.
-     * @param string  $line  The line of code.
-     *
-     * @return string
-     */
-    private static function printCode(int $level, string $line)
-    {
-        $indent = function ($lvl) {
-            return str_repeat(' ', ($lvl * 4));
-        };
-
-        return $indent($level).$line."\n";
-
-    }//end printCode()
-
-
-    /**
      * Bakes router class.
      *
      * @param array  $apis    The api paths to bake.
@@ -163,16 +145,16 @@ class API
      */
     private static function bakeRouter(array $apis, string $project)
     {
-        $router  = self::printCode(0, '<?php');
-        $router .= self::printCode(0, 'namespace '.$project.';');
-        $router .= self::printCode(0, '');
-        $router .= self::printCode(0, 'class APIRouter {');
-        $router .= self::printCode(0, '');
-        $router .= self::printCode(1, 'public static function process($path, $httpMethod, $queryParams)');
-        $router .= self::printCode(1, '{');
-        $router .= self::printCode(2, '$operationid = null;');
-        $router .= self::printCode(0, '');
-        $router .= self::printCode(2, 'switch ($httpMethod) {');
+        $router  = Util::printCode(0, '<?php');
+        $router .= Util::printCode(0, 'namespace '.$project.';');
+        $router .= Util::printCode(0, '');
+        $router .= Util::printCode(0, 'class APIRouter {');
+        $router .= Util::printCode(0, '');
+        $router .= Util::printCode(1, 'public static function process($path, $httpMethod, $queryParams)');
+        $router .= Util::printCode(1, '{');
+        $router .= Util::printCode(2, '$operationid = null;');
+        $router .= Util::printCode(0, '');
+        $router .= Util::printCode(2, 'switch ($httpMethod) {');
 
         foreach ($apis as $method => $paths) {
             $case = 'case \''.$method.'\':';
@@ -180,7 +162,7 @@ class API
                 $case .= ' case \'head\':';
             }
 
-            $router .= self::printCode(3, $case);
+            $router .= Util::printCode(3, $case);
 
             foreach ($paths as $id => $api) {
                 $api['path'] = ltrim($api['path'], '/');
@@ -215,14 +197,14 @@ class API
                         $api['path'] = str_replace('\{'.$param['name'].'\}', $replace, $api['path']);
                     }
 
-                    $router .= self::printCode(4, '$matches = [];');
-                    $router .= self::printCode(4, 'if (preg_match(\'~^'.$api['path'].'$~\', $path, $matches) === 1) {');
+                    $router .= Util::printCode(4, '$matches = [];');
+                    $router .= Util::printCode(4, 'if (preg_match(\'~^'.$api['path'].'$~\', $path, $matches) === 1) {');
                     foreach ($pathParams as $param) {
                         $matchIndex                = ($matchIndexes[$param['name']] + 1);
                         $arguments[$param['name']] = '$matches['.$matchIndex.']';
                     }
                 } else {
-                    $router .= self::printCode(4, 'if ($path === \''.$api['path'].'\') {');
+                    $router .= Util::printCode(4, 'if ($path === \''.$api['path'].'\') {');
                 }//end if
 
                 $queryParams = ($allParams['query'] ?? []);
@@ -244,42 +226,42 @@ class API
                     $arguments[$param['name']] = '$_COOKIE[\''.$param['name'].'\'] ?? null';
                 }
 
-                $router .= self::printCode(5, '$operationid  = \''.$api['operationid'].'\';');
-                $router .= self::printCode(5, '$arguments    = [');
+                $router .= Util::printCode(5, '$operationid  = \''.$api['operationid'].'\';');
+                $router .= Util::printCode(5, '$arguments    = [');
                 foreach ($arguments as $argIndex => $argValue) {
-                    $router .= self::printCode(6, '\''.$argIndex.'\' => '.$argValue.',');
+                    $router .= Util::printCode(6, '\''.$argIndex.'\' => '.$argValue.',');
                 }
 
-                $router .= self::printCode(5, '];');
-                $router .= self::printCode(5, 'break;');
-                $router .= self::printCode(4, '}');
+                $router .= Util::printCode(5, '];');
+                $router .= Util::printCode(5, 'break;');
+                $router .= Util::printCode(4, '}');
             }//end foreach
         }//end foreach
 
-        $router .= self::printCode(2, '}//end switch');
-        $router .= self::printCode(0, '');
-        $router .= self::printCode(2, 'if ($operationid !== null) {');
-        $router .= self::printCode(3, '$requestBody = file_get_contents(\'php://input\');');
-        $router .= self::printCode(
+        $router .= Util::printCode(2, '}//end switch');
+        $router .= Util::printCode(0, '');
+        $router .= Util::printCode(2, 'if ($operationid !== null) {');
+        $router .= Util::printCode(3, '$requestBody = file_get_contents(\'php://input\');');
+        $router .= Util::printCode(
             3,
             '$contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? \'\');'
         );
-        $router .= self::printCode(3, 'if (strpos($contentType, \'application/json\') !== false) {');
-        $router .= self::printCode(4, '$requestBody = json_decode($requestBody, true);');
-        $router .= self::printCode(3, '}');
-        $router .= self::printCode(3, '$arguments[] = $requestBody;');
-        $router .= self::printCode(3, '$api = new API;');
-        $router .= self::printCode(3, '$output = call_user_func_array([$api, $operationid], $arguments);');
-        $router .= self::printCode(3, 'header(\'Content-Type: application/json\');');
-        $router .= self::printCode(3, 'echo json_encode($output);');
-        $router .= self::printCode(2, '} else {');
-        $router .= self::printCode(3, 'header(\'HTTP/1.1 404 Not Found\');');
-        $router .= self::printCode(3, 'exit();');
-        $router .= self::printCode(2, '}');
-        $router .= self::printCode(1, '}//end process');
-        $router .= self::printCode(0, '');
-        $router .= self::printCode(0, '');
-        $router .= self::printCode(0, '}//end class');
+        $router .= Util::printCode(3, 'if (strpos($contentType, \'application/json\') !== false) {');
+        $router .= Util::printCode(4, '$requestBody = json_decode($requestBody, true);');
+        $router .= Util::printCode(3, '}');
+        $router .= Util::printCode(3, '$arguments[] = $requestBody;');
+        $router .= Util::printCode(3, '$api = new API;');
+        $router .= Util::printCode(3, '$output = call_user_func_array([$api, $operationid], $arguments);');
+        $router .= Util::printCode(3, 'header(\'Content-Type: application/json\');');
+        $router .= Util::printCode(3, 'echo json_encode($output);');
+        $router .= Util::printCode(2, '} else {');
+        $router .= Util::printCode(3, 'header(\'HTTP/1.1 404 Not Found\');');
+        $router .= Util::printCode(3, 'exit();');
+        $router .= Util::printCode(2, '}');
+        $router .= Util::printCode(1, '}//end process');
+        $router .= Util::printCode(0, '');
+        $router .= Util::printCode(0, '');
+        $router .= Util::printCode(0, '}//end class');
 
         $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/APIRouter.php';
         file_put_contents($routerFile, $router);
@@ -297,13 +279,13 @@ class API
      */
     private static function bakeAPIFunctions(array $apis, string $project)
     {
-        $function  = self::printCode(0, '<?php');
-        $function .= self::printCode(0, 'namespace '.$project.';');
-        $function .= self::printCode(0, '');
-        $function .= self::printCode(0, 'class API');
-        $function .= self::printCode(0, '{');
-        $function .= self::printCode(0, '');
-        $function .= self::printCode(0, '');
+        $function  = Util::printCode(0, '<?php');
+        $function .= Util::printCode(0, 'namespace '.$project.';');
+        $function .= Util::printCode(0, '');
+        $function .= Util::printCode(0, 'class API');
+        $function .= Util::printCode(0, '{');
+        $function .= Util::printCode(0, '');
+        $function .= Util::printCode(0, '');
 
         foreach ($apis as $method => $paths) {
             foreach ($paths as $id => $api) {
@@ -390,20 +372,20 @@ class API
                 $functionSignature .= implode(', ', $arguments);
                 $functionSignature .= ')';
 
-                $function .= self::printCode(1, $functionSignature);
-                $function .= self::printCode(1, '{');
-                $function .= self::printCode(
+                $function .= Util::printCode(1, $functionSignature);
+                $function .= Util::printCode(1, '{');
+                $function .= Util::printCode(
                     2,
                     '$content = \PerspectiveSimulator\API::getAPIFunction(__NAMESPACE__, \''.$api['operationid'].'\');'
                 );
-                $function .= self::printCode(2, 'return eval($content);');
-                $function .= self::printCode(1, '}');
-                $function .= self::printCode(0, '');
-                $function .= self::printCode(0, '');
+                $function .= Util::printCode(2, 'return eval($content);');
+                $function .= Util::printCode(1, '}');
+                $function .= Util::printCode(0, '');
+                $function .= Util::printCode(0, '');
             }//end foreach
         }//end foreach
 
-        $function .= self::printCode(0, '}//end class');
+        $function .= Util::printCode(0, '}//end class');
 
         $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/API.php';
         file_put_contents($functionFile, $function);
@@ -422,26 +404,26 @@ class API
      */
     private static function generateAPIFunction(string $project, array $api, array $allParams)
     {
-        $functionContent  = self::printCode(0, '<?php');
-        $functionContent .= self::printCode(0, '/**');
-        $functionContent .= self::printCode(0, ' * API stub for the '.$api['operationid'].'() operation.');
-        $functionContent .= self::printCode(0, ' *');
-        $functionContent .= self::printCode(0, ' * '.$api['description']);
-        $functionContent .= self::printCode(0, ' *');
+        $functionContent  = Util::printCode(0, '<?php');
+        $functionContent .= Util::printCode(0, '/**');
+        $functionContent .= Util::printCode(0, ' * API stub for the '.$api['operationid'].'() operation.');
+        $functionContent .= Util::printCode(0, ' *');
+        $functionContent .= Util::printCode(0, ' * '.$api['description']);
+        $functionContent .= Util::printCode(0, ' *');
 
         foreach ($allParams as $type => $params) {
             foreach ($params as $param) {
                 $paramCommement   = ' * @param '.$param['schema']['type'].' $'.$param['name'].' '.$param['description'];
-                $functionContent .= self::printCode(0, $paramCommement);
+                $functionContent .= Util::printCode(0, $paramCommement);
             }
         }
 
         if ($api['http_method'] !== 'get') {
-            $functionContent .= self::printCode(0, ' * @param array $requestBody');
+            $functionContent .= Util::printCode(0, ' * @param array $requestBody');
         }
 
-        $functionContent .= self::printCode(0, ' */');
-        $functionContent .= self::printCode(0, '');
+        $functionContent .= Util::printCode(0, ' */');
+        $functionContent .= Util::printCode(0, '');
 
         $file = self::getAPIPath($project).'/Operations/'.$api['operationid'].'.php';
         file_put_contents($file, $functionContent);

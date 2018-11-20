@@ -27,6 +27,11 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/APIRouter.php';
             }
 
+            if (substr($class, -9) === '\JobQueue' && substr_count($class, '\\') === 1) {
+                $project = substr($class, 0, strpos($class, '\\'));
+                $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/JobQueue.php';
+            }
+
             if (substr($class, 0, 21) === 'PerspectiveSimulator\\') {
                 $parts = explode('\\', $class);
                 if ($parts[1] === 'StorageType') {
