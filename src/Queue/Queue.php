@@ -127,7 +127,6 @@ class Queue
         $valid = self::validateQueues($queueNames);
         if ($valid === false) {
             if ($failedCallback !== null) {
-                // TODO: Review if this is the right place to run this or do wee nedd to in the simulator?
                 call_user_func($failedCallback);
             }
 
@@ -152,7 +151,6 @@ class Queue
         self::save();
 
         if ($successCallback !== null) {
-            // TODO: Review if this is the right place to run this or do wee nedd to in the simulator?
             call_user_func($successCallback);
         }
 
