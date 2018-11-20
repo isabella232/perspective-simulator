@@ -41,7 +41,7 @@ class SimulatorTest extends \PHPUnit\Framework\TestCase
      *
      * @return string
      */
-    public static function getSecretKey()
+    public function getSecretKey()
     {
         return \PerspectiveSimulator\Authentication::getSecretKey();
 

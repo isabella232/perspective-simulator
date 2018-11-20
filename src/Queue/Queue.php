@@ -296,12 +296,12 @@ class Queue
                 $queueClass .= Libs\Util::printCode(0, '');
                 $queueClass .= Libs\Util::printCode(0, '');
             }
+
+            $queueClass .= Libs\Util::printCode(0, '}');
+
+            $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/JobQueue.php';
+            file_put_contents($queueFile, $queueClass);
         }//end if
-
-        $queueClass .= Libs\Util::printCode(0, '}');
-
-        $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/JobQueue.php';
-        file_put_contents($queueFile, $queueClass);
 
         return true;
 
