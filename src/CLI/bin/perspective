@@ -1,0 +1,80 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Perspective command for the perspective simulator
+ *
+ * @package    Perspective
+ * @subpackage Simulator
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
+ */
+
+// Prepare script for cli run.
+if (php_sapi_name() !== 'cli') {
+    echo "This script must be run from the command line.\n";
+    exit(1);
+}
+
+include_once dirname(__DIR__, 5).'/autoload.php';
+
+error_reporting(E_ALL | E_STRICT);
+ini_set('default_charset', 'UTF-8');
+mb_internal_encoding('UTF-8');
+
+// Get options
+$opts = getopt(
+    'p:hi',
+    [
+        'project:',
+        'help',
+        'install',
+    ]
+);
+
+if (isset($opts['h']) === true || isset($opts['help']) === true) {
+    printUsage();
+    exit;
+}
+
+$install = false;
+if (isset($opts['i']) === true || isset($opts['install']) === true) {
+    $install = true;
+}
+
+$project = ($opts['p'] ?? $opts['project'] ?? null);
+
+if ((isset($opts['i']) === true
+    || isset($opts['install']) === true)
+    && is_dir(\PerspectiveSimulator\Libs\FileSystem::getSimulatorDir()) === true
+) {
+    echo 'Perspective Simulator already installed.'."\n";
+    exit;
+}
+
+if ($install === false) {
+    \PerspectiveSimulator\CLI\Console::loadProject($project);
+}
+
+$console = \PerspectiveSimulator\CLI\Console::getInstance();
+$console->run([
+    'project' => $project,
+    'install' => $install,
+    'argv'    => $argv,
+]);
+
+/**
+ * Print the usage.
+ * TODO: move this to run so each command can have its own help too.
+ *
+ * @return void
+ */
+function printUsage() {
+    echo 'Usage: perspective [OPTION] <command>'."\n";
+    echo 'Without option, it will assume the export only contians 1 project'."\n";
+    echo "\n";
+    echo "\n";
+    echo '  -p, --project  Mandatory string when multiple projects in export.'."\n";
+    echo '  -h, --help     Optional Print the usage.'."\n";
+    echo "\n";
+
+}//end printUsage()

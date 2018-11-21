@@ -206,42 +206,4 @@ class Bootstrap
     }//end enableWrite()
 
 
-    /**
-     * Installs the simulator for us.
-     *
-     * @return void
-     */
-    public static function install()
-    {
-        $simulatorDir = Libs\FileSystem::getSimulatorDir();
-        if (is_dir($simulatorDir) === false) {
-            Libs\FileSystem::mkdir($simulatorDir);
-        }
-
-        $projectPath = Libs\FileSystem::getExportDir().'/projects/';
-        $projectDirs = scandir($projectPath);
-        foreach ($projectDirs as $project) {
-            $GLOBALS['project'] = $project;
-
-            $path = $projectPath.$project;
-            if (is_dir($path) === true && $project[0] !== '.') {
-                if (is_dir($simulatorDir.'/'.$project) === false) {
-                    Libs\FileSystem::mkdir($simulatorDir.'/'.$project);
-                }
-
-                $projectKey = Authentication::generateSecretKey();
-
-                $storageDir = Libs\FileSystem::getStorageDir($project);
-                if (is_dir($storageDir) === false) {
-                    Libs\FileSystem::mkdir($storageDir);
-                }
-
-                API::installAPI($project);
-                \PerspectiveSimulator\Queue\Queue::installQueues($project);
-            }
-        }//end foreach
-
-    }//end install()
-
-
 }//end class

@@ -68,4 +68,44 @@ class Util
     }//end printCode()
 
 
+    /**
+     * Only checks the letters used in ID strings.
+     *
+     * @param string  $stringid The id of being used.
+     * @param boolean $allowDot Flag to allow . or not.
+     *
+     * @return boolean
+     */
+    public static function isValidStringid(string $stringid, bool $allowDot=false)
+    {
+        $re = 'a-zA-Z0-9\_\-';
+        if ($allowDot === true) {
+            // Allow . for subproperty.
+            $re .= '\.';
+        }
+
+        $re = '/[^'.$re.']/';
+        if (empty($stringid) === true
+            || preg_match($re, $stringid) !== 0
+            || strpos($stringid, chr(0)) !== false
+        ) {
+            return false;
+        }
+
+        // Check a stringid must have at least 1 non numeric character in it.  We index arrays by stringid and it
+        // can convert string numbers into integer array keys and this has array merge implications.
+        if (preg_match('/[a-zA-Z\_\-\.]/', $stringid) === 0) {
+            return false;
+        }
+
+        // Check first letter.
+        if (preg_match('/^[a-zA-Z\_\-]/', $stringid) === 0) {
+            return false;
+        }
+
+        return true;
+
+    }//end isValidStringid()
+
+
 }//end class

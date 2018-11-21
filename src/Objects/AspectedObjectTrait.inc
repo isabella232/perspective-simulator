@@ -67,7 +67,7 @@ trait AspectedObjectTrait
      * @param string $propertyCode The property code that is being retrieved.
      *
      * @return mixed
-     * @throws InvalidDataException When propertyid is not a valid propertyid.
+     * @throws \Exception When propertyid is not a valid propertyid.
      */
     final public function getValue(string $propertyCode)
     {
@@ -77,7 +77,7 @@ trait AspectedObjectTrait
         }
 
         $functionName = 'get'.$typeName.'Property';
-        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
+        $prop         = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
