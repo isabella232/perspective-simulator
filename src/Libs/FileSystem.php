@@ -162,7 +162,7 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
-        return self::getExportDir().'/projects/'.$project;
+        return self::getExportDir().'/projects/'.$project.'/src';
 
     }//end getProjectDir()
 

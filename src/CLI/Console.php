@@ -100,6 +100,11 @@ class Console
 
         if (isset($args['install']) === true && $args['install'] === true) {
             $command = new \PerspectiveSimulator\CLI\Command\Install('install', []);
+            if (isset($args['help']) === true && $args['help'] === true) {
+                $command->printHelp(self::$actionName);
+                exit(1);
+            }
+
             $command->install();
         } else {
             if (isset($args['argv']) === true) {
@@ -162,7 +167,18 @@ class Console
         self::$scriptName  = array_shift($args);
         self::$actionName  = array_shift($args);
         self::$commandName = array_shift($args);
-        self::$args        = $args;
+
+        if (self::$commandName === 'property') {
+            self::$commandName = array_shift($args).self::$commandName;
+        } else if (self::$commandName === 'customtype') {
+            $customType = array_shift($args);
+            self::$commandName = 'CustomDataType';
+            if ($customType === 'page') {
+                self::$commandName = 'CustomPageType';
+            }
+        }
+
+        self::$args = $args;
 
     }//end getArgs()
 
@@ -212,8 +228,7 @@ class Console
         if (count($projects) > 1) {
             $eMsg  = 'Multiple projects found, perspective command expects project to be set when more than 1 project';
             $eMsg .= " in export.\n";
-            $eMsg .= 'Try running perspective -p <project name> '.self::$actionName.' '.self::$commandName;
-            $eMsg .= ' '.implode(' ', self::$args)."\n";
+            $eMsg .= 'Try running with -p=<project name> or --project=<project name>'."\n";
             throw new CLIException($eMsg);
         }
 

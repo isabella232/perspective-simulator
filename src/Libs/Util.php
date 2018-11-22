@@ -108,4 +108,79 @@ class Util
     }//end isValidStringid()
 
 
+    /**
+     * Returns true if the string is suitable for PHP class name.
+     *
+     * @param string $string The string to test.
+     *
+     * @return boolean
+     */
+    public static function isPHPClassString(string $string)
+    {
+        // Regex ref: http://php.net/manual/en/language.oop5.basic.php
+        $re = '^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$';
+        $re = '/'.$re.'/';
+        if (empty($string) === true
+            || preg_match($re, $string) !== 1
+            || strpos($string, chr(0)) !== false
+        ) {
+            return false;
+        }
+
+        return true;
+
+    }//end isPHPClassString()
+
+
+    /**
+     * Returns the default class content used from creating a new Custom Type and App PHP Class.
+     *
+     * @return string
+     */
+    public static function getDefaultPHPClass()
+    {
+        $defaultClass = '<?php
+namespace NAMESPACE;
+
+/**
+ * Class comment goes here.
+ */
+class CLASS_NAME CLASS_EXTENDS
+{
+
+}//end class
+';
+        return $defaultClass;
+
+    }//end getDefaultPHPClass()
+
+
+    /**
+     * Updates changes in PHP Class code for App and Custom Types when namespace or class name needs to be updated.
+     *
+     * @param string $sourceCode The original source code to be updated.
+     * @param array  $changeData Array of old and new values to be used.
+     * @param string $typeChange What we are going to changeeg, classname or namespace. or extends
+     *
+     * @return string
+     */
+    public static function updatePHPCode($sourceCode, $changeData , $typeChange='classname')
+    {
+        $newSourceCode = $sourceCode;
+        if ($typeChange === 'classname') {
+            $re            = '/(class|trait|interface)(\s)+'.$changeData['oldClassName'].'(\s)*/';
+            $newSourceCode = preg_replace($re, '\1\2'.$changeData['newClassName'].'\3', $sourceCode);
+        } else if ($typeChange === 'namespace') {
+            $re            = '/(namespace\s)([\s\w\\\]|[\#\/\w\.])+([\;]{1})/';
+            $newSourceCode = preg_replace($re, '\1'.$changeData['newNamespace'].'\3', $sourceCode);
+        } else if ($typeChange === 'extends') {
+            $re            = '/(extends\s)[\s\w]+([\s]{1})/';
+            $newSourceCode = preg_replace($re, '\1'.$changeData['newExtends'].'\2', $sourceCode);
+        }
+
+        return $newSourceCode;
+
+    }//end updatePHPCode()
+
+
 }//end class

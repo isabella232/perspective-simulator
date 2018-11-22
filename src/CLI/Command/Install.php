@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command;
 require_once dirname(__FILE__).'/CommandTrait.inc';
 
 use \PerspectiveSimulator\Libs;
+use \PerspectiveSimulator\CLI\Terminal;
 
 /**
  * Install Class
@@ -76,6 +77,29 @@ class Install
         }//end foreach
 
     }//end install()
+
+
+    /**
+     * Prints the help to the terminal for store commands.
+     *
+     * @param string $filter Action to filter by.
+     *
+     * @return void
+     */
+    final public function printHelp(string $filter=null)
+    {
+        $size = Terminal::getSize();
+        Terminal::printHeader(
+            Terminal::padText(_('Usage for: perspective [-i | --install]')),
+            Terminal::STDERR
+        );
+        Terminal::printLine(_('    Use -i or --install to initialise the Perspective Simulator'));
+        Terminal::printLine(
+            sprintf(_('    %s this command can only be run once.'), Terminal::formatText(_('NOTE:'), ['bold']))
+        );
+        Terminal::printReset();
+
+    }//end printHelp()
 
 
 }//end class

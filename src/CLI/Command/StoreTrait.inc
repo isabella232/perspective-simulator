@@ -70,7 +70,6 @@ trait StoreTrait
             break;
 
             case 'addReference':
-            case 'updateReference':
                 $this->args['targetType']    = $this->type;
                 $this->args['referneceName'] = ($args[0] ?? null);
                 $this->args['targetCode']    = ($args[1] ?? null);
@@ -188,7 +187,7 @@ trait StoreTrait
     {
         try {
             $this->validateStoreName($this->args['storeName']);
-            $dataStoreDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.$this->args['storeName'];
+            $dataStoreDir = $this->storeDir.$this->args['storeName'];
             Libs\FileSystem::mkdir($dataStoreDir, true);
             touch($dataStoreDir.'/.gitkeep');
         } catch (\Exception $e) {
@@ -207,7 +206,7 @@ trait StoreTrait
     public function delete()
     {
         try {
-            $dataStoreDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.$this->args['storeName'];
+            $dataStoreDir = $this->storeDir.$this->args['storeName'];
             if (is_dir($dataStoreDir) === false) {
                 throw new CLIException(
                     sprintf(
@@ -464,20 +463,6 @@ trait StoreTrait
                     ],
                 ],
             ],
-            'updateReference' => [
-                'action'    => sprintf('perspective [-p] updateReference %s', $type),
-                'arguments' => [
-                    'required' => [
-                        'referneceName' => _('The name of the reference we are adding.'),
-                        'targetCode'    => _('The name of the store the reference will be added to.'),
-                        'sourceType'    => _('The type of store being referenced.'),
-                        'sourceCode'    => _('The name of the store being referenced.'),
-                    ],
-                    'optional' => [
-                        'cardinatlity' => _('The cardinatlity of the reference, eg. 1:1, 1:M or M:M, if not provided M:M will be used.'),
-                    ],
-                ],
-            ],
             'renameReference' => [
                 'action'    => sprintf('perspective [-p] renameReference %s', $type),
                 'arguments' => [
@@ -507,21 +492,19 @@ trait StoreTrait
                 },
                 ARRAY_FILTER_USE_KEY
             );
-            Terminal::printHeader(
+            Terminal::printLine(
                 Terminal::padText(
                     'Usage for: '.$actions[$filter]['action']
-                ),
-                Terminal::STDERR
+                )
             );
         } else {
-            Terminal::printHeader(
+            Terminal::printLine(
                 Terminal::padText(
                     sprintf(
                         'Usage for: perspective <action> %s <arguments>',
                         $type
                     )
-                ),
-                Terminal::STDERR
+                )
             );
         }
 
