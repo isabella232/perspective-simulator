@@ -72,20 +72,8 @@ class CLIException extends \Exception
             Terminal::wrapText($this->message, $size['cols'])
         );
 
+        Terminal::printLine();
         Terminal::printReset();
-
-        // Terminal::printError(
-        //     sprintf(
-        //         Terminal::RESET.'line: %s of %s',
-        //         Terminal::colourText($this->line, 'yellow'),
-        //         Terminal::colourText($this->file, 'cyan')
-        //     )
-        // );
-
-        // Terminal::write(
-        //     $this->getTraceAsString()
-        // );
-
         Terminal::beep();
 
     }//end prettyPrint()

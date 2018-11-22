@@ -93,9 +93,7 @@ class Console
         set_error_handler(
             function ($errno, $errstr, $errfile, $errline) {
                 // phpcs:disable
-                error_log('--------------------------------------------------');
                 error_log(var_export([$errno, $errstr, $errfile, $errline], 1));
-                error_log('--------------------------------------------------');
                 // phpcs:enable
             }
         );
@@ -113,10 +111,13 @@ class Console
                 try {
                     $command = new $actionClass(self::$actionName, self::$args);
                     if (method_exists($command, self::$actionName) === false) {
-                        // TODO:: show help for command instread of error.
-                        throw new CLIException(
-                            _('Invalid action "'.self::$actionName.'" for command "'.self::$commandName.'"')
-                        );
+                        $command->printHelp();
+                        exit(1);
+                    }
+
+                    if (isset($args['help']) === true && $args['help'] === true) {
+                        $command->printHelp(self::$actionName);
+                        exit(1);
                     }
 
                     $funcName = self::$actionName;
@@ -125,11 +126,12 @@ class Console
                     $e->prettyPrint();
                     exit(1);
                 } catch (\Exception $e) {
-                    // phpcs:disable
-                    error_log($e->getMessage());
-                    // phpcs:enable
+                    $size = Terminal::getSize();
+                    Terminal::printError(
+                        Terminal::wrapText($e->getMessage(), $size['cols'])
+                    );
                     exit(1);
-                }
+                }//end try
             } else {
                 throw new CLIException(_('Print help'));
             }//end if
@@ -149,6 +151,14 @@ class Console
      */
     private static function getArgs(array $args)
     {
+        // Filter out any options we don't want -h or -p.
+        $args = array_filter(
+            $args,
+            function ($arg) {
+                return $arg[0] !== '-';
+            }
+        );
+
         self::$scriptName  = array_shift($args);
         self::$actionName  = array_shift($args);
         self::$commandName = array_shift($args);
@@ -181,10 +191,12 @@ class Console
 
     }//end loadProject()
 
+
     /**
      * Gets the project from the projects directory, if more than one project will return null and let run deal with it.
      *
      * @return mixed
+     * @throws CLIException When more than 1 project found and -p not specified.
      */
     private static function getProject()
     {

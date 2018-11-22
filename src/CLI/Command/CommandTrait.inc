@@ -11,6 +11,7 @@
 namespace PerspectiveSimulator\CLI\Command;
 
 use \PerspectiveSimulator\Libs;
+use \PerspectiveSimulator\CLI\Terminal;
 
 /**
  * Command Trait
@@ -43,6 +44,21 @@ trait CommandTrait
         return $default;
 
     }//end getArg()
+
+
+    /**
+     * This should be defined for each command.
+     *
+     * @return void
+     */
+    public function printHelp()
+    {
+        Terminal::printHeader(
+            Terminal::padText(_('No help found.')),
+            Terminal::STDERR
+        );
+
+    }//end printHelp()
 
 
 }//end class

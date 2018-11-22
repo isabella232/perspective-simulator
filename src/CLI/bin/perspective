@@ -31,9 +31,9 @@ $opts = getopt(
     ]
 );
 
+$help = false;
 if (isset($opts['h']) === true || isset($opts['help']) === true) {
-    printUsage();
-    exit;
+    $help = true;
 }
 
 $install = false;
@@ -59,12 +59,12 @@ $console = \PerspectiveSimulator\CLI\Console::getInstance();
 $console->run([
     'project' => $project,
     'install' => $install,
+    'help'    => $help,
     'argv'    => $argv,
 ]);
 
 /**
  * Print the usage.
- * TODO: move this to run so each command can have its own help too.
  *
  * @return void
  */

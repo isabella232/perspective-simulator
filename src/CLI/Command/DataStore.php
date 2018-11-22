@@ -32,7 +32,7 @@ class DataStore
      */
     public function __construct(string $action, array $args)
     {
-        $projectDir = Libs\FileSystem::getProjectDir();
+        $projectDir         = Libs\FileSystem::getProjectDir();
         $this->storeDir     = $projectDir.'/Stores/Data/';
         $this->readableType = 'Data Store';
         $this->type         = 'DataStore';

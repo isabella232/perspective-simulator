@@ -31,7 +31,7 @@ class UserStore
      */
     public function __construct(string $action, array $args)
     {
-        $projectDir = Libs\FileSystem::getProjectDir();
+        $projectDir         = Libs\FileSystem::getProjectDir();
         $this->storeDir     = $projectDir.'/Stores/User/';
         $this->readableType = 'User Store';
         $this->type         = 'UserStore';

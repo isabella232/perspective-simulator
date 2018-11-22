@@ -501,4 +501,63 @@ class Terminal
     }//end wrapText()
 
 
+    /**
+     * Pad text to a maximum width.
+     *
+     * @param string  $text      String to pad.
+     * @param integer $maxWidth  Maximum width (or string length if it exceeds width).
+     * @param string  $padChar   The pad character to use.
+     * @param string  $direction The direction to pad (left|right|center).
+     *
+     * @return string
+     */
+    public static function padTo(
+        $text,
+        $maxWidth,
+        $padChar=self::DEFAULT_PAD_CHAR,
+        $direction='right'
+    ) {
+        $marginLeft  = 0;
+        $marginRight = 0;
+        $length      = strlen(self::stripControlChars($text));
+
+        if ($length > $maxWidth) {
+            $maxWidth = $length;
+        }
+
+        switch ($direction) {
+            case 'center':
+                $marginLeft  = ceil(($maxWidth - $length) / 2);
+                $marginRight = floor(($maxWidth - $length) / 2);
+            break;
+
+            case 'left':
+                $marginLeft = ($maxWidth - $length);
+            break;
+
+            default:
+            case 'right':
+                $marginRight = ($maxWidth - $length);
+            break;
+        }
+
+        return self::padText($text, $padChar, $marginLeft, $marginRight);
+
+    }//end padTo()
+
+
+    /**
+     * Strip out control characters (e.g. colours)
+     *
+     * @param string $text Text to modify.
+     *
+     * @return string
+     */
+    public static function stripControlChars($text)
+    {
+        return preg_replace('/[[:^print:]]/', '', $text);
+
+    }//end stripControlChars()
+
+
 }//end class
