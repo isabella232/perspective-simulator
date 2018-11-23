@@ -62,19 +62,3 @@ $console->run([
     'help'    => $help,
     'argv'    => $argv,
 ]);
-
-/**
- * Print the usage.
- *
- * @return void
- */
-function printUsage() {
-    echo 'Usage: perspective [OPTION] <command>'."\n";
-    echo 'Without option, it will assume the export only contians 1 project'."\n";
-    echo "\n";
-    echo "\n";
-    echo '  -p, --project  Mandatory string when multiple projects in export.'."\n";
-    echo '  -h, --help     Optional Print the usage.'."\n";
-    echo "\n";
-
-}//end printUsage()

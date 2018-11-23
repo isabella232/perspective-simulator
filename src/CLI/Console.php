@@ -92,9 +92,90 @@ class Console
     {
         set_error_handler(
             function ($errno, $errstr, $errfile, $errline) {
-                // phpcs:disable
-                error_log(var_export([$errno, $errstr, $errfile, $errline], 1));
-                // phpcs:enable
+                $errorType = 'PERSPECTIVE_SIMULATOR_ERROR';
+                switch ($errno) {
+                    case E_ERROR:
+                        $errorType = 'E_ERROR';
+                    break;
+
+                    case E_WARNING:
+                        $errorType = 'E_WARNING';
+                    break;
+
+                    case E_PARSE:
+                        $errorType = 'E_PARSE';
+                    break;
+
+                    case E_NOTICE:
+                        $errorType = 'E_NOTICE';
+                    break;
+
+                    case E_CORE_ERROR:
+                        $errorType = 'E_CORE_ERROR';
+                    break;
+
+                    case E_CORE_WARNING:
+                        $errorType = 'E_CORE_WARNING';
+                    break;
+
+                    case E_COMPILE_ERROR:
+                        $errorType = 'E_COMPILE_ERROR';
+                    break;
+
+                    case E_COMPILE_WARNING:
+                        $errorType = 'E_COMPILE_WARNING';
+                    break;
+
+                    case E_USER_ERROR:
+                        $errorType = 'E_USER_ERROR';
+                    break;
+
+                    case E_USER_WARNING:
+                        $errorType = 'E_USER_WARNING';
+                    break;
+
+                    case E_USER_NOTICE:
+                        $errorType = 'E_USER_NOTICE';
+                    break;
+
+                    case E_STRICT:
+                        $errorType = 'E_STRICT';
+                    break;
+
+                    case E_RECOVERABLE_ERROR:
+                        $errorType = 'E_RECOVERABLE_ERROR';
+                    break;
+
+                    case E_DEPRECATED:
+                        $errorType = 'E_DEPRECATED';
+                    break;
+
+                    case E_USER_DEPRECATED:
+                        $errorType = 'E_USER_DEPRECATED';
+                    break;
+
+                    default:
+                        $errorType = 'PERSPECTIVE_SIMULATOR_ERROR';
+                    break;
+                }//end switch
+
+                $size             = Terminal::getSize();
+                $indent           = str_repeat(' ', 4);
+                $optionMaxWidth   = 25;
+                $errorTypeConsole = Terminal::formatText(Terminal::colourText($errorType, 'red'), ['bold']);
+
+                Terminal::printHeader(Terminal::formatText('Perspective Simulator Error.', ['bold']));
+                Terminal::write(Terminal::padTo($indent.$errorTypeConsole, $optionMaxWidth, ' '));
+                Terminal::printError(
+                    Terminal::wrapText(
+                        Terminal::colourText($errstr.' '.$errfile.':'.$errline, 'red'),
+                        $size['cols'],
+                        ' ',
+                        $optionMaxWidth,
+                        4,
+                        false
+                    )
+                );
             }
         );
 
@@ -138,7 +219,13 @@ class Console
                     exit(1);
                 }//end try
             } else {
-                throw new CLIException(_('Print help'));
+                echo 'Usage: perspective [OPTION] <command> <arguments>'."\n";
+                echo 'Without option, it will assume the export only contians 1 project'."\n";
+                echo "\n";
+                echo "\n";
+                echo '  -p, --project  Mandatory string when multiple projects in export.'."\n";
+                echo '  -h, --help     Optional Print the usage.'."\n";
+                echo "\n";
             }//end if
         }//end if
 
@@ -171,7 +258,7 @@ class Console
         if (self::$commandName === 'property') {
             self::$commandName = array_shift($args).self::$commandName;
         } else if (self::$commandName === 'customtype') {
-            $customType = array_shift($args);
+            $customType        = array_shift($args);
             self::$commandName = 'CustomDataType';
             if ($customType === 'page') {
                 self::$commandName = 'CustomPageType';

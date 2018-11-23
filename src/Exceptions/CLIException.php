@@ -63,8 +63,16 @@ class CLIException extends \Exception
     {
         $size = Terminal::getSize();
 
+        $title = Terminal::colourText(
+            Terminal::formatText(
+                $this->title,
+                ['bold']
+            ),
+            'red'
+        );
+
         Terminal::printHeader(
-            Terminal::padText($this->title),
+            Terminal::padText($title),
             Terminal::STDERR
         );
 

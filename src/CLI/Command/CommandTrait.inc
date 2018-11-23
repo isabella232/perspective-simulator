@@ -47,6 +47,27 @@ trait CommandTrait
 
 
     /**
+     * Displays confirm action message to the user.
+     *
+     * @param string $msg The message to be displayed.
+     *
+     * @return void
+     */
+    final public function confirmAction(string $msg)
+    {
+        $indent = str_repeat(' ', 4);
+        Terminal::write(Terminal::padTo($indent.$msg, 25, ' '));
+        flush();
+        $confirmation = trim(fgets(STDIN));
+        if ($confirmation !== 'y') {
+            // The user did not say yes.
+            exit(0);
+        }
+
+    }//end confirmAction()
+
+
+    /**
      * This should be defined for each command.
      *
      * @param string $filter Action to filter by.
@@ -75,9 +96,10 @@ trait CommandTrait
     {
         $size = Terminal::getSize();
         foreach ($actions as $action => $details) {
-            $command      = $details['action'];
-            $commandArgs  = $details['arguments'];
-            $descriptions = [
+            $command            = Terminal::formatText($details['action'], ['bold']);
+            $commandArgs        = $details['arguments'];
+            $commandDescription = ($details['description'] ?? null);
+            $descriptions       = [
                 'required' => [],
                 'optional' => [],
             ];
@@ -105,7 +127,14 @@ trait CommandTrait
             $indent         = str_repeat(' ', 4);
             $optionMaxWidth = 25;
 
+            Terminal::printLine();
             Terminal::printLine($command);
+
+            if ($commandDescription !== null) {
+                Terminal::printLine();
+                Terminal::printLine($commandDescription);
+            }
+
             if (empty($descriptions['required']) === false) {
                 Terminal::printLine();
                 Terminal::printLine(Terminal::formatText(_('Required arguments:'), ['bold']));
@@ -149,7 +178,7 @@ trait CommandTrait
 
         Terminal::printReset();
 
-    }
+    }//end printHelpToScreen()
 
 
 }//end class

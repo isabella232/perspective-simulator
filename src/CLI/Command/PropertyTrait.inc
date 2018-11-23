@@ -198,7 +198,7 @@ trait PropertyTrait
             );
         } catch (\Exceptions $e) {
             throw new CLIException($e->getMessage());
-        }
+        }//end try
 
     }//end add()
 
@@ -237,6 +237,17 @@ trait PropertyTrait
      */
     public function delete()
     {
+        $msg  = Terminal::formatText(
+            _('This will delete the property.'),
+            ['bold']
+        );
+        $msg .= "\n    ";
+        $msg .= Terminal::formatText(
+            _('Are you sure you want to continue? [y/N]'),
+            ['bold']
+        );
+        $this->confirmAction($msg);
+
         try {
             $propertyFile = $this->storeDir.$this->args['code'].'.json';
             if (file_exists($propertyFile) === false) {
@@ -268,24 +279,27 @@ trait PropertyTrait
         $type    = strtolower($this->type);
         $actions = [
             'add'    => [
-                'action'    => sprintf('perspective [-p] add property %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] add property %s', $type),
+                'description' => _('Adds a new property to the project'),
+                'arguments'   => [
                     'required' => [
                         'propertyCode' => _('The property code for the new property.'),
                     ],
                 ],
             ],
             'delete' => [
-                'action'    => sprintf('perspective [-p] delete property %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] delete property %s', $type),
+                'description' => _('Deletes a  property from the project'),
+                'arguments'   => [
                     'required' => [
                         'propertyCode' => _('The property code for the new property.'),
                     ],
                 ],
             ],
             'rename' => [
-                'action'    => sprintf('perspective [-p] rename property %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] rename property %s', $type),
+                'description' => _('Renames a property in the project'),
+                'arguments'   => [
                     'required' => [
                         'oldPropertyCode' => _('The code for the property.'),
                         'newPropertyCode' => _('The new code for the property.'),

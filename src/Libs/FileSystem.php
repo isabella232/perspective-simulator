@@ -27,6 +27,25 @@ class FileSystem
 
 
     /**
+     * Returns an extension of given filename.
+     *
+     * @param string $fileName The filename to write to.
+     *
+     * @return string
+     */
+    public static function getExtension($fileName)
+    {
+        if (is_string($fileName) === true) {
+            $name = strtolower(substr(strrchr($fileName, '.'), 1));
+            return $name;
+        } else {
+            return '';
+        }
+
+    }//end getExtension()
+
+
+    /**
      * Create a directory in the file system.
      *
      * @param string  $pathname  The directory path.

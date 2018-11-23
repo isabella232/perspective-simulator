@@ -190,7 +190,7 @@ class App
                 }
 
                 $fileName = str_replace('.php', '', implode(DIRECTORY_SEPARATOR, $classNameParts));
-                $phpFile = $this->storeDir.$fileName.'.php';
+                $phpFile  = $this->storeDir.$fileName.'.php';
 
                 $fileDir = $this->storeDir.implode(DIRECTORY_SEPARATOR, $nameParts);
                 if (is_dir($fileDir) === false) {
@@ -222,12 +222,35 @@ class App
 
         try {
             if ($this->args['type'] === 'folder') {
+                $msg  = Terminal::formatText(
+                    _('This will delete the app folder and all its children.'),
+                    ['bold']
+                );
+                $msg .= "\n    ";
+                $msg .= Terminal::formatText(
+                    _('Are you sure you want to continue? [y/N]'),
+                    ['bold']
+                );
+                $this->confirmAction($msg);
+
+
                 $path = $this->storeDir.$this->args['name'];
                 if (is_dir($path) === false) {
                     $eMsg = sprintf('Folder "%s" doesn\'t exist.', $path);
                     throw new CLIException($eMsg);
                 }
             } else {
+                $msg  = Terminal::formatText(
+                    _('This will delete the app class file.'),
+                    ['bold']
+                );
+                $msg .= "\n    ";
+                $msg .= Terminal::formatText(
+                    _('Are you sure you want to continue? [y/N]'),
+                    ['bold']
+                );
+                $this->confirmAction($msg);
+
                 // Remove .php incase it was provided we will readd to ensure its there.
                 $path = str_replace('.php', '', $this->storeDir.$this->args['name']);
                 $path = $path.'.php';
@@ -288,6 +311,29 @@ class App
 
                 $newFolder = $this->storeDir.$this->args['newName'];
                 Libs\FileSystem::move($oldFolder, $newFolder);
+
+                $appClasses = Libs\FileSystem::listDirectory($newFolder, ['.php']);
+
+                foreach ($appClasses as $path) {
+                    $phpClass  = file_get_contents($path);
+                    $path      = str_replace($this->storeDir, '', $path);
+                    $nameParts = explode(DIRECTORY_SEPARATOR, $path);
+                    array_pop($nameParts);
+
+                    if (count($nameParts) > 0) {
+                        $namespace = $this->baseNamespace.'\\'.implode('\\', $nameParts);
+                    } else {
+                        $namespace = $this->baseNamespace;
+                    }
+
+                    $phpClass  = Libs\Util::updatePHPCode($phpClass, ['newNamespace' => $namespace], 'namespace');
+                    $validCode = Libs\Util::checkPHPSyntax($phpClass);
+                    if ($validCode !== true) {
+                        throw new CLIException($validCode);
+                    }
+
+                    file_put_contents($this->storeDir.$path, $phpClass);
+                }
             } else {
                 $oldFile = str_replace('.php', '', $this->storeDir.$this->args['oldName']).'.php';
                 if (file_exists($oldFile) === false) {
@@ -328,13 +374,12 @@ class App
 
                 Libs\FileSystem::move($oldFile, $newFile);
                 file_put_contents($newFile, $phpClass);
-            }
+            }//end if
         } catch (\Exception $e) {
             throw new CLIException($e->getMessage());
         }//end try
 
-    }//end rename()
-
+    }//end move()
 
 
     /**
@@ -349,24 +394,27 @@ class App
         $type    = strtolower(($this->args['type'] ?? 'class/folder'));
         $actions = [
             'add'    => [
-                'action'    => sprintf('perspective [-p] add app %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] add app %s', $type),
+                'description' => _('Adds a new app file or folder in the location provided.'),
+                'arguments'   => [
                     'required' => [
                         'name' => _('The name of the class or folder, can also be path to file or folder location.'),
                     ],
                 ],
             ],
             'delete' => [
-                'action'    => sprintf('perspective [-p] delete app %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] delete app %s', $type),
+                'description' => _('Deletes an app file or folder in the location provided.'),
+                'arguments'   => [
                     'required' => [
                         'name' => _('The name of the class or folder, can also be path to file or folder location.'),
                     ],
                 ],
             ],
             'rename' => [
-                'action'    => sprintf('perspective [-p] rename app %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] rename app %s', $type),
+                'description' => _('Renames an app file or folder in the location provided.'),
+                'arguments'   => [
                     'required' => [
                         'oldName' => _('The current name of the class or folder, can also be path to file or folder location.'),
                         'newName' => _('The new name of the class or folder, can also be path to file or folder location.'),
@@ -374,8 +422,9 @@ class App
                 ],
             ],
             'move'   => [
-                'action'    => sprintf('perspective [-p] move customtype %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] move customtype %s', $type),
+                'description' => _('Moves an app file or folder in the location provided.'),
+                'arguments'   => [
                     'required' => [
                         'oldName' => _('The current name of the class or folder, can also be path to file or folder location.'),
                         'newName' => _('The new name of the class or folder, can also be path to file or folder location.'),

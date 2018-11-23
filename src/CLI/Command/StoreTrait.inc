@@ -205,6 +205,17 @@ trait StoreTrait
      */
     public function delete()
     {
+        $msg  = Terminal::formatText(
+            _('This will delete the store.'),
+            ['bold']
+        );
+        $msg .= "\n    ";
+        $msg .= Terminal::formatText(
+            _('Are you sure you want to continue? [y/N]'),
+            ['bold']
+        );
+        $this->confirmAction($msg);
+
         try {
             $dataStoreDir = $this->storeDir.$this->args['storeName'];
             if (is_dir($dataStoreDir) === false) {
@@ -366,6 +377,17 @@ trait StoreTrait
      */
     public function deleteReference()
     {
+        $msg  = Terminal::formatText(
+            _('This will delete the reference.'),
+            ['bold']
+        );
+        $msg .= "\n    ";
+        $msg .= Terminal::formatText(
+            _('Are you sure you want to continue? [y/N]'),
+            ['bold']
+        );
+        $this->confirmAction($msg);
+
         try {
             $ref = $this->storeDir.$this->args['targetCode'].'/'.$this->args['referneceName'].'.json';
             if (file_exists($ref) === false) {
@@ -423,24 +445,27 @@ trait StoreTrait
         $type    = strtolower($this->type);
         $actions = [
             'add'             => [
-                'action'    => sprintf('perspective [-p] add %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] add %s', $type),
+                'description' => _('Adds a new store for use in the project'),
+                'arguments'   => [
                     'required' => [
                         'storeName' => _('The name of the new store to be created.'),
                     ],
                 ],
             ],
             'delete'          => [
-                'action'    => sprintf('perspective [-p] delete %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] delete %s', $type),
+                'description' => _('Deletes a store from the project'),
+                'arguments'   => [
                     'required' => [
                         'storeName' => _('The name of the store to be deleted.'),
                     ],
                 ],
             ],
             'rename'          => [
-                'action'    => sprintf('perspective [-p] rename %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] rename %s', $type),
+                'description' => _('Renames a store in the project'),
+                'arguments'   => [
                     'required' => [
                         'oldName' => _('The current name of the store.'),
                         'newName' => _('The new name of the store.'),
@@ -448,8 +473,9 @@ trait StoreTrait
                 ],
             ],
             'addReference'    => [
-                'action'    => sprintf('perspective [-p] addReference %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] addReference %s', $type),
+                'description' => _('Adds a reference between two stores'),
+                'arguments'   => [
                     'required' => [
                         'referneceName' => _('The name of the reference we are adding.'),
                         'targetCode'    => _('The name of the store the reference will be added to.'),
@@ -462,8 +488,9 @@ trait StoreTrait
                 ],
             ],
             'renameReference' => [
-                'action'    => sprintf('perspective [-p] renameReference %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] renameReference %s', $type),
+                'description' => _('Renames the reference between two stores'),
+                'arguments'   => [
                     'required' => [
                         'targetCode' => _('The name of the store the reference belongs to.'),
                         'oldName'    => _('The current name of the reference.'),
@@ -472,8 +499,9 @@ trait StoreTrait
                 ],
             ],
             'deleteReference' => [
-                'action'    => sprintf('perspective [-p] deleteReference %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] deleteReference %s', $type),
+                'description' => _('Deletes the reference between two stores'),
+                'arguments'   => [
                     'required' => [
                         'referneceName' => _('The name of the reference we are adding.'),
                         'targetCode'    => _('The name of the store the reference will be added to.'),
@@ -482,7 +510,7 @@ trait StoreTrait
             ],
         ];
 
-        if ($filter !== null){
+        if ($filter !== null) {
             $actions = array_filter(
                 $actions,
                 function ($a) use ($filter) {

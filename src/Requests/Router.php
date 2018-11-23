@@ -14,15 +14,19 @@ include dirname(__DIR__, 4).'/autoload.php';
 
 $path = $_SERVER['REQUEST_URI'];
 
+if ($path === '/favicon.ico') {
+    return;
+}
+
 if (isset($_SERVER['QUERY_STRING']) === true) {
     $path = str_replace('?'.$_SERVER['QUERY_STRING'], '', $path);
 }
 
-$path    = trim($path, '/');
-$project = strtolower(substr($path, 0, strpos($path, '/')));
-$path    = substr($path, (strpos($path, '/') + 1));
-$type    = strtolower(substr($path, 0, strpos($path, '/')));
-$path    = substr($path, (strpos($path, '/') + 1));
+$pathParts = explode('/', $path);
+$domain    = array_shift($pathParts);
+$type      = array_shift($pathParts);
+$project   = array_shift($pathParts);
+$path      = implode('/', $pathParts);
 
 \PerspectiveSimulator\Bootstrap::load($project);
 
@@ -35,6 +39,13 @@ switch ($type) {
 
         $class = $project.'\APIRouter';
         $class::process($path, $method, $queryParams);
+    break;
+
+    case 'cdn':
+        echo "CDN Request\n";
+        print_r($project);
+        echo "\n";
+        print_r($path);
     break;
 
     default:

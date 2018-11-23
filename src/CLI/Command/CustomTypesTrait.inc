@@ -203,7 +203,7 @@ trait CustomTypesTrait
             file_put_contents($jsonFile, Libs\Util::jsonEncode($jsonData));
         } catch (\Exceptions $e) {
             throw new CLIException($e->getMessage());
-        }
+        }//end try
 
     }//end add()
 
@@ -235,8 +235,8 @@ trait CustomTypesTrait
             $newDir = $this->storeDir.$this->args['newCode'].'.php';
             Libs\FileSystem::move($oldDir, $newDir);
 
-            $phpClass   = file_get_contents($newDir);
-            $changeData = [
+            $phpClass      = file_get_contents($newDir);
+            $changeData    = [
                 'oldClassName' => $this->args['oldCode'],
                 'newClassName' => $this->args['newCode'],
             ];
@@ -244,7 +244,7 @@ trait CustomTypesTrait
             file_put_contents($newDir, $newSourceCode);
         } catch (\Exception $e) {
             throw new CLIException($e->getMessage());
-        }
+        }//end try
 
     }//end rename()
 
@@ -257,6 +257,17 @@ trait CustomTypesTrait
      */
     public function delete()
     {
+        $msg  = Terminal::formatText(
+            _('This will delete the custom type.'),
+            ['bold']
+        );
+        $msg .= "\n    ";
+        $msg .= Terminal::formatText(
+            _('Are you sure you want to continue? [y/N]'),
+            ['bold']
+        );
+        $this->confirmAction($msg);
+
         try {
             $customTypeFile = $this->storeDir.$this->args['code'].'.json';
             if (file_exists($customTypeFile) === false) {
@@ -298,8 +309,8 @@ trait CustomTypesTrait
                 );
             }
 
-            $phpClass   = file_get_contents($customTypeFile);
-            $changeData = ['newExtends' => $this->args['parent']];
+            $phpClass      = file_get_contents($customTypeFile);
+            $changeData    = ['newExtends' => $this->args['parent']];
             $newSourceCode = Libs\Util::updatePHPCode($phpClass, $changeData, 'extends');
             file_put_contents($customTypeFile, $newSourceCode);
         } catch (\Exception $e) {
@@ -321,8 +332,9 @@ trait CustomTypesTrait
         $type    = strtolower($this->type);
         $actions = [
             'add'    => [
-                'action'    => sprintf('perspective [-p] add customtype %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] add customtype %s', $type),
+                'description' => _('Adds a new Custom Type to the project'),
+                'arguments'   => [
                     'required' => [
                         'customTypeCode' => _('The custom type\'s code.'),
                     ],
@@ -332,16 +344,18 @@ trait CustomTypesTrait
                 ],
             ],
             'delete' => [
-                'action'    => sprintf('perspective [-p] delete customtype %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] delete customtype %s', $type),
+                'description' => _('Deletes a Custom Type from the project'),
+                'arguments'   => [
                     'required' => [
                         'customTypeCode' => _('The custom type\'s code.'),
                     ],
                 ],
             ],
             'rename' => [
-                'action'    => sprintf('perspective [-p] rename customtype %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] rename customtype %s', $type),
+                'description' => _('Renames a Custom Type in the project'),
+                'arguments'   => [
                     'required' => [
                         'oldCustomTypeCode' => _('The current code for the custom type.'),
                         'newCustomTypeCode' => _('The new code for the custom type.'),
@@ -349,8 +363,9 @@ trait CustomTypesTrait
                 ],
             ],
             'move'   => [
-                'action'    => sprintf('perspective [-p] move customtype %s', $type),
-                'arguments' => [
+                'action'      => sprintf('perspective [-p] move customtype %s', $type),
+                'description' => _('Moves a Custom Type in the project'),
+                'arguments'   => [
                     'required' => [
                         'customTypeCode' => _('The custom type\'s code.'),
                     ],
