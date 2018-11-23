@@ -173,7 +173,7 @@ class FileSystem
      *
      * @param string $project The project code we are getting the directory for.
      *
-     * @return mixed
+     * @return string
      */
     public static function getProjectDir(string $project=null)
     {
@@ -184,6 +184,24 @@ class FileSystem
         return self::getExportDir().'/projects/'.$project.'/src';
 
     }//end getProjectDir()
+
+
+    /**
+     * Gets the project's CDN directory.
+     *
+     * @param string $project The project code we are getting the directory for.
+     *
+     * @return string
+     */
+    public static function getCDNDir(string $project=null)
+    {
+        if ($project === null) {
+            $project = $GLOBALS['project'];
+        }
+
+        return self::getExportDir().'/projects/'.$project.'/src/CDN';
+
+    }//end getCDNDir()
 
 
     /**
@@ -296,6 +314,42 @@ class FileSystem
         return $files;
 
     }//end listDirectory()
+
+
+    /**
+     * Serves file.
+     *
+     * @param string $filePath Path to the file.
+     *
+     * @return void
+     */
+    public static function serveFile(string $filePath)
+    {
+        $mimeType = mime_content_type($filePath);
+        if (in_array(
+            $mimeType,
+            [
+                'text/css',
+                'text/html',
+                'text/plain',
+                'text/xml',
+                'text/csv',
+                'text/tab-separated-values',
+                'text/x-sgml',
+                'application/x-javascript',
+            ]
+        ) === true
+        ) {
+            $charset = 'UTF-8';
+        } else {
+            $charset = null;
+        }
+
+        Web::sendContentTypeHeader($mimeType, $charset);
+        readfile($filePath);
+        exit;
+
+    }//end serveFile()
 
 
 }//end class

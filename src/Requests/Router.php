@@ -42,13 +42,10 @@ switch ($type) {
     break;
 
     case 'cdn':
-        echo "CDN Request\n";
-        print_r($project);
-        echo "\n";
-        print_r($path);
+       \PerspectiveSimulator\Requests\CDN::serveFile($path);
     break;
 
     default:
-        echo 'send 404';
+        \PerspectiveSimulator\Libs\Web::send404();
     break;
 }
