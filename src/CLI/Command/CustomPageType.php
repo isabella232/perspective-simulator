@@ -36,7 +36,7 @@ class CustomPageType
         $this->storeDir     = $projectDir.'/CustomTypes/Page/';
         $this->type         = 'custompagetype';
         $this->readableType = 'Custom Page Type';
-        $this->namespace    = 'Commenting\\CustomTypes\\Page';
+        $this->namespace    = $GLOBALS['project'].'\\CustomTypes\\Page';
         $this->extends      = 'Page';
         $this->setArgs($action, $args);
 

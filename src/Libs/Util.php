@@ -183,4 +183,40 @@ class CLASS_NAME CLASS_EXTENDS
     }//end updatePHPCode()
 
 
+    /**
+     * Check PHP syntax of the code.
+     *
+     * If no syntax error is found, it returns true. Otherwise, it returns an error message string.
+     *
+     * @param string $code The code to check PHP syntax.
+     *
+     * @return mixed
+     */
+    public static function checkPHPSyntax($code)
+    {
+        $tmpFilename = tempnam(FileSystem::getSimulatorDir(), 'php');
+        file_put_contents($tmpFilename, $code);
+        exec('php -c /etc/php.ini -l '.$tmpFilename.' 2>&1', $output, $returnVar);
+        unlink($tmpFilename);
+
+        if ($returnVar === 0) {
+            return true;
+        }
+
+        // Do NOT expose temp file path.
+        foreach ($output as &$line) {
+            $line = str_replace($tmpFilename, 'SOURCE', $line);
+            if (strpos($line, 'PHP Startup') !== false) {
+                $line = '';
+            }
+        }
+
+        // Remove the empty lines.
+        $output = array_filter($output, 'strlen');
+
+        return implode("\n", $output);
+
+    }//end checkPHPSyntax()
+
+
 }//end class

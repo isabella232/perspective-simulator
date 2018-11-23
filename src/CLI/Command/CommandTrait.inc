@@ -49,9 +49,11 @@ trait CommandTrait
     /**
      * This should be defined for each command.
      *
+     * @param string $filter Action to filter by.
+     *
      * @return void
      */
-    public function printHelp()
+    public function printHelp(string $filter=null)
     {
         Terminal::printHeader(
             Terminal::padText(_('No help found.')),
@@ -59,6 +61,95 @@ trait CommandTrait
         );
 
     }//end printHelp()
+
+
+    /**
+     * Prints the main help content for all commands.
+     *
+     * @param array  $actions Array of actions to print.
+     * @param string $filter  Optionial filter key for actions.
+     *
+     * @return void
+     */
+    final public function printHelpToScreen(array $actions, string $filter=null)
+    {
+        $size = Terminal::getSize();
+        foreach ($actions as $action => $details) {
+            $command      = $details['action'];
+            $commandArgs  = $details['arguments'];
+            $descriptions = [
+                'required' => [],
+                'optional' => [],
+            ];
+
+            if (isset($commandArgs['required']) === true) {
+                foreach ($commandArgs['required'] as $arg => $description) {
+                    $command                   .= ' <'.Terminal::colourText($arg, 'yellow').'>';
+                    $descriptions['required'][] = [
+                        Terminal::colourText($arg, 'yellow'),
+                        $description,
+                    ];
+                }
+            }
+
+            if (isset($commandArgs['optional']) === true) {
+                foreach ($commandArgs['optional'] as $arg => $description) {
+                    $command                   .= ' <'.Terminal::colourText($arg, 'cyan').'>';
+                    $descriptions['optional'][] = [
+                        Terminal::colourText($arg, 'cyan'),
+                        $description,
+                    ];
+                }
+            }
+
+            $indent         = str_repeat(' ', 4);
+            $optionMaxWidth = 25;
+
+            Terminal::printLine($command);
+            if (empty($descriptions['required']) === false) {
+                Terminal::printLine();
+                Terminal::printLine(Terminal::formatText(_('Required arguments:'), ['bold']));
+            }
+
+            foreach ($descriptions['required'] as $description) {
+                Terminal::write(Terminal::padTo($indent.$description[0], $optionMaxWidth, ' '));
+                Terminal::printLine(
+                    Terminal::wrapText(
+                        $description[1],
+                        $size['cols'],
+                        ' ',
+                        $optionMaxWidth,
+                        4,
+                        false
+                    )
+                );
+            }
+
+            if (empty($descriptions['optional']) === false) {
+                Terminal::printLine();
+                Terminal::printLine(Terminal::formatText(_('Optional arguments:'), ['bold']));
+            }
+
+            foreach ($descriptions['optional'] as $description) {
+                Terminal::write(Terminal::padTo($indent.$description[0], $optionMaxWidth, ' '));
+                Terminal::printLine(
+                    Terminal::wrapText(
+                        $description[1],
+                        $size['cols'],
+                        ' ',
+                        $optionMaxWidth,
+                        4,
+                        false
+                    )
+                );
+            }
+
+            Terminal::printLine();
+        }//end foreach
+
+        Terminal::printReset();
+
+    }
 
 
 }//end class

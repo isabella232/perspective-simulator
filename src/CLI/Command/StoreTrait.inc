@@ -420,9 +420,7 @@ trait StoreTrait
      */
     final public function printHelp(string $filter=null)
     {
-        $type = strtolower($this->type);
-        $size = Terminal::getSize();
-
+        $type    = strtolower($this->type);
         $actions = [
             'add'             => [
                 'action'    => sprintf('perspective [-p] add %s', $type),
@@ -492,6 +490,7 @@ trait StoreTrait
                 },
                 ARRAY_FILTER_USE_KEY
             );
+
             Terminal::printLine(
                 Terminal::padText(
                     'Usage for: '.$actions[$filter]['action']
@@ -506,82 +505,9 @@ trait StoreTrait
                     )
                 )
             );
-        }
+        }//end if
 
-        foreach ($actions as $action => $details) {
-            $command      = $details['action'];
-            $commandArgs  = $details['arguments'];
-            $descriptions = [
-                'required' => [],
-                'optional' => [],
-            ];
-
-            if (isset($commandArgs['required']) === true) {
-                foreach ($commandArgs['required'] as $arg => $description) {
-                    $command                   .= ' <'.Terminal::colourText($arg, 'yellow').'>';
-                    $descriptions['required'][] = [
-                        Terminal::colourText($arg, 'yellow'),
-                        $description,
-                    ];
-                }
-            }
-
-            if (isset($commandArgs['optional']) === true) {
-                foreach ($commandArgs['optional'] as $arg => $description) {
-                    $command                   .= ' <'.Terminal::colourText($arg, 'cyan').'>';
-                    $descriptions['optional'][] = [
-                        Terminal::colourText($arg, 'cyan'),
-                        $description,
-                    ];
-                }
-            }
-
-            $indent         = str_repeat(' ', 4);
-            $optionMaxWidth = 25;
-
-            Terminal::printLine($command);
-            if (empty($descriptions['required']) === false) {
-                Terminal::printLine();
-                Terminal::printLine(Terminal::formatText(_('Required arguments:'), ['bold']));
-            }
-
-            foreach ($descriptions['required'] as $description) {
-                Terminal::write(Terminal::padTo($indent.$description[0], $optionMaxWidth, ' '));
-                Terminal::printLine(
-                    Terminal::wrapText(
-                        $description[1],
-                        $size['cols'],
-                        ' ',
-                        $optionMaxWidth,
-                        4,
-                        false
-                    )
-                );
-            }
-
-            if (empty($descriptions['optional']) === false) {
-                Terminal::printLine();
-                Terminal::printLine(Terminal::formatText(_('Optional arguments:'), ['bold']));
-            }
-
-            foreach ($descriptions['optional'] as $description) {
-                Terminal::write(Terminal::padTo($indent.$description[0], $optionMaxWidth, ' '));
-                Terminal::printLine(
-                    Terminal::wrapText(
-                        $description[1],
-                        $size['cols'],
-                        ' ',
-                        $optionMaxWidth,
-                        4,
-                        false
-                    )
-                );
-            }
-
-            Terminal::printLine();
-        }//end foreach
-
-        Terminal::printReset();
+        $this->printHelpToScreen($actions, $filter);
 
     }//end printHelp()
 

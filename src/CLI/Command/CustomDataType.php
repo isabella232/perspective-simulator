@@ -36,7 +36,7 @@ class CustomDataType
         $this->storeDir     = $projectDir.'/CustomTypes/Data/';
         $this->type         = 'customdatatype';
         $this->readableType = 'Custom Data Type';
-        $this->namespace    = 'Commenting\\CustomTypes\\Data';
+        $this->namespace    = $GLOBALS['project'].'\\CustomTypes\\Data';
         $this->extends      = 'DataRecord';
         $this->setArgs($action, $args);
 
