@@ -64,7 +64,7 @@ class App
 
 
     /**
-     * Validates the app class or folder name
+     * Validates the app class or directory name
      *
      * @param string $name The name we are validating.
      *
@@ -79,7 +79,7 @@ class App
         }
 
         $nameParts = explode(DIRECTORY_SEPARATOR, $name);
-        if ($this->args['type'] === 'folder') {
+        if ($this->args['type'] === 'directory') {
             $valid = Libs\Util::isValidStringid(end($nameParts));
             if ($valid === false) {
                 $eMsg = sprintf(_('Invalid %s name provided.'), $this->args['type']);
@@ -87,7 +87,7 @@ class App
             }
 
             if (is_dir($this->storeDir.$name) === true) {
-                throw new CLIException(_('Duplicate folder name provided.'));
+                throw new CLIException(_('Duplicate directory name provided.'));
             }
         } else {
             $className = str_replace('.php', '', end($nameParts));
@@ -140,7 +140,7 @@ class App
 
 
     /**
-     * Adds a new App Class or Folder.
+     * Adds a new App Class or directory.
      *
      * @return void
      * @throws CLIException When somthing goes wrong.
@@ -154,7 +154,7 @@ class App
 
         try {
             $this->validateName($this->args['name']);
-            if ($this->args['type'] === 'folder') {
+            if ($this->args['type'] === 'directory') {
                 Libs\FileSystem::mkdir($this->storeDir.$this->args['name'], true);
             } else {
                 $nameParts = explode(DIRECTORY_SEPARATOR, $this->args['name']);
@@ -208,7 +208,7 @@ class App
 
 
     /**
-     * Deletes a App Class or Folder.
+     * Deletes a App Class or directory.
      *
      * @return void
      * @throws CLIException When somthing goes wrong.
@@ -221,9 +221,9 @@ class App
         }
 
         try {
-            if ($this->args['type'] === 'folder') {
+            if ($this->args['type'] === 'directory') {
                 $msg  = Terminal::formatText(
-                    _('This will delete the app folder and all its children.'),
+                    _('This will delete the app directory and all its children.'),
                     ['bold']
                 );
                 $msg .= "\n    ";
@@ -236,7 +236,7 @@ class App
 
                 $path = $this->storeDir.$this->args['name'];
                 if (is_dir($path) === false) {
-                    $eMsg = sprintf('Folder "%s" doesn\'t exist.', $path);
+                    $eMsg = sprintf('The directory "%s" doesn\'t exist.', $path);
                     throw new CLIException($eMsg);
                 }
             } else {
@@ -270,7 +270,7 @@ class App
 
 
     /**
-     * Renames an app file or folder
+     * Renames an app file or directory
      * This just wraps move for ease of commands.
      *
      * @return void
@@ -288,7 +288,7 @@ class App
 
 
     /**
-     * Moves an app file or folder, updating this will affect $this->rename()
+     * Moves an app file or directory, updating this will affect $this->rename()
      *
      * @return void
      * @throws CLIException When somthing goes wrong.
@@ -303,16 +303,16 @@ class App
 
         try {
             $this->validateName($this->args['newName']);
-            if ($this->args['type'] === 'folder') {
-                $oldFolder = $this->storeDir.$this->args['oldName'];
-                if (is_dir($oldFolder) === false) {
-                    throw new CLIException(_('Current folder doesn\'t exist.'));
+            if ($this->args['type'] === 'directory') {
+                $oldDirectory = $this->storeDir.$this->args['oldName'];
+                if (is_dir($oldDirectory) === false) {
+                    throw new CLIException(_('Current directory doesn\'t exist.'));
                 }
 
-                $newFolder = $this->storeDir.$this->args['newName'];
-                Libs\FileSystem::move($oldFolder, $newFolder);
+                $newDirectory = $this->storeDir.$this->args['newName'];
+                Libs\FileSystem::move($oldDirectory, $newDirectory);
 
-                $appClasses = Libs\FileSystem::listDirectory($newFolder, ['.php']);
+                $appClasses = Libs\FileSystem::listDirectory($newDirectory, ['.php']);
 
                 foreach ($appClasses as $path) {
                     $phpClass  = file_get_contents($path);
@@ -391,43 +391,43 @@ class App
      */
     public function printHelp(string $filter=null)
     {
-        $type    = strtolower(($this->args['type'] ?? 'class/folder'));
+        $type    = strtolower(($this->args['type'] ?? 'class/directory'));
         $actions = [
             'add'    => [
                 'action'      => sprintf('perspective [-p] add app %s', $type),
-                'description' => _('Adds a new app file or folder in the location provided.'),
+                'description' => _('Adds a new app file or directory in the location provided.'),
                 'arguments'   => [
                     'required' => [
-                        'name' => _('The name of the class or folder, can also be path to file or folder location.'),
+                        'name' => _('The name of the class or directory, can also be path to file or directory location relative to the projects app folder.'),
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => sprintf('perspective [-p] delete app %s', $type),
-                'description' => _('Deletes an app file or folder in the location provided.'),
+                'description' => _('Deletes an app file or directory in the location provided.'),
                 'arguments'   => [
                     'required' => [
-                        'name' => _('The name of the class or folder, can also be path to file or folder location.'),
+                        'name' => _('The name of the class or directory, can also be path to file or directory location relative to the projects app folder.'),
                     ],
                 ],
             ],
             'rename' => [
                 'action'      => sprintf('perspective [-p] rename app %s', $type),
-                'description' => _('Renames an app file or folder in the location provided.'),
+                'description' => _('Renames an app file or directory in the location provided.'),
                 'arguments'   => [
                     'required' => [
-                        'oldName' => _('The current name of the class or folder, can also be path to file or folder location.'),
-                        'newName' => _('The new name of the class or folder, can also be path to file or folder location.'),
+                        'oldName' => _('The current name of the class or directory, can also be path to file or directory location relative to the projects app folder.'),
+                        'newName' => _('The new name of the class or directory, can also be path to file or directory location relative to the projects app folder.'),
                     ],
                 ],
             ],
             'move'   => [
                 'action'      => sprintf('perspective [-p] move customtype %s', $type),
-                'description' => _('Moves an app file or folder in the location provided.'),
+                'description' => _('Moves an app file or directory in the location provided.'),
                 'arguments'   => [
                     'required' => [
-                        'oldName' => _('The current name of the class or folder, can also be path to file or folder location.'),
-                        'newName' => _('The new name of the class or folder, can also be path to file or folder location.'),
+                        'oldName' => _('The current name of the class or directory, can also be path to file or directory location relative to the projects app folder.'),
+                        'newName' => _('The new name of the class or directory, can also be path to file or directory location relative to the projects app folder.'),
                     ],
                 ],
             ],
