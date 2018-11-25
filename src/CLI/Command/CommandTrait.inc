@@ -12,6 +12,7 @@ namespace PerspectiveSimulator\CLI\Command;
 
 use \PerspectiveSimulator\Libs;
 use \PerspectiveSimulator\CLI\Terminal;
+use \PerspectiveSimulator\CLI\Prompt;
 
 /**
  * Command Trait
@@ -55,12 +56,15 @@ trait CommandTrait
      */
     final public function confirmAction(string $msg)
     {
-        $indent = str_repeat(' ', 4);
-        Terminal::write(Terminal::padTo($indent.$msg, 25, ' '));
-        flush();
-        $confirmation = trim(fgets(STDIN));
-        if ($confirmation !== 'y') {
-            // The user did not say yes.
+        Terminal::printLine($msg);
+        $action  = "    ";
+        $action .= Terminal::formatText(
+            _('Are you sure you want to continue?'),
+            ['bold']
+        );
+
+        $confirmation = Prompt::confirm($action);
+        if ($confirmation === false) {
             exit(0);
         }
 

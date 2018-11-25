@@ -226,11 +226,6 @@ class App
                     _('This will delete the app directory and all its children.'),
                     ['bold']
                 );
-                $msg .= "\n    ";
-                $msg .= Terminal::formatText(
-                    _('Are you sure you want to continue? [y/N]'),
-                    ['bold']
-                );
                 $this->confirmAction($msg);
 
 
@@ -242,11 +237,6 @@ class App
             } else {
                 $msg  = Terminal::formatText(
                     _('This will delete the app class file.'),
-                    ['bold']
-                );
-                $msg .= "\n    ";
-                $msg .= Terminal::formatText(
-                    _('Are you sure you want to continue? [y/N]'),
                     ['bold']
                 );
                 $this->confirmAction($msg);

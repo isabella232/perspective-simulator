@@ -113,11 +113,6 @@ class API
             _('This will remove the API specification and all its operations from the project.'),
             ['bold']
         );
-        $msg .= "\n    ";
-        $msg .= Terminal::formatText(
-            _('Are you sure you want to continue? [y/N]'),
-            ['bold']
-        );
         $this->confirmAction($msg);
 
         try {

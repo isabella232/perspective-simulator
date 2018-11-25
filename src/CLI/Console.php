@@ -313,10 +313,16 @@ class Console
         }//end foreach
 
         if (count($projects) > 1) {
-            $eMsg  = 'Multiple projects found, perspective command expects project to be set when more than 1 project';
-            $eMsg .= " in export.\n";
-            $eMsg .= 'Try running with -p=<project name> or --project=<project name>'."\n";
-            throw new CLIException($eMsg);
+            $msg          = _('Confirm which project you want to perform the action on.');
+            $suppressMsg  = _('Alternatively you can run the command with');
+            $suppressMsg .= '-p=<project name> or --project=<project name> to supress this message.';
+            Terminal::printHeader(_('Multiple projects found.'));
+            Terminal::printLine($suppressMsg);
+            $project = Prompt::optionList($msg, $projects);
+
+            if ($project === null) {
+                throw new CLIException(_('Multiple projects found and invalid project selected.'));
+            }
         }
 
         return $project;

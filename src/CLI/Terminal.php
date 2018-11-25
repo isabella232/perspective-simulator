@@ -54,7 +54,6 @@ class Terminal
     const DEFAULT_TERM_COLS    = 80;
     const DEFAULT_TERM_ROWS    = 40;
 
-
     /**
      * Stored size cache so we don't have to run tput each time.
      *
@@ -108,6 +107,45 @@ class Terminal
      */
     private static $linesCountActual = 0;
 
+    /**
+     * The number of lines since the last clear()
+     *
+     * @var integer
+     */
+    private static $linesSinceLastClear = 0;
+
+    /**
+     * Enable flag for the line counter.
+     *
+     * @var boolean
+     */
+    private static $lineCounterEnabled = true;
+
+
+    /**
+     * Enable the internal line counter.
+     *
+     * @return void
+     */
+    public static function enableLineCounter()
+    {
+        self::$lineCounterEnabled = true;
+
+    }//end enableLineCounter()
+
+
+    /**
+     * Disabled the internal line counter.
+     *
+     * @return void
+     */
+    public static function disableLineCounter()
+    {
+        self::$lineCounterEnabled  = false;
+        self::$linesSinceLastClear = 0;
+
+    }//end disableLineCounter()
+
 
     /**
      * Get the terminal dimensions so that text can be formatted correctly to fit if necessary.
@@ -117,7 +155,7 @@ class Terminal
      *
      * @return array
      */
-    public static function getSize($defaultWidth=self::DEFAULT_TERM_COLS, $defaultHeight=self::DEFAULT_TERM_ROWS)
+    public static function getSize(int $defaultWidth=self::DEFAULT_TERM_COLS, int $defaultHeight=self::DEFAULT_TERM_ROWS)
     {
         if (empty(self::$sizeCache) === false) {
             return self::$sizeCache;
@@ -175,7 +213,7 @@ class Terminal
      *
      * @return string
      */
-    public static function colourText($text, $fgColour, $bgColour=null)
+    public static function colourText(string $text, string $fgColour, string $bgColour=null)
     {
         if (self::$coloursEnabled === false) {
             return $text;
@@ -207,7 +245,7 @@ class Terminal
      *
      * @return string
      */
-    public static function formatText($text, $formats=[])
+    public static function formatText(string $text, $formats=[])
     {
         $formats = (array) $formats;
         $codes   = [];
@@ -231,7 +269,7 @@ class Terminal
      *
      * @return string
      */
-    private static function getFormattedText($text, array $codes=[])
+    private static function getFormattedText(string $text, array $codes=[])
     {
         // Escape %.
         $text = preg_replace('/%/m', '%%', $text);
@@ -248,7 +286,7 @@ class Terminal
      *
      * @return void
      */
-    public static function printHeader($header, $pipe=self::STDOUT)
+    public static function printHeader(string $header, string $pipe=self::STDOUT)
     {
         $size    = self::getSize();
         $divider = str_repeat('-', $size['cols']);
@@ -279,7 +317,7 @@ class Terminal
      *
      * @return void
      */
-    public static function printError($msg)
+    public static function printError(string $msg)
     {
         self::printLine($msg, false, self::STDERR);
 
@@ -289,13 +327,13 @@ class Terminal
     /**
      * Print text with a newline character.
      *
-     * @param string $msg     Message to send.
-     * @param string $counted Whether the lines should be counted.
-     * @param string $pipe    Output channel.
+     * @param string  $msg     Message to send.
+     * @param boolean $counted Whether the lines should be counted.
+     * @param string  $pipe    Output channel.
      *
      * @return array
      */
-    public static function printLine($msg='', $counted=true, $pipe=self::STDOUT)
+    public static function printLine(string $msg='', bool $counted=true, string $pipe=self::STDOUT)
     {
         return self::write($msg, $counted, $pipe, true);
 
@@ -305,7 +343,7 @@ class Terminal
     /**
      * Prints a reset format char.
      *
-     * @return void
+     * @return string
      */
     public static function printReset()
     {
@@ -322,7 +360,7 @@ class Terminal
      *
      * @return void
      */
-    public static function printTable(array $table, $pipe=self::STDOUT)
+    public static function printTable(array $table, string $pipe=self::STDOUT)
     {
         $vDelim     = ' | ';
         $hDelim     = '-';
@@ -389,12 +427,20 @@ class Terminal
      * @return null|array If lines are written returns [lineCountStart, lineCountEnd] otherwise null.
      */
     public static function write(
-        $msg,
-        $counted=true,
-        $pipe=self::STDOUT,
-        $newline=false,
-        $reset=true
+        string $msg,
+        bool $counted=true,
+        string $pipe=self::STDOUT,
+        bool $newline=false,
+        bool $reset=true
     ) {
+        // Suspend line counting.
+        $disabledCount = false;
+        if ($pipe === self::STDERR || $counted === false) {
+            $disabledCount = true;
+            $prevSetting   = self::$lineCounterEnabled;
+            self::disableLineCounter();
+        }
+
         $nextLine = (self::$linesCountActual + 1);
         self::incrementLineCounter($msg);
 
@@ -410,6 +456,10 @@ class Terminal
         }
 
         fclose($out);
+
+        if ($disabledCount === true && $prevSetting === true) {
+            self::enableLineCounter();
+        }
 
         return [
             $nextLine,
@@ -427,10 +477,14 @@ class Terminal
      *
      * @return void
      */
-    private static function incrementLineCounter($msg, $add=0)
+    private static function incrementLineCounter(string $msg, int $add=0)
     {
-        $newlines  = $add;
-        $newlines += substr_count($msg, "\n");
+        $newlines = $add;
+        $newlines+= substr_count($msg, "\n");
+        if (self::$lineCounterEnabled === true) {
+            self::$linesSinceLastClear += $newlines;
+        }
+
         self::$linesCountActual += $newlines;
 
     }//end incrementLineCounter()
@@ -447,10 +501,10 @@ class Terminal
      * @return string
      */
     public static function padText(
-        $text,
-        $padChar=self::DEFAULT_PAD_CHAR,
-        $marginLeft=self::DEFAULT_MARGIN_LEFT,
-        $marginRight=self::DEFAULT_MARGIN_RIGHT
+        string $text,
+        string $padChar=self::DEFAULT_PAD_CHAR,
+        int $marginLeft=self::DEFAULT_MARGIN_LEFT,
+        int $marginRight=self::DEFAULT_MARGIN_RIGHT
     ) {
         return str_repeat($padChar, $marginLeft).$text.str_repeat($padChar, $marginRight);
 
@@ -470,12 +524,12 @@ class Terminal
      * @return string
      */
     public static function wrapText(
-        $text,
-        $maxSize=self::DEFAULT_TERM_COLS,
-        $padChar=self::DEFAULT_PAD_CHAR,
-        $marginLeft=self::DEFAULT_MARGIN_LEFT,
-        $marginRight=self::DEFAULT_MARGIN_RIGHT,
-        $indentFirstLine=true
+        string $text,
+        int $maxSize=self::DEFAULT_TERM_COLS,
+        string $padChar=self::DEFAULT_PAD_CHAR,
+        int $marginLeft=self::DEFAULT_MARGIN_LEFT,
+        int $marginRight=self::DEFAULT_MARGIN_RIGHT,
+        bool $indentFirstLine=true
     ) {
         $lenPadChar    = strlen($padChar);
         $actualMaxSize = ($maxSize - ($marginLeft * $lenPadChar) - ($marginRight * $lenPadChar));
@@ -512,10 +566,10 @@ class Terminal
      * @return string
      */
     public static function padTo(
-        $text,
-        $maxWidth,
-        $padChar=self::DEFAULT_PAD_CHAR,
-        $direction='right'
+        string $text,
+        int $maxWidth,
+        string $padChar=self::DEFAULT_PAD_CHAR,
+        string $direction='right'
     ) {
         $marginLeft  = 0;
         $marginRight = 0;
@@ -553,11 +607,79 @@ class Terminal
      *
      * @return string
      */
-    public static function stripControlChars($text)
+    public static function stripControlChars(string $text)
     {
         return preg_replace('/[[:^print:]]/', '', $text);
 
     }//end stripControlChars()
+
+
+    /**
+     * Remove a number of lines from the terminal
+     *
+     * @param integer $count Number of lines to remove.
+     *
+     * @return void
+     */
+    public static function removeLines(int $count=1)
+    {
+        for ($i = 0; $i < $count; $i ++) {
+            self::write(self::CLEAR_LINE, false, self::STDOUT, false, false);
+            self::moveCursor('up', 1);
+            self::write(self::CLEAR_LINE, false, self::STDOUT, false, false);
+        }
+
+        self::$linesCountActual -= $count;
+
+    }//end removeLines()
+
+
+    /**
+     * Moves the cursor to a position in the console.
+     *
+     * @param string  $direction One of 'up', 'down', 'left' or 'right'.
+     * @param integer $count     The number of rows or columns to move.
+     *
+     * @return void
+     */
+    public static function moveCursor(string $direction='up', int $count=1)
+    {
+        $code = 'A';
+        switch (strtolower($direction)) {
+            case 'down':
+                $code = 'B';
+            break;
+
+            case 'right':
+                $code = 'C';
+            break;
+
+            case 'left':
+                $code = 'D';
+            break;
+
+            default:
+                $code = 'A';
+            break;
+        }
+
+        self::write("\033[".$count.$code, false, self::STDOUT, false, false);
+
+    }//end moveCursor()
+
+
+    /**
+     * Clears given number of lines.
+     *
+     * @return void
+     */
+    public static function clear()
+    {
+        if (self::$linesSinceLastClear > 0) {
+            self::removeLines(self::$linesSinceLastClear);
+        }
+
+    }//end clear()
 
 
 }//end class

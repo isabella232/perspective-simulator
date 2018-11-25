@@ -241,11 +241,6 @@ trait PropertyTrait
             _('This will delete the property.'),
             ['bold']
         );
-        $msg .= "\n    ";
-        $msg .= Terminal::formatText(
-            _('Are you sure you want to continue? [y/N]'),
-            ['bold']
-        );
         $this->confirmAction($msg);
 
         try {
