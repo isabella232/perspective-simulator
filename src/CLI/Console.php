@@ -246,6 +246,11 @@ class Console
                         '--install',
                         _('Installs the simulator, runs only when simulator directory doesn\'t exist.'),
                     ],
+                    [
+                        '-S',
+                        '--server',
+                        _('Starts the PHP development server for the simulator.'),
+                    ],
                 ];
 
                 foreach ($options as $option) {
@@ -265,12 +270,14 @@ class Console
                 }
 
                 foreach ($commands as $command) {
+                    Terminal::printLine();
                     $commandParts = explode(DIRECTORY_SEPARATOR, $command);
 
                     $name      = str_replace('.php', '', end($commandParts));
                     $fullClass = '\\PerspectiveSimulator\\CLI\\Command\\'.$name;
                     $com       = new $fullClass('help', self::$args);
                     $com->printHelp();
+                    Terminal::printLine();
                 }
             }//end if
         }//end if
@@ -330,7 +337,7 @@ class Console
             self::getArgs($args['argv']);
         }
 
-        if (self::$commandName === 'project') {
+        if (self::$commandName === 'project' || $args['help'] === true) {
             // We don't have a project so nothing to load in the simulator.
             return;
         }

@@ -379,7 +379,19 @@ class Project
                 },
                 ARRAY_FILTER_USE_KEY
             );
-        }
+
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: '.$actions[$filter]['action']
+                )
+            );
+        } else {
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: perspective <action> project <arguments>'
+                )
+            );
+        }//end if
 
         $this->printHelpToScreen($actions, $filter);
 

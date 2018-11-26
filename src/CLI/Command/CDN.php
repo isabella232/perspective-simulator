@@ -266,7 +266,7 @@ class CDN
         } else {
             Terminal::printLine(
                 Terminal::padText(
-                    'Usage for: perspective <action> cdn <arguments>',
+                    'Usage for: perspective <action> cdn <arguments>'
                 )
             );
         }//end if

@@ -23,13 +23,26 @@ mb_internal_encoding('UTF-8');
 
 // Get options
 $opts = getopt(
-    'p:hi',
+    'p:hiS::',
     [
         'project:',
         'help',
         'install',
+        'server::'
     ]
 );
+
+if (isset($opts['S']) === true || isset($opts['server']) === true) {
+    $host = ($opts['S'] ?? $opts['server'] ?? 'localhost:8000');
+    if (empty($host) === true) {
+        $host = 'localhost:8000';
+    }
+
+    \PerspectiveSimulator\CLI\Terminal::printLine(sprintf(_('Perspective Simulator listening on: http://%s'), $host));
+    \PerspectiveSimulator\CLI\Terminal::printLine(_('Press Ctrl-C to quit.'));
+    exec('php -S '.$host.' vendor/Perspective/Simulator/src/Requests/Router.php');
+    exit(1);
+}
 
 $help = false;
 if (isset($opts['h']) === true || isset($opts['help']) === true) {

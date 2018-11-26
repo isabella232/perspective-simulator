@@ -118,7 +118,7 @@ class Install
         } else {
             Terminal::printLine(
                 Terminal::padText(
-                    'Usage for: perspective -i|--install',
+                    'Usage for: perspective -i|--install'
                 )
             );
         }//end if

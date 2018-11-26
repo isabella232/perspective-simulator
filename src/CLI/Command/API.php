@@ -202,7 +202,7 @@ class API
         } else {
             Terminal::printLine(
                 Terminal::padText(
-                    'Usage for: perspective <action> api <arguments>',
+                    'Usage for: perspective <action> api <arguments>'
                 )
             );
         }//end if
