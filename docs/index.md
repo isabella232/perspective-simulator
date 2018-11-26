@@ -3,12 +3,13 @@
 ```bash
 perspective [options] <action> <command> <arguments>
 ```
-
+## Options
 | Long option | Short option | Description                                                               |
 | :---------: | :----------: | :------------------------------------------------------------------------ |
 |  --project  |      -p      | Specifies the project to perform the action on.                           |
 |   --help    |      -h      | Shows the help screen for the action.                                     |
 |  --install  |      -i      | Installs the simulator, runs only when simulator directory doesn't exist. |
+|  --server   |      -S      | Starts the PHP development server for the simulator.                      |
 
 ## Comands
 1. [API Actions](./api.md)
