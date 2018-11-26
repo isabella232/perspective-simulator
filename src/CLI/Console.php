@@ -188,7 +188,7 @@ class Console
 
             $command->install();
         } else {
-            $actionClass = '\\PerspectiveSimulator\\CLI\\Command1\\'.self::$commandName;
+            $actionClass = '\\PerspectiveSimulator\\CLI\\Command\\'.self::$commandName;
             if (class_exists($actionClass) === true) {
                 try {
                     $command = new $actionClass(self::$actionName, self::$args);
