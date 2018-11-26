@@ -23,3 +23,5 @@ To start the web server:
 ```
 php -S localhost:8000 vendor/Perspective/Simulator/src/Requests/Router.php
 ```
+
+[perspective comand help](./docs/index.md)

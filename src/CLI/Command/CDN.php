@@ -214,13 +214,13 @@ class CDN
                 'arguments'   => [
                     'required' => [
                         'path'         => _('The absolute path to the file to copy or the CDN path for a directory.'),
-                        'locationPath' => _('The CDN path to copy the file to, not required when adding a directory.'),
+                        'locationPath' => _('The CDN path to copy the file to, OPTIONAL when adding a directory.'),
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => sprintf('perspective [-p] delete cdn %s', $type),
-                'description' => _('Deletes the file or directory from the project.'),
+                'description' => _('Deletes the file or directory from the CDN in project.'),
                 'arguments'   => [
                     'required' => [
                         'path' => _('The path to the file or directory to delete from the CDN'),
@@ -229,7 +229,7 @@ class CDN
             ],
             'rename' => [
                 'action'      => sprintf('perspective [-p] move cdn %s', $type),
-                'description' => _('Moves a file or directory from the project.'),
+                'description' => _('Moves a file or directory in the CDN of the project.'),
                 'arguments'   => [
                     'required' => [
                         'oldPath' => _('The current CDN path for the file or directory.'),
@@ -239,7 +239,7 @@ class CDN
             ],
             'move'   => [
                 'action'      => sprintf('perspective [-p] rename cdn %s', $type),
-                'description' => _('Renames a file or directory from the project.'),
+                'description' => _('Renames a file or directory in the CDN.'),
                 'arguments'   => [
                     'required' => [
                         'oldPath' => _('The current CDN path for the file or directory.'),
@@ -257,7 +257,19 @@ class CDN
                 },
                 ARRAY_FILTER_USE_KEY
             );
-        }
+
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: '.$actions[$filter]['action']
+                )
+            );
+        } else {
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: perspective <action> cdn <arguments>',
+                )
+            );
+        }//end if
 
         $this->printHelpToScreen($actions, $filter);
 

@@ -431,7 +431,22 @@ class App
                 },
                 ARRAY_FILTER_USE_KEY
             );
-        }
+
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: '.$actions[$filter]['action']
+                )
+            );
+        } else {
+            Terminal::printLine(
+                Terminal::padText(
+                    sprintf(
+                        'Usage for: perspective <action> app %s <arguments>',
+                        $type
+                    )
+                )
+            );
+        }//end if
 
         $this->printHelpToScreen($actions, $filter);
 

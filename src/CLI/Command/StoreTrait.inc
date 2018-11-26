@@ -498,8 +498,8 @@ trait StoreTrait
                 'description' => _('Deletes the reference between two stores'),
                 'arguments'   => [
                     'required' => [
-                        'referneceName' => _('The name of the reference we are adding.'),
-                        'targetCode'    => _('The name of the store the reference will be added to.'),
+                        'referneceName' => _('The name of the reference we are deleting.'),
+                        'targetCode'    => _('The name of the store the reference will be deleted from.'),
                     ],
                 ],
             ],

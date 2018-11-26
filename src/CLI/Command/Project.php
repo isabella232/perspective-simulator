@@ -360,7 +360,7 @@ class Project
             ],
             'update' => [
                 'action'      => 'perspective [-p] update project',
-                'description' => _('Deletes a project.'),
+                'description' => _('Updates a project setting.'),
                 'arguments'   => [
                     'required' => [
                         'namespace' => _('The namespace of the Project we are updating.'),

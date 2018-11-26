@@ -164,7 +164,7 @@ class API
                 'action'      => 'perspective [-p] add api',
                 'description' => _('Adds a new API specification file.'),
                 'arguments'   => [
-                    'optional' => [
+                    'required' => [
                         'path' => _('The path to a new API specification yaml file.'),
                     ],
                 ],
@@ -175,7 +175,7 @@ class API
                 'arguments'   => [],
             ],
             'update' => [
-                'action'      => 'perspective [-p] rename api',
+                'action'      => 'perspective [-p] update api',
                 'description' => _('Updates the projects API specification file and its operations.'),
                 'arguments'   => [
                     'optional' => [
@@ -193,7 +193,19 @@ class API
                 },
                 ARRAY_FILTER_USE_KEY
             );
-        }
+
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: '.$actions[$filter]['action']
+                )
+            );
+        } else {
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: perspective <action> api <arguments>',
+                )
+            );
+        }//end if
 
         $this->printHelpToScreen($actions, $filter);
 

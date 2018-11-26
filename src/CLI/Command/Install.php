@@ -109,7 +109,19 @@ class Install
                 },
                 ARRAY_FILTER_USE_KEY
             );
-        }
+
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: '.$actions[$filter]['action']
+                )
+            );
+        } else {
+            Terminal::printLine(
+                Terminal::padText(
+                    'Usage for: perspective -i|--install',
+                )
+            );
+        }//end if
 
         $this->printHelpToScreen($actions, $filter);
 
