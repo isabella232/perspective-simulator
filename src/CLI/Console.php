@@ -188,10 +188,6 @@ class Console
 
             $command->install();
         } else {
-            if (isset($args['argv']) === true) {
-                self::getArgs($args['argv']);
-            }
-
             $actionClass = '\\PerspectiveSimulator\\CLI\\Command\\'.self::$commandName;
             if (class_exists($actionClass) === true) {
                 try {
@@ -219,6 +215,7 @@ class Console
                     exit(1);
                 }//end try
             } else {
+                // TODO:: all help.
                 echo 'Usage: perspective [OPTION] <command> <arguments>'."\n";
                 echo 'Without option, it will assume the export only contians 1 project'."\n";
                 echo "\n";
@@ -274,15 +271,25 @@ class Console
      * Loads the project for the CLI
      *
      * @param string $project The name of the project.
+     * @param array  $args    The arguments passed in for the action we will perform later.
      *
      * @return void
      */
-    public static function loadProject(string $project=null)
+    public function loadProject(string $project=null, array $args=[])
     {
+        if (isset($args['argv']) === true) {
+            self::getArgs($args['argv']);
+        }
+
+        if (self::$commandName === 'project') {
+            // We don't have a project so nothing to load in the simulator.
+            return;
+        }
+
         if ($project === null) {
             // Check that theres only 1 project if so we can use that otherwise throw error.
             try {
-                $project = self::getProject();
+                $project = $this->getProject();
             } catch (CLIException $e) {
                 $e->prettyPrint();
                 exit;
@@ -301,7 +308,7 @@ class Console
      * @return mixed
      * @throws CLIException When more than 1 project found and -p not specified.
      */
-    private static function getProject()
+    private function getProject()
     {
         $projectPath = Libs\FileSystem::getExportDir().'/projects/';
         $projectDirs = scandir($projectPath);

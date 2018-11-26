@@ -412,7 +412,7 @@ class App
                 ],
             ],
             'move'   => [
-                'action'      => sprintf('perspective [-p] move customtype %s', $type),
+                'action'      => sprintf('perspective [-p] move app %s', $type),
                 'description' => _('Moves an app file or directory in the location provided.'),
                 'arguments'   => [
                     'required' => [

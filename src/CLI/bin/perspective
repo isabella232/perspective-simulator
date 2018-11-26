@@ -51,14 +51,16 @@ if ((isset($opts['i']) === true
     exit;
 }
 
-if ($install === false) {
-    \PerspectiveSimulator\CLI\Console::loadProject($project);
-}
-
 $console = \PerspectiveSimulator\CLI\Console::getInstance();
-$console->run([
+$args    = [
     'project' => $project,
     'install' => $install,
     'help'    => $help,
     'argv'    => $argv,
-]);
+];
+
+if ($install === false) {
+    $console->loadProject($project, $args);
+}
+
+$console->run($args);
