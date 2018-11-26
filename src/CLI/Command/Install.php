@@ -88,16 +88,30 @@ class Install
      */
     final public function printHelp(string $filter=null)
     {
-        $size = Terminal::getSize();
-        Terminal::printHeader(
-            Terminal::padText(_('Usage for: perspective [-i | --install]')),
-            Terminal::STDERR
-        );
-        Terminal::printLine(_('    Use -i or --install to initialise the Perspective Simulator'));
-        Terminal::printLine(
-            sprintf(_('    %s this command can only be run once.'), Terminal::formatText(_('NOTE:'), ['bold']))
-        );
-        Terminal::printReset();
+        $actions = [
+            '-i'        => [
+                'action'      => 'perspective -i',
+                'description' => _('Installs the simulator.'),
+                'arguments'   => [],
+            ],
+            '--install' => [
+                'action'      => 'perspective --install',
+                'description' => _('Installs the simulator.'),
+                'arguments'   => [],
+            ],
+        ];
+
+        if ($filter !== null) {
+            $actions = array_filter(
+                $actions,
+                function ($a) use ($filter) {
+                    return $a === $filter;
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+        }
+
+        $this->printHelpToScreen($actions, $filter);
 
     }//end printHelp()
 

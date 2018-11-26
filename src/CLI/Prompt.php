@@ -97,7 +97,7 @@ class Prompt
         }
 
         $formatted = self::formatMessage($message, $defaultMessage);
-        $input     = trim(readline($formatted));
+        $input     = trim(Terminal::readline($formatted));
 
         if (empty($input) === true) {
             $input = $default;
@@ -137,7 +137,7 @@ class Prompt
             0,
             4
         );
-        $input     = strtoupper(trim(readline($formatted)));
+        $input     = strtoupper(trim(Terminal::readline($formatted)));
 
         if ($input === 'Y') {
             $answer = 'Yes';
@@ -192,7 +192,7 @@ class Prompt
             $inputText = _('Select a number (default: 1): ');
         }
 
-        $input = trim(readline($inputText));
+        $input = trim(Terminal::readline($inputText));
 
         if (empty($input) === true) {
             $input = 1;

@@ -56,8 +56,8 @@ trait CommandTrait
      */
     final public function confirmAction(string $msg)
     {
-        Terminal::printLine($msg);
-        $action  = "    ";
+        $action  = $msg;
+        $action .= "\n    ";
         $action .= Terminal::formatText(
             _('Are you sure you want to continue?'),
             ['bold']
@@ -129,7 +129,7 @@ trait CommandTrait
             }
 
             $indent         = str_repeat(' ', 4);
-            $optionMaxWidth = 25;
+            $optionMaxWidth = 30;
 
             Terminal::printLine();
             Terminal::printLine($command);

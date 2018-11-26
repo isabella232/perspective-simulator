@@ -161,7 +161,7 @@ class Console
 
                 $size             = Terminal::getSize();
                 $indent           = str_repeat(' ', 4);
-                $optionMaxWidth   = 25;
+                $optionMaxWidth   = 30;
                 $errorTypeConsole = Terminal::formatText(Terminal::colourText($errorType, 'red'), ['bold']);
 
                 Terminal::printHeader(Terminal::formatText('Perspective Simulator Error.', ['bold']));
@@ -188,7 +188,7 @@ class Console
 
             $command->install();
         } else {
-            $actionClass = '\\PerspectiveSimulator\\CLI\\Command\\'.self::$commandName;
+            $actionClass = '\\PerspectiveSimulator\\CLI\\Command1\\'.self::$commandName;
             if (class_exists($actionClass) === true) {
                 try {
                     $command = new $actionClass(self::$actionName, self::$args);
@@ -215,14 +215,63 @@ class Console
                     exit(1);
                 }//end try
             } else {
-                // TODO:: all help.
-                echo 'Usage: perspective [OPTION] <command> <arguments>'."\n";
-                echo 'Without option, it will assume the export only contians 1 project'."\n";
-                echo "\n";
-                echo "\n";
-                echo '  -p, --project  Mandatory string when multiple projects in export.'."\n";
-                echo '  -h, --help     Optional Print the usage.'."\n";
-                echo "\n";
+                $size           = Terminal::getSize();
+                $indent         = str_repeat(' ', 4);
+                $optionMaxWidth = 30;
+                $commands       = Libs\FileSystem::listDirectory(
+                    dirname(__FILE__).'/Command/',
+                    ['.php']
+                );
+
+                Terminal::printHeader(
+                    sprintf(
+                        _('Help for: %s'),
+                        Terminal::formatText('perspective [options] <action> <command> <arguments>', ['bold'])
+                    )
+                );
+
+                $options = [
+                    [
+                        '-p',
+                        '--project',
+                        _('Specifies the project to perform the action on.'),
+                    ],
+                    [
+                        '-h',
+                        '--help',
+                        _('Shows the help screen for the action.'),
+                    ],
+                    [
+                        '-i',
+                        '--install',
+                        _('Installs the simulator, runs only when simulator directory doesn\'t exist.'),
+                    ],
+                ];
+
+                foreach ($options as $option) {
+                    Terminal::write(Terminal::padTo($indent.$option[0], $optionMaxWidth, ' '));
+                    Terminal::printLine(
+                        Terminal::wrapText(
+                            $option[2],
+                            $size['cols'],
+                            ' ',
+                            $optionMaxWidth,
+                            4,
+                            false
+                        )
+                    );
+                    Terminal::printLine($indent.$option[1]);
+                    Terminal::printLine();
+                }
+
+                foreach ($commands as $command) {
+                    $commandParts = explode(DIRECTORY_SEPARATOR, $command);
+
+                    $name      = str_replace('.php', '', end($commandParts));
+                    $fullClass = '\\PerspectiveSimulator\\CLI\\Command\\'.$name;
+                    $com       = new $fullClass('help', self::$args);
+                    $com->printHelp();
+                }
             }//end if
         }//end if
 

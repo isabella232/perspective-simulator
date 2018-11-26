@@ -682,4 +682,21 @@ class Terminal
     }//end clear()
 
 
+    /**
+     * Read data from user input
+     *
+     * @param string $msg     Message to output.
+     * @param string $default Default value to return if interactive mode is disabled.
+     *
+     * @return string User input.
+     */
+    public static function readline($msg, $default='')
+    {
+        self::incrementLineCounter($msg, 1);
+        $input = readline($msg);
+        return $input;
+
+    }//end readline()
+
+
 }//end class

@@ -79,7 +79,13 @@ class API
      */
     public static function installAPI(string $project)
     {
-        $yaml = file_get_contents(self::getAPIPath($project).'/api.yaml');
+        $apiFile = self::getAPIPath($project).'/api.yaml';
+        if (file_exists($apiFile) === false) {
+            // No api file so nothing to do here.
+            return true;
+        }
+
+        $yaml = file_get_contents($apiFile);
         ini_set('yaml.decode_php', 0);
         $parsed = yaml_parse($yaml);
         if ($parsed === false || empty($parsed['paths']) === true) {
