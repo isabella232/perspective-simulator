@@ -327,7 +327,7 @@ trait CustomTypesTrait
         $type    = strtolower($this->type);
         $actions = [
             'add'    => [
-                'action'      => sprintf('perspective [-p] add customtype %s', $type),
+                'action'      => sprintf('perspective [-p] add %s', $type),
                 'description' => _('Adds a new Custom Type to the project'),
                 'arguments'   => [
                     'required' => [
@@ -339,7 +339,7 @@ trait CustomTypesTrait
                 ],
             ],
             'delete' => [
-                'action'      => sprintf('perspective [-p] delete customtype %s', $type),
+                'action'      => sprintf('perspective [-p] delete %s', $type),
                 'description' => _('Deletes a Custom Type from the project'),
                 'arguments'   => [
                     'required' => [
@@ -348,7 +348,7 @@ trait CustomTypesTrait
                 ],
             ],
             'rename' => [
-                'action'      => sprintf('perspective [-p] rename customtype %s', $type),
+                'action'      => sprintf('perspective [-p] rename %s', $type),
                 'description' => _('Renames a Custom Type in the project'),
                 'arguments'   => [
                     'required' => [
@@ -358,7 +358,7 @@ trait CustomTypesTrait
                 ],
             ],
             'move'   => [
-                'action'      => sprintf('perspective [-p] move customtype %s', $type),
+                'action'      => sprintf('perspective [-p] move %s', $type),
                 'description' => _('Moves a Custom Type in the project'),
                 'arguments'   => [
                     'required' => [
@@ -389,7 +389,7 @@ trait CustomTypesTrait
             Terminal::printLine(
                 Terminal::padText(
                     sprintf(
-                        'Usage for: perspective <action> customtype %s <arguments>',
+                        'Usage for: perspective <action> %s <arguments>',
                         $type
                     )
                 )

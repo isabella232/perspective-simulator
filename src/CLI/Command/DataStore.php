@@ -39,6 +39,10 @@ class DataStore
 
         $this->setArgs($action, $args);
 
+        if (is_dir($this->storeDir) === false) {
+            Libs\FileSystem::mkdir($this->storeDir, true);
+        }
+
     }//end __construct()
 
 

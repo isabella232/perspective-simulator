@@ -46,6 +46,10 @@ class Project
         $this->storeDir = $exportDir.'/projects/';
         $this->setArgs($action, $args);
 
+        if (is_dir($this->storeDir) === false) {
+            Libs\FileSystem::mkdir($this->storeDir, true);
+        }
+
     }//end __construct()
 
 
@@ -187,6 +191,25 @@ class Project
             $projectDir = Libs\FileSystem::getProjectDir($this->args['namespace']);
             Libs\FileSystem::mkdir($projectDir, true);
             file_put_contents($projectDir.'/project.json', Libs\Util::jsonEncode($settings));
+
+            // Install project for the simulator.
+            $simulatorDir       = Libs\FileSystem::getSimulatorDir();
+            $project            = $this->args['namespace'];
+            $GLOBALS['project'] = $project;
+
+            if (is_dir($simulatorDir.'/'.$project) === false) {
+                Libs\FileSystem::mkdir($simulatorDir.'/'.$project);
+            }
+
+            $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
+
+            $storageDir = Libs\FileSystem::getStorageDir($project);
+            if (is_dir($storageDir) === false) {
+                Libs\FileSystem::mkdir($storageDir);
+            }
+
+            \PerspectiveSimulator\API::installAPI($project);
+            \PerspectiveSimulator\Queue\Queue::installQueues($project);
         } catch (\Exception $e) {
             throw new CLIException($e->getMessage());
         }//end try

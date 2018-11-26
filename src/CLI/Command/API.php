@@ -45,6 +45,10 @@ class API
         $this->storeDir = $projectDir.'/API/';
         $this->setArgs($action, $args);
 
+        if (is_dir($this->storeDir) === false) {
+            Libs\FileSystem::mkdir($this->storeDir.'Operations/', true);
+        }
+
     }//end __construct()
 
 

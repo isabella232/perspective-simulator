@@ -5,7 +5,7 @@
 **Usage for:**
 
 ```bash
-perspective <action> customtype customdatatype <arguments>
+perspective <action> customdatatype <arguments>
 ```
 
 ### Add
@@ -13,7 +13,7 @@ perspective <action> customtype customdatatype <arguments>
 Adds a new Custom Data Type to the project
 
 ```bash
-perspective [-p] add customtype customdatatype <customTypeCode> <parent>
+perspective [-p] add customdatatype <customTypeCode> <parent>
 ```
 
 #### Required arguments:
@@ -33,7 +33,7 @@ perspective [-p] add customtype customdatatype <customTypeCode> <parent>
 Deletes a Custom Data Type from the project
 
 ```bash
-perspective [-p] delete customtype customdatatype <customTypeCode>
+perspective [-p] delete customdatatype <customTypeCode>
 ```
 
 #### Required arguments:
@@ -47,7 +47,7 @@ perspective [-p] delete customtype customdatatype <customTypeCode>
 Renames a Custom Data Type in the project
 
 ```bash
-perspective [-p] rename customtype customdatatype <oldCustomTypeCode> <newCustomTypeCode>
+perspective [-p] rename customdatatype <oldCustomTypeCode> <newCustomTypeCode>
 ```
 
 #### Required arguments:
@@ -62,7 +62,7 @@ perspective [-p] rename customtype customdatatype <oldCustomTypeCode> <newCustom
 Moves a Custom Data Type in the project
 
 ```bash
-perspective [-p] move customtype customdatatype <customTypeCode> <parent>
+perspective [-p] move customdatatype <customTypeCode> <parent>
 ```
 
 #### Required arguments:
@@ -82,7 +82,7 @@ perspective [-p] move customtype customdatatype <customTypeCode> <parent>
 **Usage for:**
 
 ```bash
-perspective <action> customtype custompagetype <arguments>
+perspective <action> custompagetype <arguments>
 ```
 
 ### Add
@@ -90,7 +90,7 @@ perspective <action> customtype custompagetype <arguments>
 Adds a new Custom Page Type to the project
 
 ```bash
-perspective [-p] add customtype custompagetype <customTypeCode> <parent>
+perspective [-p] add custompagetype <customTypeCode> <parent>
 ```
 
 #### Required arguments:
@@ -110,7 +110,7 @@ perspective [-p] add customtype custompagetype <customTypeCode> <parent>
 Deletes a Custom Page Type from the project
 
 ```bash
-perspective [-p] delete customtype custompagetype <customTypeCode>
+perspective [-p] delete custompagetype <customTypeCode>
 ```
 
 #### Required arguments:
@@ -124,7 +124,7 @@ perspective [-p] delete customtype custompagetype <customTypeCode>
 Renames a Custom Page Type in the project
 
 ```bash
-perspective [-p] rename customtype custompagetype <oldCustomTypeCode> <newCustomTypeCode>
+perspective [-p] rename custompagetype <oldCustomTypeCode> <newCustomTypeCode>
 ```
 
 #### Required arguments:
@@ -139,7 +139,7 @@ perspective [-p] rename customtype custompagetype <oldCustomTypeCode> <newCustom
 Moves a Custom Page Type in the project
 
 ```bash
-perspective [-p] move customtype custompagetype <customTypeCode> <parent>
+perspective [-p] move custompagetype <customTypeCode> <parent>
 ```
 
 #### Required arguments:
