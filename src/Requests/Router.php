@@ -24,8 +24,8 @@ if (isset($_SERVER['QUERY_STRING']) === true) {
 
 $pathParts = explode('/', $path);
 $domain    = array_shift($pathParts);
-$type      = array_shift($pathParts);
 $project   = array_shift($pathParts);
+$type      = array_shift($pathParts);
 $path      = implode('/', $pathParts);
 
 \PerspectiveSimulator\Bootstrap::load($project);
