@@ -71,6 +71,32 @@ trait ReferenceObjectTrait
             return;
         }
 
+        $code       = $this->store->getCode();
+        $storeType  = $this->store->getType();
+        $storageDir = \PerspectiveSimulator\Libs\FileSystem::getProjectDir();
+        $filePath   = $storageDir.'/Stores/'.$storeType.'/'.$code.'/'.$referenceid.'.json';
+        if (file_exists($filePath) === true) {
+            $reference     = \PerspectiveSimulator\Libs\Util::jsonDecode(file_get_contents($filePath));
+            $sourceValue   = [];
+            $targetValue   = [];
+            $referenceSide = $this->getReferenceSide($reference, $this);
+            if ($referenceSide === 'source') {
+                $sourceValue[] = $this->getId();
+            } else if ($referenceSide === 'target') {
+                $targetValue[] = $this->getId();
+            }
+
+            if ($reference['cardinality'] === '1:1') {
+                if (count($sourceValue) === 1 || count($targetValue) === 1 ) {
+                    unset($this->references[$referenceid]);
+                }
+            } else if ($reference['cardinality'] === '1:M') {
+                if (count($sourceValue) !== 1) {
+                    unset($this->references[$referenceid]);
+                }
+            }
+        }//end if
+
         if (isset($this->references[$referenceid]) === false) {
             $this->references[$referenceid] = [];
         }

@@ -24,11 +24,16 @@ if (isset($_SERVER['QUERY_STRING']) === true) {
 
 $pathParts = explode('/', $path);
 $domain    = array_shift($pathParts);
-$project   = array_shift($pathParts);
 $type      = array_shift($pathParts);
+$project   = ucfirst(array_shift($pathParts));
 $path      = implode('/', $pathParts);
 
-\PerspectiveSimulator\Bootstrap::load($project);
+if ($project !== null) {
+    \PerspectiveSimulator\Bootstrap::load($project);
+}
+
+processCORSPreflight();
+sendCORSHeaders();
 
 switch ($type) {
     case 'api':
@@ -46,6 +51,39 @@ switch ($type) {
     break;
 
     default:
-        \PerspectiveSimulator\Libs\Web::send404();
+        return;
     break;
 }
+
+
+function processCORSPreflight()
+{
+    $httpMethod = strtolower(($_SERVER['REQUEST_METHOD'] ?? ''));
+    if ($httpMethod === 'options') {
+        if (empty($_SERVER['HTTP_ORIGIN']) === false
+            && empty($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) === false
+        ) {
+            header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
+            header('Access-Control-Allow-Credentials: true');
+            header('Access-Control-Max-Age: 600');
+            header('Vary: Origin');
+            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD');
+            if (empty($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']) === false) {
+                header('Access-Control-Allow-Headers: '.$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
+            }
+
+            exit();
+        }
+    }
+
+}//end processCORSPreflight()
+
+
+function sendCORSHeaders()
+{
+    if (empty($_SERVER['HTTP_ORIGIN']) === false) {
+        header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
+        header('Access-Control-Allow-Credentials: true');
+    }
+
+}//end sendCORSHeaders()

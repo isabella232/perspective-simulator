@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\StorageType;
 require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
+use \PerspectiveSimulator\Libs;
 use \PerspectiveSimulator\ObjectType\DataRecord;
 use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 
@@ -218,6 +219,106 @@ class DataStore
         return $parents;
 
     }//end getParents()
+
+
+    /**
+     * Save the store as a json object.
+     *
+     * @return boolean
+     */
+    final public function save()
+    {
+        if (Bootstrap::isWriteEnabled() === false) {
+            return false;
+        }
+
+        $store = [
+            'records'   => [],
+            'uniqueMap' => [],
+        ];
+
+        foreach ($this->records as $recordid => $data) {
+            $children = [];
+            if (isset($data['children']) === true) {
+                $children = (array_keys($data['children']) ?? []);
+            }
+
+            $store['records'][$recordid] = [
+                'depth'    => ($data['depth'] ?? null),
+                'children' => $children,
+                'parent'   => ($data['parent'] ?? null),
+            ];
+        }
+
+        foreach ($this->uniqueMap as $propid => $values) {
+            $store['uniqueMap'][$propid] = [];
+            foreach ($values as $value => $record) {
+                $store['uniqueMap'][$propid][$value] = $record->getId();
+            }
+        }
+
+        $storageDir = Libs\FileSystem::getStorageDir();
+        $filePath   = $storageDir.'/'.$this->code.'/store.json';
+        file_put_contents($filePath, Libs\Util::jsonEncode($store));
+        return true;
+
+    }//end save()
+
+
+    /**
+     * Loads the Stores cache.
+     *
+     * @return boolean
+     */
+    public function load()
+    {
+        if (Bootstrap::isReadEnabled() === false) {
+            return false;
+        }
+
+        $storageDir = Libs\FileSystem::getStorageDir();
+        $filePath   = $storageDir.'/'.$this->code.'/store.json';
+
+        if (is_file($filePath) === false) {
+            return false;
+        }
+
+        $store = Libs\Util::jsonDecode(file_get_contents($filePath));
+
+        foreach ($store['records'] as $recordid => $data) {
+            $recordPath = dirname($filePath).'/'.$recordid.'.json';
+            $recordData = Libs\Util::jsonDecode(file_get_contents($recordPath));
+            $type       = $recordData['type'];
+            $data['object'] = new $type($this, $recordid);
+
+            $this->records[$recordid] = $data;
+
+            $baseRecordid     = (int) substr($recordid, 0, -2);
+            $this->numRecords = max($this->numRecords, $baseRecordid);
+        }//end foreach
+
+        foreach ($store['records'] as $recordid => $data) {
+            $children = [];
+            foreach ($data['children'] as $childid) {
+                $children[$childid] = $this->records[$childid]['object'];
+            }
+
+            $this->records[$recordid]['children'] = $children;
+            $this->records[$recordid]['parent']   = $data['parent'];
+        }
+
+        foreach ($store['uniqueMap'] as $propid => $values) {
+            $this->uniqueMap[$propid] = [];
+            foreach ($values as $value => $recordid) {
+                $this->uniqueMap[$propid][$value] = $this->records[$recordid]['object'];
+            }
+        }
+
+        $this->numRecords++;
+
+        return true;
+
+    }//end load()
 
 
 }//end class
