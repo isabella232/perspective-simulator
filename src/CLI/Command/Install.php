@@ -91,12 +91,12 @@ class Install
         $actions = [
             '-i'        => [
                 'action'      => 'perspective -i',
-                'description' => _('Installs the simulator.'),
+                'description' => 'Installs the simulator.',
                 'arguments'   => [],
             ],
             '--install' => [
                 'action'      => 'perspective --install',
-                'description' => _('Installs the simulator.'),
+                'description' => 'Installs the simulator.',
                 'arguments'   => [],
             ],
         ];

@@ -64,12 +64,12 @@ class Queue
     {
         $valid = Libs\Util::isValidStringid($name);
         if ($valid === false) {
-            throw new CLIException(_('Queue name invalid.'));
+            throw new CLIException('Queue name invalid.');
         }
 
         $queueFile = $this->storeDir.$name.'.php';
         if (file_exists($queueFile) === true) {
-            throw new CLIException(_('Duplicate queue name.'));
+            throw new CLIException('Duplicate queue name.');
         }
 
         return $name;
@@ -126,7 +126,7 @@ class Queue
     public function add()
     {
         if ($this->args['name'] === null) {
-            throw new CLIException(_('Queue name is required.'));
+            throw new CLIException('Queue name is required.');
         }
 
         try {
@@ -166,11 +166,11 @@ class Queue
     public function delete()
     {
         if ($this->args['name'] === null) {
-            throw new CLIException(_('Queue name is required.'));
+            throw new CLIException('Queue name is required.');
         }
 
         $msg  = Terminal::formatText(
-            sprintf(_('This will delete %s queue from the project'), $this->args['name']),
+            sprintf('This will delete %s queue from the project', $this->args['name']),
             ['bold']
         );
         $this->confirmAction($msg);
@@ -194,14 +194,14 @@ class Queue
     public function rename()
     {
         if ($this->args['oldName'] === null && $this->args['newName'] === null) {
-            throw new CLIException(_('Queue\'s current name and new name are required.'));
+            throw new CLIException('Queue\'s current name and new name are required.');
         } else if ($this->args['newName'] === null) {
-            throw new CLIException(_('Queue\'s new name is required.'));
+            throw new CLIException('Queue\'s new name is required.');
         }
 
         try {
             if (file_exists($this->storeDir.$this->args['oldName'].'.php') === false) {
-                throw new CLIException(_('Queue doesn\'t exist.'));
+                throw new CLIException('Queue doesn\'t exist.');
             }
 
             $this->validateQueueName($this->args['newName']);
@@ -230,29 +230,29 @@ class Queue
         $actions = [
             'add'    => [
                 'action'      => 'perspective [-p] add queue',
-                'description' => _('Adds a new Queue to a project.'),
+                'description' => 'Adds a new Queue to a project.',
                 'arguments'   => [
                     'required' => [
-                        'queueName' => _('The name for the new queue.'),
+                        'queueName' => 'The name for the new queue.',
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => 'perspective [-p] delete queue',
-                'description' => _('Deletes a queue in a project.'),
+                'description' => 'Deletes a queue in a project.',
                 'arguments'   => [
                     'required' => [
-                        'queueName' => _('The name for the queue being deleted.'),
+                        'queueName' => 'The name for the queue being deleted.',
                     ],
                 ],
             ],
             'rename' => [
                 'action'      => 'perspective [-p] rename queue',
-                'description' => _('Renames a queue.'),
+                'description' => 'Renames a queue.',
                 'arguments'   => [
                     'optional' => [
-                        'oldName' => _('The current name of the queue.'),
-                        'newName' => _('The new name for the queue.'),
+                        'oldName' => 'The current name of the queue.',
+                        'newName' => 'The new name for the queue.',
                     ],
                 ],
             ],

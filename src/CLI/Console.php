@@ -225,7 +225,7 @@ class Console
 
                 Terminal::printHeader(
                     sprintf(
-                        _('Help for: %s'),
+                        'Help for: %s',
                         Terminal::formatText('perspective [options] <action> <command> <arguments>', ['bold'])
                     )
                 );
@@ -234,22 +234,22 @@ class Console
                     [
                         '-p',
                         '--project',
-                        _('Specifies the project to perform the action on.'),
+                        'Specifies the project to perform the action on.',
                     ],
                     [
                         '-h',
                         '--help',
-                        _('Shows the help screen for the action.'),
+                        'Shows the help screen for the action.',
                     ],
                     [
                         '-i',
                         '--install',
-                        _('Installs the simulator, runs only when simulator directory doesn\'t exist.'),
+                        'Installs the simulator, runs only when simulator directory doesn\'t exist.',
                     ],
                     [
                         '-S',
                         '--server',
-                        _('Starts the PHP development server for the simulator.'),
+                        'Starts the PHP development server for the simulator.',
                     ],
                 ];
 
@@ -376,15 +376,15 @@ class Console
         }//end foreach
 
         if (count($projects) > 1) {
-            $msg          = _('Confirm which project you want to perform the action on.');
-            $suppressMsg  = _('Alternatively you can run the command with');
+            $msg          = 'Confirm which project you want to perform the action on.';
+            $suppressMsg  = 'Alternatively you can run the command with';
             $suppressMsg .= '-p=<project name> or --project=<project name> to supress this message.';
-            Terminal::printHeader(_('Multiple projects found.'));
+            Terminal::printHeader('Multiple projects found.');
             Terminal::printLine($suppressMsg);
             $project = Prompt::optionList($msg, $projects);
 
             if ($project === null) {
-                throw new CLIException(_('Multiple projects found and invalid project selected.'));
+                throw new CLIException('Multiple projects found and invalid project selected.');
             }
         }
 

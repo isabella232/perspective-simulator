@@ -40,7 +40,7 @@ class Request
         try {
             $deploymentObject = new \PerspectiveSimulator\ObjectType\Deployment($GLOBALS['project']);
         } catch (\Exception $e) {
-            throw new \Exception(_('Unable to create new deployment object'));
+            throw new \Exception('Unable to create new deployment object');
         }
 
         return $deploymentObject;

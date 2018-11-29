@@ -189,7 +189,7 @@ class Prompt
         }
 
         if ($inputText === null) {
-            $inputText = _('Select a number (default: 1): ');
+            $inputText = 'Select a number (default: 1): ';
         }
 
         $input = trim(Terminal::readline($inputText));
@@ -209,7 +209,7 @@ class Prompt
             return $options[$selectedIndex];
         } else {
             if ($errorText === null) {
-                $errorText = _('That option is not valid.');
+                $errorText = 'That option is not valid.';
             }
 
             Terminal::clear();

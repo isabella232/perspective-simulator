@@ -207,7 +207,7 @@ trait ReferenceObjectTrait
                 $targetValue[] = $this->getId();
             }
 
-            $errorMsg = _('Expecting single %s value in %s cardinality, but %s given');
+            $errorMsg = 'Expecting single %s value in %s cardinality, but %s given';
             if ($reference['cardinality'] === '1:1') {
                 if (count($sourceValue) !== 1) {
                     throw new \Exception(
@@ -230,13 +230,13 @@ trait ReferenceObjectTrait
 
             if ($referenceSide === 'source') {
                 if ($sourceValue[0] !== $this->getId()) {
-                    throw new \Exception(_('The target must be the object itself'));
+                    throw new \Exception('The target must be the object itself');
                 }
 
                 $valid = true;
             } else {
                 if ($targetValue[0] !== $this->getId()) {
-                    throw new \Exception(_('The source must be the object itself'));
+                    throw new \Exception('The source must be the object itself');
                 }
 
                 if ($reference['cardinality'] === 'M:M' && count($sourceValue) > 1) {
@@ -279,7 +279,7 @@ trait ReferenceObjectTrait
         if ($object === null) {
             $object = $this;
         } else if (is_object($object) === false) {
-            throw new \Exception(_('Invalid referenced object: is not an object'));
+            throw new \Exception('Invalid referenced object: is not an object');
         }
 
         if ($object instanceof \PerspectiveSimulator\ObjectType\User) {
@@ -288,7 +288,7 @@ trait ReferenceObjectTrait
             $storageClass = 'DataStore';
         } else {
             throw new \Exception(
-                sprintf(_('Invalid referenced object: invalid object type: %s'), get_class($object))
+                sprintf('Invalid referenced object: invalid object type: %s'), get_class($object)
             );
         }
 
@@ -298,7 +298,7 @@ trait ReferenceObjectTrait
         } else if ($reference['targetType'] === $storageClass && $reference['targetCode'] === $storageCode) {
             return 'target';
         } else {
-            throw new \Exception(sprintf(_('Invalid referenced object: %s'), get_class($object)));
+            throw new \Exception(sprintf('Invalid referenced object: %s'), get_class($object));
         }
 
     }//end getReferenceSide()

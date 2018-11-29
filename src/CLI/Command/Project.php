@@ -83,8 +83,8 @@ class Project
                 $this->args['value']     = ($args[2] ?? Prompt::textInput('Value'));
 
                 if ($this->args['setting'] === 'url') {
-                    $message   = _('Select URL Type');
-                    $inputText = _('URL Types (default: 1):');
+                    $message   = 'Select URL Type';
+                    $inputText = 'URL Types (default: 1):';
                     $options   = ['api', 'cdn', 'delete'];
                     $this->args['urlType'] = ($args[3] ?? Prompt::optionList($message, $options, $inputText));
                 }
@@ -109,13 +109,13 @@ class Project
     private function validateProjectNamespace(string $namespace)
     {
         if (is_dir($this->storeDir.$namespace) === true) {
-            throw new CLIException(sprintf(_('Duplicate project namespace (%s).'), $namespace));
+            throw new CLIException(sprintf('Duplicate project namespace (%s).', $namespace));
         }
 
         // Check php namspace.
         $syntaxRes = Libs\Util::checkPHPSyntax('<?php'."\n".'namespace '.$namespace.'; ?>');
         if ($syntaxRes !== true) {
-            throw new CLIException(sprintf(_('Invalid project namespace (%s).'), $namespace));
+            throw new CLIException(sprintf('Invalid project namespace (%s).', $namespace));
         }
 
     }//end validateProjectNamespace()
@@ -143,7 +143,7 @@ class Project
                         $baseURL  = array_shift($urlParts);
                         $urlPath  = implode('/', $urlParts);
                         if (strtolower($urlPath) === $path) {
-                            throw new CLIException(sprintf(_('Duplicate project path (%s)'), $path));
+                            throw new CLIException(sprintf('Duplicate project path (%s)', $path));
                         }
                     }
                 }
@@ -162,7 +162,7 @@ class Project
     public function add()
     {
         if (empty($this->args['name']) === true) {
-            throw new CLIException(_('Projects name is required.'));
+            throw new CLIException('Projects name is required.');
         }
 
         try {
@@ -208,6 +208,13 @@ class Project
                 Libs\FileSystem::mkdir($storageDir);
             }
 
+            $folders = ['API', 'App', 'CDN', 'CustomTypes', 'Properties', 'Stores', 'Queues'];
+            foreach ($folders as $folder) {
+                if (is_dir($projectDir.$folder) === false) {
+                    Libs\FileSystem::mkdir($projectDir.$folder);
+                }
+            }
+
             \PerspectiveSimulator\API::installAPI($project);
             \PerspectiveSimulator\Queue\Queue::installQueues($project);
         } catch (\Exception $e) {
@@ -226,19 +233,19 @@ class Project
     public function delete()
     {
         if (empty($this->args['namespace']) === true) {
-            throw new CLIException(_('Projects namespace is required.'));
+            throw new CLIException('Projects namespace is required.');
         }
 
         try {
             $msg = Terminal::formatText(
-                sprintf(_('This will delete the %s project.'), $this->args['namespace']),
+                sprintf('This will delete the %s project.', $this->args['namespace']),
                 ['bold']
             );
             $this->confirmAction($msg);
 
             $projectDir = Libs\FileSystem::getExportDir().'/projects/'.$this->args['namespace'];
             if (is_dir($projectDir) === false) {
-                throw new CLIException(sprintf(_('Project (%s) doesn\'t exist'), $this->args['namespace']));
+                throw new CLIException(sprintf('Project (%s) doesn\'t exist', $this->args['namespace']));
             }
 
             Libs\FileSystem::delete($projectDir);
@@ -258,7 +265,7 @@ class Project
     public function update()
     {
         if (empty($this->args['namespace']) === true) {
-            throw new CLIException(_('Projects namespace is required.'));
+            throw new CLIException('Projects namespace is required.');
         }
 
         try {
@@ -281,7 +288,7 @@ class Project
 
                 case 'name':
                     if (empty($this->args['value']) === true) {
-                        throw new CLIException(_('Project name is required.'));
+                        throw new CLIException('Project name is required.');
                     }
 
                     $project          = Libs\FileSystem::getExportDir().'/projects/'.$this->args['namespace'].'/src/project.json';
@@ -313,7 +320,7 @@ class Project
                         if ($this->args['urlType'] === 'delete') {
                             if (strtolower($url['url']) === strtolower($this->args['value'])) {
                                 $msg = Terminal::formatText(
-                                    sprintf(_('This will remove the url %s from the project.'), $url['url']),
+                                    sprintf('This will remove the url %s from the project.', $url['url']),
                                     ['bold']
                                 );
                                 $this->confirmAction($msg);
@@ -342,7 +349,7 @@ class Project
                 break;
 
                 default:
-                throw new CLIException(sprintf(_('Invalid project setting: %s'), $this->args['setting']));
+                throw new CLIException(sprintf('Invalid project setting: %s', $this->args['setting']));
             }
         } catch (\Exception $e) {
             throw new CLIException($e->getMessage());
@@ -363,32 +370,32 @@ class Project
         $actions = [
             'add'    => [
                 'action'      => 'perspective [-p] add project',
-                'description' => _('Creates a new project.'),
+                'description' =>'Creates a new project.',
                 'arguments'   => [
                     'required' => [
-                        'name'      => _('The name for the new Project.'),
-                        'namespace' => _('The namespace for the new Project.'),
-                        'path'      => _('The web path for the new Project.'),
+                        'name'      => 'The name for the new Project.',
+                        'namespace' => 'The namespace for the new Project.',
+                        'path'      => 'The web path for the new Project.',
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => 'perspective [-p] delete project',
-                'description' => _('Deletes a project.'),
+                'description' => 'Deletes a project.',
                 'arguments'   => [
                     'required' => [
-                        'namespace' => _('The namespace of the Project we are deleting.'),
+                        'namespace' => 'The namespace of the Project we are deleting.',
                     ],
                 ],
             ],
             'update' => [
                 'action'      => 'perspective [-p] update project',
-                'description' => _('Updates a project setting.'),
+                'description' => 'Updates a project setting.',
                 'arguments'   => [
                     'required' => [
-                        'namespace' => _('The namespace of the Project we are updating.'),
-                        'setting'   => _('The setting we are updating.'),
-                        'value'     => _('The new value for the setting'),
+                        'namespace' => 'The namespace of the Project we are updating.',
+                        'setting'   => 'The setting we are updating.',
+                        'value'     => 'The new value for the setting',
                     ],
                 ],
             ],

@@ -144,19 +144,19 @@ trait PropertyTrait
     private function validatedPropertyCode(string $code)
     {
         if ($code === null) {
-            $eMsg = sprintf(_('%s property code is required.'), $this->readableType);
+            $eMsg = sprintf('%s property code is required.', $this->readableType);
             throw new CLIException($eMsg);
         }
 
         $valid = Libs\Util::isValidStringid($code);
         if ($valid === false) {
-            $eMsg = sprintf(_('Invalid %s property code provided'), $this->readableType);
+            $eMsg = sprintf('Invalid %s property code provided', $this->readableType);
             throw new CLIException($eMsg);
         }
 
         $property = $this->storeDir.$code.'.json';
         if (file_exists($property) === true) {
-            throw new CLIException(_('Property Code is already in use'));
+            throw new CLIException('Property Code is already in use');
         }
 
         return $code;
@@ -173,9 +173,9 @@ trait PropertyTrait
     public function add()
     {
         if ($this->args['code'] === null) {
-            throw new CLIException(_('Property Code is required'));
+            throw new CLIException('Property Code is required');
         } else if ($this->args['type'] === null) {
-            throw new CLIException(_('Property type is required'));
+            throw new CLIException('Property type is required');
         }
 
         try {
@@ -212,9 +212,9 @@ trait PropertyTrait
     public function rename()
     {
         if ($this->args['oldCode'] === null && $this->args['newCode'] === null) {
-            throw new CLIException(_('Original and New codes are required.'));
+            throw new CLIException('Original and New codes are required.');
         } else if ($this->args['newCode'] === null) {
-            throw new CLIException(_('New code is required.'));
+            throw new CLIException('New code is required.');
         }
 
         try {
@@ -238,7 +238,7 @@ trait PropertyTrait
     public function delete()
     {
         $msg  = Terminal::formatText(
-            _('This will delete the property.'),
+            'This will delete the property.',
             ['bold']
         );
         $this->confirmAction($msg);
@@ -248,7 +248,7 @@ trait PropertyTrait
             if (file_exists($propertyFile) === false) {
                 throw new CLIException(
                     sprintf(
-                        _('%s property doesn\'t exist.'),
+                        '%s property doesn\'t exist.',
                         $this->args['code']
                     )
                 );
@@ -275,29 +275,29 @@ trait PropertyTrait
         $actions = [
             'add'    => [
                 'action'      => sprintf('perspective [-p] add property %s', $type),
-                'description' => _('Adds a new property to the project'),
+                'description' => 'Adds a new property to the project',
                 'arguments'   => [
                     'required' => [
-                        'propertyCode' => _('The property code for the new property.'),
+                        'propertyCode' => 'The property code for the new property.',
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => sprintf('perspective [-p] delete property %s', $type),
-                'description' => _('Deletes a  property from the project'),
+                'description' => 'Deletes a  property from the project',
                 'arguments'   => [
                     'required' => [
-                        'propertyCode' => _('The property code for the new property.'),
+                        'propertyCode' => 'The property code for the new property.',
                     ],
                 ],
             ],
             'rename' => [
                 'action'      => sprintf('perspective [-p] rename property %s', $type),
-                'description' => _('Renames a property in the project'),
+                'description' => 'Renames a property in the project',
                 'arguments'   => [
                     'required' => [
-                        'oldPropertyCode' => _('The code for the property.'),
-                        'newPropertyCode' => _('The new code for the property.'),
+                        'oldPropertyCode' => 'The code for the property.',
+                        'newPropertyCode' => 'The new code for the property.',
                     ],
                 ],
             ],

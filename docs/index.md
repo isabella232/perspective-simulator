@@ -18,5 +18,6 @@ perspective [options] <action> <command> <arguments>
 4. [Custom Type Actions](./customtypes.md)
 5. [Install](./install.md)
 6. [Project Actions](./project.md)
-6. [Property Actions](./properties.md)
-6. [Store Actions](./stores.md)
+7. [Property Actions](./properties.md)
+8. [Queue Actions](./queue.md)
+9. [Store Actions](./stores.md)

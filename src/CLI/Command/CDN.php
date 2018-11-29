@@ -94,7 +94,7 @@ class CDN
     public function add()
     {
         if ($this->args['cpPath'] === null) {
-            throw new CLIException(_('Path to new API specification file is required.'));
+            throw new CLIException('Path to new API specification file is required.');
         }
 
         try {
@@ -120,7 +120,7 @@ class CDN
     {
         $msg = Terminal::formatText(
             sprintf(
-                _('This will remove %s from the projects\' CDN.'),
+                'This will remove %s from the projects\' CDN.',
                 $this->args['cpPath']
             ),
             ['bold']
@@ -130,11 +130,11 @@ class CDN
         try {
             if ($this->args['type'] === 'directory') {
                 if (is_dir($this->storeDir.$this->args['cpPath']) === false) {
-                    throw new CLIException(_('Invalid CDN directory.'));
+                    throw new CLIException('Invalid CDN directory.');
                 }
             } else {
                 if (file_exists($this->storeDir.$this->args['cpPath']) === false) {
-                    throw new CLIException(_('CDN file doens\'t exist.'));
+                    throw new CLIException('CDN file doens\'t exist.');
                 }
             }
 
@@ -173,23 +173,23 @@ class CDN
     public function move()
     {
         if ($this->args['oldPath'] === null && $this->args['newPath'] === null) {
-            throw new CLIException(_('Current path and New path are required.'));
+            throw new CLIException('Current path and New path are required.');
         } else if ($this->args['newPath'] === null) {
-            throw new CLIException(_('New path is required.'));
+            throw new CLIException('New path is required.');
         }
 
         try {
             if ($this->args['type'] === 'directory') {
                 if (is_dir($this->storeDir.$this->args['oldPath']) === false) {
-                    throw new CLIException(_('The old CDN path doesn\'t exist.'));
+                    throw new CLIException('The old CDN path doesn\'t exist.');
                 } else if (is_dir($this->storeDir.$this->args['newPath']) === true) {
-                    throw new CLIException(_('CDN directory already exits.'));
+                    throw new CLIException('CDN directory already exits.');
                 }
             } else {
                 if (file_exists($this->storeDir.$this->args['oldPath']) === false) {
-                    throw new CLIException(_('The old CDN file doesn\'t exist.'));
+                    throw new CLIException('The old CDN file doesn\'t exist.');
                 } else if (file_exists($this->storeDir.$this->args['newPath']) === true) {
-                    throw new CLIException(_('CDN file already exits.'));
+                    throw new CLIException('CDN file already exits.');
                 }
             }//end if
 
@@ -214,40 +214,40 @@ class CDN
         $actions = [
             'add'    => [
                 'action'      => sprintf('perspective [-p] add cdn %s', $type),
-                'description' => _('Copies a file to the CDN for the project or makes a new directory.'),
+                'description' => 'Copies a file to the CDN for the project or makes a new directory.',
                 'arguments'   => [
                     'required' => [
-                        'path'         => _('The absolute path to the file to copy or the CDN path for a directory.'),
-                        'locationPath' => _('The CDN path to copy the file to, OPTIONAL when adding a directory.'),
+                        'path'         => 'The absolute path to the file to copy or the CDN path for a directory.',
+                        'locationPath' => 'The CDN path to copy the file to, OPTIONAL when adding a directory.',
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => sprintf('perspective [-p] delete cdn %s', $type),
-                'description' => _('Deletes the file or directory from the CDN in project.'),
+                'description' => 'Deletes the file or directory from the CDN in project.',
                 'arguments'   => [
                     'required' => [
-                        'path' => _('The path to the file or directory to delete from the CDN'),
+                        'path' => 'The path to the file or directory to delete from the CDN',
                     ],
                 ],
             ],
             'rename' => [
                 'action'      => sprintf('perspective [-p] move cdn %s', $type),
-                'description' => _('Moves a file or directory in the CDN of the project.'),
+                'description' => 'Moves a file or directory in the CDN of the project.',
                 'arguments'   => [
                     'required' => [
-                        'oldPath' => _('The current CDN path for the file or directory.'),
-                        'newPath' => _('The new CDN path for the file or directory.'),
+                        'oldPath' => 'The current CDN path for the file or directory.',
+                        'newPath' => 'The new CDN path for the file or directory.',
                     ],
                 ],
             ],
             'move'   => [
                 'action'      => sprintf('perspective [-p] rename cdn %s', $type),
-                'description' => _('Renames a file or directory in the CDN.'),
+                'description' => 'Renames a file or directory in the CDN.',
                 'arguments'   => [
                     'required' => [
-                        'oldPath' => _('The current CDN path for the file or directory.'),
-                        'newPath' => _('The new CDN path for the file or directory.'),
+                        'oldPath' => 'The current CDN path for the file or directory.',
+                        'newPath' => 'The new CDN path for the file or directory.',
                     ],
                 ],
             ],

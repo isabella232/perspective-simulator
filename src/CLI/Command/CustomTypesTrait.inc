@@ -119,26 +119,26 @@ trait CustomTypesTrait
     private function validatedCustomTypeCode(string $code)
     {
         if ($code === null) {
-            $eMsg = sprintf(_('%s code is required.'), $this->readableType);
+            $eMsg = sprintf('%s code is required.', $this->readableType);
             throw new CLIException($eMsg);
         }
 
         foreach ($this->bannedTypeNames as $banned) {
             if ($banned === strtolower($code)) {
-                throw new CLIException(_('Invalid custom type name'));
+                throw new CLIException('Invalid custom type name');
             }
         }
 
         $valid = Libs\Util::isPHPClassString($code);
 
         if ($valid === false) {
-            $eMsg = sprintf(_('Invalid %s code provided'), $this->readableType);
+            $eMsg = sprintf('Invalid %s code provided', $this->readableType);
             throw new CLIException($eMsg);
         }
 
         $customType = $this->storeDir.$code.'.json';
         if (file_exists($customType) === true) {
-            $eMsg = sprintf(_('Duplicate %s code provided'), $this->readableType);
+            $eMsg = sprintf('Duplicate %s code provided', $this->readableType);
             throw new CLIException($eMsg);
         }
 
@@ -217,9 +217,9 @@ trait CustomTypesTrait
     public function rename()
     {
         if ($this->args['oldCode'] === null && $this->args['newCode'] === null) {
-            throw new CLIException(_('Original and New codes are required.'));
+            throw new CLIException('Original and New codes are required.');
         } else if ($this->args['newCode'] === null) {
-            throw new CLIException(_('New code is required.'));
+            throw new CLIException('New code is required.');
         }
 
         try {
@@ -258,7 +258,7 @@ trait CustomTypesTrait
     public function delete()
     {
         $msg  = Terminal::formatText(
-            _('This will delete the custom type.'),
+            'This will delete the custom type.',
             ['bold']
         );
         $this->confirmAction($msg);
@@ -268,7 +268,7 @@ trait CustomTypesTrait
             if (file_exists($customTypeFile) === false) {
                 throw new CLIException(
                     sprintf(
-                        _('%1$s "%2$s" doesn\'t exist.'),
+                        '%1$s "%2$s" doesn\'t exist.',
                         $this->readableType,
                         $this->args['code']
                     )
@@ -297,7 +297,7 @@ trait CustomTypesTrait
             if (file_exists($customTypeFile) === false) {
                 throw new CLIException(
                     sprintf(
-                        _('%1$s "%2$s" doesn\'t exist.'),
+                        '%1$s "%2$s" doesn\'t exist.',
                         $this->readableType,
                         $this->args['code']
                     )
@@ -328,44 +328,44 @@ trait CustomTypesTrait
         $actions = [
             'add'    => [
                 'action'      => sprintf('perspective [-p] add %s', $type),
-                'description' => _('Adds a new Custom Type to the project'),
+                'description' => 'Adds a new Custom Type to the project',
                 'arguments'   => [
                     'required' => [
-                        'customTypeCode' => _('The custom type\'s code.'),
+                        'customTypeCode' => 'The custom type\'s code.',
                     ],
                     'optional' => [
-                        'parent' => _('The parent type code, if not provided the default type\'s parent will be used.'),
+                        'parent' => 'The parent type code, if not provided the default type\'s parent will be used.',
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => sprintf('perspective [-p] delete %s', $type),
-                'description' => _('Deletes a Custom Type from the project'),
+                'description' => 'Deletes a Custom Type from the project',
                 'arguments'   => [
                     'required' => [
-                        'customTypeCode' => _('The custom type\'s code.'),
+                        'customTypeCode' => 'The custom type\'s code.',
                     ],
                 ],
             ],
             'rename' => [
                 'action'      => sprintf('perspective [-p] rename %s', $type),
-                'description' => _('Renames a Custom Type in the project'),
+                'description' => 'Renames a Custom Type in the project',
                 'arguments'   => [
                     'required' => [
-                        'oldCustomTypeCode' => _('The current code for the custom type.'),
-                        'newCustomTypeCode' => _('The new code for the custom type.'),
+                        'oldCustomTypeCode' => 'The current code for the custom type.',
+                        'newCustomTypeCode' => 'The new code for the custom type.',
                     ],
                 ],
             ],
             'move'   => [
                 'action'      => sprintf('perspective [-p] move %s', $type),
-                'description' => _('Moves a Custom Type in the project'),
+                'description' => 'Moves a Custom Type in the project',
                 'arguments'   => [
                     'required' => [
-                        'customTypeCode' => _('The custom type\'s code.'),
+                        'customTypeCode' => 'The custom type\'s code.',
                     ],
                     'optional' => [
-                        'parent' => _('The parent type code, if not provided the default type\'s parent will be used.'),
+                        'parent' => 'The parent type code, if not provided the default type\'s parent will be used.',
                     ],
                 ],
             ],

@@ -88,12 +88,12 @@ class API
     public function add()
     {
         if ($this->args['path'] === null) {
-            throw new CLIException(_('Path to new API specification file is required.'));
+            throw new CLIException('Path to new API specification file is required.');
         }
 
         try {
             if (Libs\FileSystem::getExtension($this->args['path']) !== 'yaml') {
-                throw new CLIException(_('Only yaml API specification files are supported.'));
+                throw new CLIException('Only yaml API specification files are supported.');
             }
 
             copy($this->args['path'], $this->storeDir.'api.yaml');
@@ -114,7 +114,7 @@ class API
     public function delete()
     {
         $msg  = Terminal::formatText(
-            _('This will remove the API specification and all its operations from the project.'),
+            'This will remove the API specification and all its operations from the project.',
             ['bold']
         );
         $this->confirmAction($msg);
@@ -166,24 +166,24 @@ class API
         $actions = [
             'add'    => [
                 'action'      => 'perspective [-p] add api',
-                'description' => _('Adds a new API specification file.'),
+                'description' => 'Adds a new API specification file.',
                 'arguments'   => [
                     'required' => [
-                        'path' => _('The path to a new API specification yaml file.'),
+                        'path' => 'The path to a new API specification yaml file.',
                     ],
                 ],
             ],
             'delete' => [
                 'action'      => 'perspective [-p] delete api',
-                'description' => _('Deletes the projects API specification file.'),
+                'description' => 'Deletes the projects API specification file.',
                 'arguments'   => [],
             ],
             'update' => [
                 'action'      => 'perspective [-p] update api',
-                'description' => _('Updates the projects API specification file and its operations.'),
+                'description' => 'Updates the projects API specification file and its operations.',
                 'arguments'   => [
                     'optional' => [
-                        'path' => _('The path to a new API specification yaml file.'),
+                        'path' => 'The path to a new API specification yaml file.',
                     ],
                 ],
             ],

@@ -219,7 +219,7 @@ class Queue
             if (method_exists($className, $name) === false) {
                 // Log to the error_log instead of throwing an \Exception so we can continue to run other jobs.
                 // phpcs:disable
-                error_log(sprintf(_('Queue "%s" does not exist in project \'%s\'.'), $name, $project));
+                error_log(sprintf('Queue "%s" does not exist in project \'%s\'.', $name, $project));
                 // phpcs:enable
 
                 continue;

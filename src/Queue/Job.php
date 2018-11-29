@@ -110,7 +110,7 @@ class Job
     final public function retry(int $retryDelaySeconds=0)
     {
         if ($retryDelaySeconds < 0) {
-            throw new \Exception(_('The number of seconds to delay must be a positive integer or zero.'));
+            throw new \Exception('The number of seconds to delay must be a positive integer or zero.');
         }
 
         $this->status            = 'retry';

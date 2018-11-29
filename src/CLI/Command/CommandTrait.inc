@@ -59,7 +59,7 @@ trait CommandTrait
         $action  = $msg;
         $action .= "\n    ";
         $action .= Terminal::formatText(
-            _('Are you sure you want to continue?'),
+            'Are you sure you want to continue?',
             ['bold']
         );
 
@@ -81,7 +81,7 @@ trait CommandTrait
     public function printHelp(string $filter=null)
     {
         Terminal::printHeader(
-            Terminal::padText(_('No help found.')),
+            Terminal::padText('No help found.'),
             Terminal::STDERR
         );
 
@@ -141,7 +141,7 @@ trait CommandTrait
 
             if (empty($descriptions['required']) === false) {
                 Terminal::printLine();
-                Terminal::printLine(Terminal::formatText(_('Required arguments:'), ['bold']));
+                Terminal::printLine(Terminal::formatText('Required arguments:', ['bold']));
             }
 
             foreach ($descriptions['required'] as $description) {
@@ -160,7 +160,7 @@ trait CommandTrait
 
             if (empty($descriptions['optional']) === false) {
                 Terminal::printLine();
-                Terminal::printLine(Terminal::formatText(_('Optional arguments:'), ['bold']));
+                Terminal::printLine(Terminal::formatText('Optional arguments:', ['bold']));
             }
 
             foreach ($descriptions['optional'] as $description) {

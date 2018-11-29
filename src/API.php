@@ -89,7 +89,7 @@ class API
         ini_set('yaml.decode_php', 0);
         $parsed = yaml_parse($yaml);
         if ($parsed === false || empty($parsed['paths']) === true) {
-            throw new \Exception(_('Failed to parse API specficiation'));
+            throw new \Exception('Failed to parse API specficiation');
         }
 
         $apis = [

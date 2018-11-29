@@ -121,13 +121,13 @@ trait StoreTrait
     private function validateStoreName(string $name)
     {
         if ($name === null) {
-            $eMsg = sprintf(_('%s name is required.'), $this->readableType);
+            $eMsg = sprintf('%s name is required.', $this->readableType);
             throw new CLIException($eMsg);
         }
 
         $valid = Libs\Util::isValidStringid($name);
         if ($valid === false) {
-            $eMsg = sprintf(_('Invalid %s name provided'), $this->readableType);
+            $eMsg = sprintf('Invalid %s name provided', $this->readableType);
             throw new CLIException($eMsg);
         }
 
@@ -137,7 +137,7 @@ trait StoreTrait
         foreach ($dirs as $dir) {
             $storeName = strtolower(basename($dir));
             if (strtolower($name) === $storeName) {
-                $eMsg = sprintf(_('%s name is already in use'), $this->readableType);
+                $eMsg = sprintf('%s name is already in use', $this->readableType);
                 throw new CLIException($eMsg);
             }
         }
@@ -158,18 +158,18 @@ trait StoreTrait
     private function validateReferenceName(string $name)
     {
         if ($name === null) {
-            throw new CLIException(_('Reference name is required.'));
+            throw new CLIException('Reference name is required.');
         }
 
         $valid = Libs\Util::isValidStringid($name);
         if ($valid === false) {
-            throw new CLIException(_('Invalid reference name provided'));
+            throw new CLIException('Invalid reference name provided');
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
         $reference  = $this->storeDir.$this->args['targetCode'].'/'.$this->args['referneceName'].'.json';
         if (file_exists($reference) === true) {
-            throw new CLIException(_('Reference name is already in use'));
+            throw new CLIException('Reference name is already in use');
         }
 
         return $name;
@@ -206,7 +206,7 @@ trait StoreTrait
     public function delete()
     {
         $msg  = Terminal::formatText(
-            _('This will delete the store.'),
+            'This will delete the store.',
             ['bold']
         );
         $this->confirmAction($msg);
@@ -216,7 +216,7 @@ trait StoreTrait
             if (is_dir($dataStoreDir) === false) {
                 throw new CLIException(
                     sprintf(
-                        _('%s directory doesn\'t exist.'),
+                        '%s directory doesn\'t exist.',
                         $this->readableType
                     )
                 );
@@ -241,14 +241,14 @@ trait StoreTrait
         if ($this->args['oldName'] === null && $this->args['newName'] === null) {
             throw new CLIException(
                 sprintf(
-                    _('Original and New %s names are required.'),
+                    'Original and New %s names are required.',
                     $this->readableType
                 )
             );
         } else if ($this->args['newName'] === null) {
             throw new CLIException(
                 sprintf(
-                    _('New %s name is required.'),
+                    'New %s name is required.',
                     $this->readableType
                 )
             );
@@ -350,7 +350,7 @@ trait StoreTrait
             if (file_exists($path) === false) {
                 throw new CLIException(
                     sprintf(
-                        _('%s doesn\'t exist.'),
+                        '%s doesn\'t exist.',
                         $this->args['referneceName']
                     )
                 );
@@ -373,7 +373,7 @@ trait StoreTrait
     public function deleteReference()
     {
         $msg  = Terminal::formatText(
-            _('This will delete the reference.'),
+            'This will delete the reference.',
             ['bold']
         );
         $this->confirmAction($msg);
@@ -383,7 +383,7 @@ trait StoreTrait
             if (file_exists($ref) === false) {
                 throw new CLIException(
                     sprintf(
-                        _('%s doesn\'t exist.'),
+                        '%s doesn\'t exist.',
                         $this->args['referneceName']
                     )
                 );
@@ -406,9 +406,9 @@ trait StoreTrait
     public function renameReference()
     {
         if ($this->args['oldName'] === null && $this->args['newName'] === null) {
-            throw new CLIException(_('Original and New names are required.'));
+            throw new CLIException('Original and New names are required.');
         } else if ($this->args['newName'] === null) {
-            throw new CLIException(_('New name is required.'));
+            throw new CLIException('New name is required.');
         }
 
         try {
@@ -436,65 +436,65 @@ trait StoreTrait
         $actions = [
             'add'             => [
                 'action'      => sprintf('perspective [-p] add %s', $type),
-                'description' => _('Adds a new store for use in the project'),
+                'description' => 'Adds a new store for use in the project',
                 'arguments'   => [
                     'required' => [
-                        'storeName' => _('The name of the new store to be created.'),
+                        'storeName' => 'The name of the new store to be created.',
                     ],
                 ],
             ],
             'delete'          => [
                 'action'      => sprintf('perspective [-p] delete %s', $type),
-                'description' => _('Deletes a store from the project'),
+                'description' => 'Deletes a store from the project',
                 'arguments'   => [
                     'required' => [
-                        'storeName' => _('The name of the store to be deleted.'),
+                        'storeName' => 'The name of the store to be deleted.',
                     ],
                 ],
             ],
             'rename'          => [
                 'action'      => sprintf('perspective [-p] rename %s', $type),
-                'description' => _('Renames a store in the project'),
+                'description' => 'Renames a store in the project',
                 'arguments'   => [
                     'required' => [
-                        'oldName' => _('The current name of the store.'),
-                        'newName' => _('The new name of the store.'),
+                        'oldName' => 'The current name of the store.',
+                        'newName' => 'The new name of the store.',
                     ],
                 ],
             ],
             'addReference'    => [
                 'action'      => sprintf('perspective [-p] addReference %s', $type),
-                'description' => _('Adds a reference between two stores'),
+                'description' => 'Adds a reference between two stores',
                 'arguments'   => [
                     'required' => [
-                        'referneceName' => _('The name of the reference we are adding.'),
-                        'targetCode'    => _('The name of the store the reference will be added to.'),
-                        'sourceType'    => _('The type of store being referenced.'),
-                        'sourceCode'    => _('The name of the store being referenced.'),
+                        'referneceName' => 'The name of the reference we are adding.',
+                        'targetCode'    => 'The name of the store the reference will be added to.',
+                        'sourceType'    => 'The type of store being referenced.',
+                        'sourceCode'    => 'The name of the store being referenced.',
                     ],
                     'optional' => [
-                        'cardinatlity' => _('The cardinatlity of the reference, eg. 1:1, 1:M or M:M, if not provided M:M will be used.'),
+                        'cardinatlity' => 'The cardinatlity of the reference, eg. 1:1, 1:M or M:M, if not provided M:M will be used.',
                     ],
                 ],
             ],
             'renameReference' => [
                 'action'      => sprintf('perspective [-p] renameReference %s', $type),
-                'description' => _('Renames the reference between two stores'),
+                'description' => 'Renames the reference between two stores',
                 'arguments'   => [
                     'required' => [
-                        'targetCode' => _('The name of the store the reference belongs to.'),
-                        'oldName'    => _('The current name of the reference.'),
-                        'newName'    => _('The new name for the reference.'),
+                        'targetCode' => 'The name of the store the reference belongs to.',
+                        'oldName'    => 'The current name of the reference.',
+                        'newName'    => 'The new name for the reference.',
                     ],
                 ],
             ],
             'deleteReference' => [
                 'action'      => sprintf('perspective [-p] deleteReference %s', $type),
-                'description' => _('Deletes the reference between two stores'),
+                'description' => 'Deletes the reference between two stores',
                 'arguments'   => [
                     'required' => [
-                        'referneceName' => _('The name of the reference we are deleting.'),
-                        'targetCode'    => _('The name of the store the reference will be deleted from.'),
+                        'referneceName' => 'The name of the reference we are deleting.',
+                        'targetCode'    => 'The name of the store the reference will be deleted from.',
                     ],
                 ],
             ],
