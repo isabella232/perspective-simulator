@@ -25,12 +25,16 @@ if (isset($_SERVER['QUERY_STRING']) === true) {
 $pathParts = explode('/', $path);
 $domain    = array_shift($pathParts);
 $type      = array_shift($pathParts);
-$project   = ucfirst(array_shift($pathParts));
-$path      = implode('/', $pathParts);
 
-if ($project !== null) {
-    \PerspectiveSimulator\Bootstrap::load($project);
+if ($type !== 'admin') {
+    $project = ucfirst(array_shift($pathParts));
+
+    if ($project !== null) {
+        \PerspectiveSimulator\Bootstrap::load($project);
+    }
 }
+
+$path = implode('/', $pathParts);
 
 processCORSPreflight();
 sendCORSHeaders();
@@ -48,6 +52,10 @@ switch ($type) {
 
     case 'cdn':
        \PerspectiveSimulator\Requests\CDN::serveFile($path);
+    break;
+
+    case 'admin':
+        \PerspectiveSimulator\UI\UI::paint($path);
     break;
 
     default:
