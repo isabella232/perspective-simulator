@@ -247,9 +247,13 @@ trait ReferenceObjectTrait
             }//end if
 
             $valid = true;
+        } else {
+            // TODO:: review how this should validate the reverse reference.
+            $valid = true;
         }//end if
 
         if ($valid === false && empty($objects) === false) {
+            // TODO:: review how this should validate the reverse reference.
             // Must be validating the reverse reference so check the objects to see if its valid.
             foreach ($objects as $object) {
                 $objectValid = $object->validateReference($referenceid, [$this]);
