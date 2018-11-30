@@ -40,7 +40,8 @@ if (isset($opts['S']) === true || isset($opts['server']) === true) {
 
     \PerspectiveSimulator\CLI\Terminal::printLine(sprintf('Perspective Simulator listening on: http://%s', $host));
     \PerspectiveSimulator\CLI\Terminal::printLine('Press Ctrl-C to quit.');
-    exec('php -S '.$host.' vendor/Perspective/Simulator/src/Requests/Router.php');
+    $router = dirname(__DIR__, 2).'/Requests/Router.php';
+    exec('php -S '.$host.' '.$router);
     exit(1);
 }
 

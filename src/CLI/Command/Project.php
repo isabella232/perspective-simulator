@@ -210,8 +210,8 @@ class Project
 
             $folders = ['API', 'App', 'CDN', 'CustomTypes', 'Properties', 'Stores', 'Queues'];
             foreach ($folders as $folder) {
-                if (is_dir($projectDir.$folder) === false) {
-                    Libs\FileSystem::mkdir($projectDir.$folder);
+                if (is_dir($projectDir.'/'.$folder) === false) {
+                    Libs\FileSystem::mkdir($projectDir.'/'.$folder);
                 }
             }
 
