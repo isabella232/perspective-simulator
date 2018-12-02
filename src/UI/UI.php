@@ -28,23 +28,35 @@ class UI
      */
     public static function paint(string $path)
     {
-        $path = dirname(__FILE__).'/Web/'.urldecode($path);
-        if (file_exists($path) === true) {
-            // Path is a file so lets just serve it.
-            self::serveFile($path);
-        } else if (file_exists($path.'.php') === true) {
-            // Path is a UI view so lets paint it now.
+        if ($path === '') {
+            $indexPaths = ['index.html', 'index.php'];
+            foreach ($indexPaths as $path) {
+                $path = dirname(__FILE__).'/Web/'.urldecode($path);
+                if (file_exists($path) === true) {
+                    break;
+                }
+            }
+        } else {
+            $path = dirname(__FILE__).'/Web/'.urldecode($path);
+        }
+
+        if (file_exists($path) === false) {
+            Libs\Web::send404();
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if ($ext === 'php') {
             ob_start();
-            include $path.'.php';
+            include $path;
             $contents = trim(ob_get_contents());
             ob_end_clean();
             echo $contents;
         } else {
-            // Nothing found.
-            Libs\Web::send404();
+            self::serveFile($path);
         }
 
     }//end paint()
+
 
     /**
      * Serves a UI file.
