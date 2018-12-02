@@ -34,7 +34,7 @@ fileTree.setState({
     }
 });
 
-fetch(`${href}/nodes.json`, {
+fetch(`${href}/files.php`, {
     method:      'GET',
     headers:     {
         'Content-Type':     'application/json',
