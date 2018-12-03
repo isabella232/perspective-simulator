@@ -13,8 +13,8 @@ fileTree.setState({
         // Splash Screens.
         let idParts = id[0].split('/');
 
-        let type = 'none';
-        let title = 'None';
+        let type = 'perspective';
+        let title = 'Perspective';
         if (idParts.length > 2) {
             type  = idParts[2].replace(/\s/g, '').toLowerCase();
             title = idParts[2];
