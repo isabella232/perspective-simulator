@@ -97,7 +97,7 @@ foreach ($projects as $projectPath) {
                 $icon = 'file';
             }
 
-            if (is_dir($projectPath.'/src') === true) {
+            if (substr($projectPath, -4) === '/src') {
                 $parentPath = preg_replace('|.*/projects/'.$projectName.'/src/App/|', '', dirname($appPath).'/');
             } else {
                 $parentPath = preg_replace('|.*/projects/'.$projectName.'/App/|', '', dirname($appPath).'/');
