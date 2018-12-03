@@ -256,9 +256,8 @@ trait ReferenceObjectTrait
             // TODO:: review how this should validate the reverse reference.
             // Must be validating the reverse reference so check the objects to see if its valid.
             foreach ($objects as $object) {
-                $objectValid = $object->validateReference($referenceid, [$this]);
-                if ($objectValid === true) {
-                    $valid = true;
+                $valid = $object->validateReference($referenceid, [$this]);
+                if ($valid === true) {
                     break;
                 }
             }

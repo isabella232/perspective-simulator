@@ -23,12 +23,13 @@ mb_internal_encoding('UTF-8');
 
 // Get options
 $opts = getopt(
-    'p:hiS::',
+    'p:hiS::c',
     [
         'project:',
         'help',
         'install',
-        'server::'
+        'server::',
+        'clean',
     ]
 );
 
@@ -55,6 +56,11 @@ if (isset($opts['i']) === true || isset($opts['install']) === true) {
     $install = true;
 }
 
+$clean = false;
+if (isset($opts['c']) === true || isset($opts['clean']) === true) {
+    $clean = true;
+}
+
 $project = ($opts['p'] ?? $opts['project'] ?? null);
 
 if ((isset($opts['i']) === true
@@ -70,6 +76,7 @@ $args    = [
     'project' => $project,
     'install' => $install,
     'help'    => $help,
+    'clean'   => $clean,
     'argv'    => $argv,
 ];
 

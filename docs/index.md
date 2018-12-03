@@ -10,6 +10,7 @@ perspective [options] <action> <command> <arguments>
 |   --help    |      -h      | Shows the help screen for the action.                                     |
 |  --install  |      -i      | Installs the simulator, runs only when simulator directory doesn't exist. |
 |  --server   |      -S      | Starts the PHP development server for the simulator.                      |
+|  --clean    |      -c      | Cleans a projects simulator directory.                                    |
 
 ## Comands
 1. [API Actions](./api.md)

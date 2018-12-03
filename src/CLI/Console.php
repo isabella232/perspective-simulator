@@ -187,6 +187,14 @@ class Console
             }
 
             $command->install();
+        } else if (isset($args['clean']) === true && $args['clean'] === true) {
+            $command = new \PerspectiveSimulator\CLI\Command\Clean('clean', []);
+            if (isset($args['help']) === true && $args['help'] === true) {
+                $command->printHelp(self::$actionName);
+                exit(1);
+            }
+
+            $command->clean();
         } else {
             $actionClass = '\\PerspectiveSimulator\\CLI\\Command\\'.self::$commandName;
             if (class_exists($actionClass) === true) {
