@@ -34,7 +34,7 @@ foreach ($projects as $projectPath) {
         'title'    => 'API',
         'content'  => 'API',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'qrcode',
     ];
 
     if (is_file($projectPath.'/API/api.yaml') === true) {
@@ -77,7 +77,7 @@ foreach ($projects as $projectPath) {
         'title'    => 'App',
         'content'  => 'App',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'folder-open',
     ];
 
     if (is_dir($projectPath.'/App') === true) {
@@ -116,7 +116,7 @@ foreach ($projects as $projectPath) {
         'title'    => 'CDN',
         'content'  => 'CDN',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'cloud',
     ];
 
     if (is_dir($projectPath.'/CDN') === true) {
@@ -154,7 +154,7 @@ foreach ($projects as $projectPath) {
         'title'    => 'Custom Types',
         'content'  => 'Custom Types',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'picture',
     ];
 
     if (is_dir($projectPath.'/CustomTypes/Data') === true) {
@@ -188,7 +188,7 @@ foreach ($projects as $projectPath) {
         'title'    => 'Properties',
         'content'  => 'Properties',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'th-list',
     ];
 
     if (is_dir($projectPath.'/Properties/Data') === true) {
@@ -246,7 +246,7 @@ foreach ($projects as $projectPath) {
         'title'    => 'Storage',
         'content'  => 'Storage',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'hdd',
     ];
 
     if (is_dir($projectPath.'/Stores/Data') === true) {
