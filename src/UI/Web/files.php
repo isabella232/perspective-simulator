@@ -97,7 +97,11 @@ foreach ($projects as $projectPath) {
                 $icon = 'file';
             }
 
-            $parentPath = preg_replace('|.*/projects/'.$projectName.'/src/App/|', '', dirname($appPath).'/');
+            if (is_dir($projectPath.'/src') === true) {
+                $parentPath = preg_replace('|.*/projects/'.$projectName.'/src/App/|', '', dirname($appPath).'/');
+            } else {
+                $parentPath = preg_replace('|.*/projects/'.$projectName.'/App/|', '', dirname($appPath).'/');
+            }
 
             $nodes[] = [
                 'id'       => '/'.$projectName.'/App/'.ltrim($parentPath, '/').$appName,
@@ -274,5 +278,4 @@ foreach ($projects as $projectPath) {
 
 }
 
-#print_r($nodes);
 echo json_encode($nodes);
