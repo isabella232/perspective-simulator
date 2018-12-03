@@ -10,27 +10,43 @@ let treeNodes = {};
 
 fileTree.setState({
     onSelectionChange: (id) => {
-        let filePath = `${href}/content/${id[0].replace(/^\/|\/$/, '')}`;
-        if (/\.([a-z]{2,4})$/.test(filePath) !== true) {
-            filePath = `${filePath}/index.html`;
+        // Splash Screens.
+        let idParts = id[0].split('/');
+
+        let type = 'none';
+        let title = 'None';
+        if (idParts.length > 2) {
+            type  = idParts[2].replace(/\s/g, '').toLowerCase();
+            title = idParts[2];
         }
 
-        fetch(filePath, {
-            method:      'GET',
-            headers:     {
-                'Content-Type':     'text/html',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        }).then(response => {
-            return response.text();
-        }).then(content => {
-            fileContent.setState({
-                content
-            });
-        }).catch(e => {
-            console.error(`File path ${filePath} may not exist. Check error: ${e}`);
+        let content = '<div class="splash splash--'+type+'"><div class="splash-icon"></div><h2 class="splash-title">'+title+'</h2></div>';
+
+        fileContent.setState({
+            content
         });
+
+        // let filePath = `${href}/content/${id[0].replace(/^\/|\/$/, '')}`;
+        // if (/\.([a-z]{2,4})$/.test(filePath) !== true) {
+        //     filePath = `${filePath}/index.html`;
+        // }
+
+        // fetch(filePath, {
+        //     method:      'GET',
+        //     headers:     {
+        //         'Content-Type':     'text/html',
+        //         'X-Requested-With': 'XMLHttpRequest'
+        //     },
+        //     credentials: 'same-origin'
+        // }).then(response => {
+        //     return response.text();
+        // }).then(content => {
+        //     fileContent.setState({
+        //         content
+        //     });
+        // }).catch(e => {
+        //     console.error(`File path ${filePath} may not exist. Check error: ${e}`);
+        // });
     }
 });
 

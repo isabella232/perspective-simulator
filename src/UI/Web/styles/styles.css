@@ -1,15 +1,403 @@
 .main {
-    margin: 1rem;
     display: flex;
     flex-direction: column;
+    height: 100vh;
 }
 
-.main > div {
+.splash {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%) translateX(-50%);
+}
+
+
+.splash-icon {
+    width: 400px;
+    height: 300px;
+    background-repeat: no-repeat;
+}
+
+.splash--api .splash-icon {
+    background-image: url(../images/api-emptyState.svg);
+}
+.splash--app .splash-icon {
+    background-image: url(../images/app-emptyState.svg);
+}
+.splash--cdn .splash-icon {
+    background-image: url(../images/cdn-emptyState.svg);
+}
+.splash--properties .splash-icon {
+    background-image: url(../images/properties-emptyState.svg);
+}
+.splash--customtypes .splash-icon {
+    background-image: url(../images/customtypes-emptyState.svg);
+}
+.splash--storage .splash-icon {
+    background-image: url(../images/storage-emptyState.svg);
+}
+
+.splash-title {
+    font-weight: bold;
+    font-size: 2.4em;
+    text-align: center;
+}
+
+.UITopToolBar {
+    z-index: 43;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 36px;
+    white-space: nowrap;
+    background: #FFF;
+    display: flex;
+    justify-content: left;
+    font-family: Arial, sans-serif;
+
+    line-height: 1.8rem;
+    color: #A3A3A3; }
+    .UITopToolBar > * {
+      flex: 0 1 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column; }
+      .UITopToolBar > * > * {
+        flex: 1;
+        display: flex; }
+      .UITopToolBar > * > ui-bubble {
+        flex: none; }
+    .UITopToolBar__spacer {
+      flex: 1 !important; }
+    .UITopToolBar__perspectiveIcon {
+      width: 48px;
+      height: 36px;
+      background-color: #6F6F6F;
+      flex: 0 0 auto; }
+      .UITopToolBar__perspectiveIcon .ui-icon {
+        display: block;
+        flex: inherit;
+        position: relative;
+        top: 6px;
+        margin: 0 auto; }
+    .UITopToolBar__systemInfoWrapper {
+      border-bottom: 1px solid #E8E8E8;
+      margin: 0px 12px 0px 12px;
+      line-height: 2.6rem; }
+    .UITopToolBar__systemInfo {
+      padding: 5px 8px 5px 8px;
+      font-weight: bold;
+       }
+    .UITopToolBar__systemTag {
+      margin-left: 16px;
+      padding: 0px 8px;
+      border-radius: 4px;
+      height: 24px;
+      font-weight: normal;
+      text-transform: uppercase; }
+      .UITopToolBar__systemTag.red {
+        background-color: #FA7171;
+        color: #FFF; }
+      .UITopToolBar__systemTag.purple {
+        background-color: #9777CF;
+        color: #FFF; }
+      .UITopToolBar__systemTag.blue {
+        background-color: #46A2F8;
+        color: #FFF; }
+      .UITopToolBar__systemTag.turquoise {
+        background-color: #32BDD6;
+        color: #FFF; }
+      .UITopToolBar__systemTag.green {
+        background-color: #42BB67;
+        color: #FFF; }
+      .UITopToolBar__systemTag.orange {
+        background-color: #FBB230;
+        color: #FFF; }
+      .UITopToolBar__systemTag.grey {
+        background-color: #AB9C89;
+        color: #FFF; }
+      .UITopToolBar__systemTag.yellow {
+        background-color: #EFC20D;
+        color: #FFF; }
+      .UITopToolBar__systemTag.black {
+        background-color: #2B2B2B;
+        color: #FFF; }
+      .UITopToolBar__systemTag.white {
+        background-color: #FFFFFF;
+        color: #FFF; }
+      .UITopToolBar__systemTag.beige {
+        color: #2b2b2b; }
+    .UITopToolBar__actions {
+      position: relative;
+      background: #F2F2F2;
+      border: 1px solid #E0E0E0;
+      border-top: none;
+      border-right: none;
+      border-radius: 0px 0px 0px 8px;
+      padding: 2px 4px 2px 0;
+      width: 100%;
+      flex-direction: row; }
+      .UITopToolBar__actions > * {
+        flex: 0 1 auto;
+        height: 100%;
+        display: flex;
+        flex-direction: column; }
+        .UITopToolBar__actions > * > * {
+          flex: 1;
+          display: flex; }
+        .UITopToolBar__actions > * > ui-bubble {
+          flex: none; }
+    .UITopToolBar__systemConfig {
+      border-left: 1px solid #E4E4E4; }
+    .UITopToolBar__publishing {
+      margin-right: 15px; }
+    .UITopToolBar__systemConfig .UIButton .ui-icon, .UITopToolBar__help .UIButton .ui-icon, .UITopToolBar__userAccount .UIButton .ui-icon {
+      left: 5px;
+      opacity: 0.45; }
+    .UITopToolBar__systemConfig .UIButton__label, .UITopToolBar__help .UIButton__label, .UITopToolBar__userAccount .UIButton__label {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      line-height: 1.8rem;
+      color: #A3A3A3; }
+    .UITopToolBar__systemConfig ui-button:empty {
+      display: none; }
+    .UITopToolBar__systemConfig ui-button {
+      display: flex;
+      min-height: 100%;
+      flex: 1; }
+    .UITopToolBar__systemConfig .UIDialogButton:empty {
+      display: none; }
+    .UITopToolBar__systemConfig .UIDialogButton {
+      display: flex;
+      min-height: 100%;
+      flex: 1; }
+    .UITopToolBar__userAccount-avatar {
+      border-radius: 50%;
+      background: #B7B7B7;
+      color: #FFFFFF;
+      height: 2.6rem;
+      width: 2.6rem;
+      display: inline-block;
+      line-height: 2.7rem;
+      margin-right: 8px;
+       }
+    .UITopToolBar__userAccount-detail-avatar {
+      border-radius: 50%;
+      background: #666666;
+      color: #FFFFFF;
+      height: 3.5rem;
+      width: 3.5rem;
+      line-height: 3.4rem;
+      margin: 10px auto;
+      
+      text-align: center; }
+    .UITopToolBar__userAccount-detail-userName {
+      color: #2b2b2b;
+      
+      font-weight: bold;
+      text-align: center;
+      margin: 10px auto 0px auto; }
+    .UITopToolBar__userAccount-detail-email {
+      color: #666666;
+      font-weight: normal;
+      text-align: center;
+      margin: auto; }
+    .UITopToolBar__userAccount-detail-logout {
+      background: #FFFFFF;
+      border-top: 1px solid #cacaca;
+      padding: 2px; }
+      .UITopToolBar__userAccount-detail-logout .UIButton .ui-icon {
+        left: auto; }
+    .UITopToolBar__system .UIBubble {
+      background: #FFFFFF; }
+    .UITopToolBar__system-version {
+      background: #666666;
+      color: #FFFFFF;
+      margin: 8px;
+      border-radius: 5px;
+      text-align: center;
+      padding: 15px; }
+      .UITopToolBar__system-version-name {
+        font-weight: normal; }
+      .UITopToolBar__system-version-version {
+        font-weight: normal; }
+    .UITopToolBar__system-menu .UIList {
+      border-top: 1px solid #E6E6E6;
+      margin: 0; }
+
+
+      .UIButton {
+        border: none;
+        background: transparent;
+        position: relative;
+        margin: 0;
+        cursor: pointer;
+        user-select: none;
+        outline: none;
+        padding: 0 12px;
+        min-width: 38px;
+        height: 32px;
+        min-height: 32px;
+        white-space: nowrap; }
+        .UIButton .UIButton__icon + .UIButton__label {
+          margin-left: 22px; }
+        .UIButton.is-text-hidden .UIButton__label {
+          position: absolute;
+          left: -9999px; }
+        .UIButton.is-text-hidden .ui-icon {
+          left: 50%;
+          position: absolute;
+          top: 50%;
+          transform: translate(-50%, -50%); }
+        .UIButton.is-text-hidden .UIButton__icon + .UIButton__label {
+          margin-left: initial; }
+        .UIButton .UIButton__label {
+          line-height: 32px; }
+        .UIButton.has-chevron .UIButton__label {
+          display: flex;
+          justify-content: space-between; }
+          .UIButton.has-chevron .UIButton__label:after {
+            content: '';
+            display: inline-block;
+            margin: auto 10px;
+            opacity: 0.3;
+            background: transparent url(sprite.svg) 0 0 no-repeat;
+            background-position: -14px -400px;
+            width: 9px;
+            height: 6px; }
+        .UIButton.has-chevron.is-read-only .UIButton__label:after {
+          display: none; }
+        .UIButton.has-chevron-right .UIButton__label:after {
+          transform: rotate(-90deg); }
+        .UIButton__style--default {
+          padding: 0 1.5em;
+          font-size: 0.75rem;
+          font-family: Arial, sans-serif;
+          font-weight: bold;
+          box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          border: 1px solid transparent;
+          -webkit-font-smoothing: auto;
+          transition: all 0.1s ease-out;
+          transition-property: background-color, box-shadow;
+          transition-duration: 0.2s;
+          transition-timing-function: ease-out;
+          text-shadow: 0 0px 1px rgba(0, 0, 0, 0.9);
+          color: rgba(255, 255, 255, 0.95); }
+        .UIButton__style--icon {
+          border: 0;
+          background-color: transparent;
+          padding: 0; }
+        .UIButton__style--flat {
+          border: 0;
+          padding: 0 1.5em;
+          width: 100%;
+          text-align: left; }
+          .UIButton__style--flat .UIButton__label {
+            line-height: 31px; }
+        .UIButton__type--primary {
+          background-color: #2485ec !important;
+          border-color: #266ABF; }
+        .UIButton__type--save {
+          background-color: #42A83D !important; }
+        .UIButton__type--dark-grey {
+          background-color: #666666;
+          border-color: #4d4d4d; }
+        .UIButton__type--orange {
+          background-color: #FB941A;
+          border-color: #de7a04; }
+        .UIButton__type--purple {
+          background-color: #9572D3;
+          border-color: #784bc7; }
+        .UIButton__type--red {
+          background-color: #E33030;
+          border-color: #c51b1b; }
+        .UIButton__type--cancel {
+          text-shadow: none !important;
+          color: #6B6B6B !important;
+          background-color: #E6E6E6 !important;
+          border-color: #CACACA; }
+        .UIButton__type--dialog-editor {
+          border: 1px solid #2d2d2d;
+          background-color: #2d2d2d;
+          border-radius: 4px;
+          color: #fff;
+          line-height: 35px;
+          padding-left: 36px; }
+        .UIButton__type--white {
+          background: #fff; }
+          .UIButton__type--white.UIButton__style--default {
+            font-weight: normal;
+            border: 1px solid #CCC;
+            text-shadow: none;
+            color: #666;
+            box-shadow: 0px 1px 3px #DDD; }
+        .UIButton__type--transparent {
+          background: transparent; }
+        .UIButton__type--predeployment {
+          color: #FFF;
+          background-color: #A34515; }
+        .UIButton__icon {
+          top: 50%;
+          transform: translateY(-50%);
+          position: absolute; }
+        .UIButton[disabled] {
+          cursor: not-allowed;
+          opacity: 0.7; }
+          .UIButton[disabled] .UIButton__label {
+            opacity: .6; }
+          .UIButton[disabled].UIButton__type--save {
+            color: #6B6B6B;
+            text-shadow: none;
+            background: transparent;
+            border-color: #ccc; }
+          .UIButton[disabled].UIButton__type--predeployment {
+            background-color: #C9551A;
+            color: #F56720; }
+        .UIButton.is-read-only {
+          cursor: auto; }
+        .UIButton__withIcon, .UIButton__iconOnly {
+          top: 50%;
+          transform: translateY(-50%);
+          position: absolute; }
+        .UIButton__iconOnly {
+          left: 50%;
+          transform: translateX(-50%); }
+        .UIButton .UIButton__icon.small + .UIButton__label {
+          margin-left: 28px; }
+        .UIButton .UIButton__icon.medium + .UIButton__label {
+          margin-left: 30px; }
+        .UIButton .UIButton__icon.large + .UIButton__label {
+          margin-left: 42px; }
+        .UIButton .UIButton__label:empty {
+          display: none; }
+        .UIButton--bordered {
+          border: 1px solid #CFCFCF;
+          border-radius: 3px;
+          background-color: #ffffff; }
+      
+
+.content {
     flex: 1;
+    display: flex;
+}
+
+.content > * {
+    padding: 8px;
 }
 
 .fileTreeWrapper {
+    flex: 0 1 auto;
+    min-width: 30%;
     border-right: 1px solid #dfdfdf;
+    overflow: auto;
+    margin-top: 35px;
+}
+
+.contentWrapper {
+    flex: 1;
+    position: relative;
+    margin-top: 35px;
 }
 
 .UITree {
@@ -165,3 +553,2094 @@
     font-style: normal;
     border: 1px solid #EEE;
 }
+
+.ui-icon {
+    background: transparent url(../images/sprite.svg) 0 0 no-repeat; }
+    .ui-icon.components.raw.add-enclosed {
+      background-position: 0px -333px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.add-folder {
+      background-position: 0px -354px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.raw.cascade {
+      background-position: 0px -379px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.chevron-down {
+      background-position: 0px -400px;
+      width: 9px;
+      height: 6px; }
+    .ui-icon.components.raw.chevron-right {
+      background-position: 0px -411px;
+      width: 6px;
+      height: 9px; }
+    .ui-icon.components.raw.cross-enclosed {
+      background-position: 0px -425px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.cross {
+      background-position: 0px -446px;
+      width: 11px;
+      height: 11px; }
+    .ui-icon.components.raw.date {
+      background-position: 0px -462px;
+      width: 22px;
+      height: 20px; }
+    .ui-icon.components.raw.edit-pencil {
+      background-position: 0px -487px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.group-child {
+      background-position: 0px -508px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.raw.group-parent {
+      background-position: 0px -525px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.raw.more-actions {
+      background-position: 0px -542px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.move {
+      background-position: 0px -563px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.raw.no-cascade {
+      background-position: 0px -580px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.publish-complete {
+      background-position: 0px -601px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.raw.publish-error {
+      background-position: 0px -620px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.raw.publish-progress {
+      background-position: 0px -639px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.raw.revert-master {
+      background-position: 0px -658px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.revert {
+      background-position: 0px -679px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.search {
+      background-position: 0px -700px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.raw.target-enclosed {
+      background-position: 0px -717px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.raw.upload-archive {
+      background-position: 0px -738px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.raw.upload-file {
+      background-position: 0px -763px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.black.add-enclosed {
+      background-position: -21px -333px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.add-folder {
+      background-position: -25px -354px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.black.cascade {
+      background-position: -21px -379px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.chevron-down {
+      background-position: -14px -400px;
+      width: 9px;
+      height: 6px; }
+    .ui-icon.components.black.chevron-right {
+      background-position: -11px -411px;
+      width: 6px;
+      height: 9px; }
+    .ui-icon.components.black.cross-enclosed {
+      background-position: -21px -425px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.cross {
+      background-position: -16px -446px;
+      width: 11px;
+      height: 11px; }
+    .ui-icon.components.black.date {
+      background-position: -27px -462px;
+      width: 22px;
+      height: 20px; }
+    .ui-icon.components.black.edit-pencil {
+      background-position: -21px -487px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.group-child {
+      background-position: -23px -508px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.black.group-parent {
+      background-position: -23px -525px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.black.more-actions {
+      background-position: -21px -542px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.move {
+      background-position: -17px -563px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.black.no-cascade {
+      background-position: -21px -580px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.publish-complete {
+      background-position: -19px -601px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.black.publish-error {
+      background-position: -19px -620px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.black.publish-progress {
+      background-position: -19px -639px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.black.revert-master {
+      background-position: -21px -658px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.revert {
+      background-position: -21px -679px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.search {
+      background-position: -17px -700px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.black.target-enclosed {
+      background-position: -21px -717px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.black.upload-archive {
+      background-position: -25px -738px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.black.upload-file {
+      background-position: -25px -763px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.white.add-enclosed {
+      background-position: -42px -333px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.add-folder {
+      background-position: -50px -354px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.white.cascade {
+      background-position: -42px -379px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.chevron-down {
+      background-position: -28px -400px;
+      width: 9px;
+      height: 6px; }
+    .ui-icon.components.white.chevron-right {
+      background-position: -22px -411px;
+      width: 6px;
+      height: 9px; }
+    .ui-icon.components.white.cross-enclosed {
+      background-position: -42px -425px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.cross {
+      background-position: -32px -446px;
+      width: 11px;
+      height: 11px; }
+    .ui-icon.components.white.date {
+      background-position: -54px -462px;
+      width: 22px;
+      height: 20px; }
+    .ui-icon.components.white.edit-pencil {
+      background-position: -42px -487px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.group-child {
+      background-position: -46px -508px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.white.group-parent {
+      background-position: -46px -525px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.white.more-actions {
+      background-position: -42px -542px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.move {
+      background-position: -34px -563px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.white.no-cascade {
+      background-position: -42px -580px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.publish-complete {
+      background-position: -38px -601px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.white.publish-error {
+      background-position: -38px -620px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.white.publish-progress {
+      background-position: -38px -639px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.white.revert-master {
+      background-position: -42px -658px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.revert {
+      background-position: -42px -679px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.search {
+      background-position: -34px -700px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.white.target-enclosed {
+      background-position: -42px -717px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.white.upload-archive {
+      background-position: -50px -738px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.white.upload-file {
+      background-position: -50px -763px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.blue.add-enclosed {
+      background-position: -63px -333px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.add-folder {
+      background-position: -75px -354px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.blue.cascade {
+      background-position: -63px -379px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.chevron-down {
+      background-position: -42px -400px;
+      width: 9px;
+      height: 6px; }
+    .ui-icon.components.blue.chevron-right {
+      background-position: -33px -411px;
+      width: 6px;
+      height: 9px; }
+    .ui-icon.components.blue.cross-enclosed {
+      background-position: -63px -425px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.cross {
+      background-position: -48px -446px;
+      width: 11px;
+      height: 11px; }
+    .ui-icon.components.blue.date {
+      background-position: -81px -462px;
+      width: 22px;
+      height: 20px; }
+    .ui-icon.components.blue.edit-pencil {
+      background-position: -63px -487px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.group-child {
+      background-position: -69px -508px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.blue.group-parent {
+      background-position: -69px -525px;
+      width: 18px;
+      height: 12px; }
+    .ui-icon.components.blue.more-actions {
+      background-position: -63px -542px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.move {
+      background-position: -51px -563px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.blue.no-cascade {
+      background-position: -63px -580px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.publish-complete {
+      background-position: -57px -601px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.blue.publish-error {
+      background-position: -57px -620px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.blue.publish-progress {
+      background-position: -57px -639px;
+      width: 14px;
+      height: 14px; }
+    .ui-icon.components.blue.revert-master {
+      background-position: -63px -658px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.revert {
+      background-position: -63px -679px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.search {
+      background-position: -51px -700px;
+      width: 12px;
+      height: 12px; }
+    .ui-icon.components.blue.target-enclosed {
+      background-position: -63px -717px;
+      width: 16px;
+      height: 16px; }
+    .ui-icon.components.blue.upload-archive {
+      background-position: -75px -738px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.components.blue.upload-file {
+      background-position: -75px -763px;
+      width: 20px;
+      height: 20px; }
+    .ui-icon.platform {
+      width: 24px;
+      height: 24px; }
+      .ui-icon.platform.raw.help {
+        background-position: 0px -4269px; }
+      .ui-icon.platform.raw.perspective {
+        background-position: 0px -4298px; }
+      .ui-icon.platform.raw.settings {
+        background-position: 0px -4327px; }
+      .ui-icon.platform.black.help {
+        background-position: -29px -4269px; }
+      .ui-icon.platform.black.perspective {
+        background-position: -29px -4298px; }
+      .ui-icon.platform.black.settings {
+        background-position: -29px -4327px; }
+      .ui-icon.platform.grey-70.help {
+        background-position: -58px -4269px; }
+      .ui-icon.platform.grey-70.perspective {
+        background-position: -58px -4298px; }
+      .ui-icon.platform.grey-70.settings {
+        background-position: -58px -4327px; }
+    .ui-icon.topbar-button {
+      width: 20px;
+      height: 20px; }
+      .ui-icon.topbar-button.black.ab-test {
+        background-position: 0px -6152px; }
+      .ui-icon.topbar-button.black.aspects {
+        background-position: 0px -6177px; }
+      .ui-icon.topbar-button.black.device-preview {
+        background-position: 0px -6202px; }
+      .ui-icon.topbar-button.black.duplicate {
+        background-position: 0px -6227px; }
+      .ui-icon.topbar-button.black.mode {
+        background-position: 0px -6252px; }
+      .ui-icon.topbar-button.black.placeholder {
+        background-position: 0px -6277px; }
+      .ui-icon.topbar-button.black.plus-closed {
+        background-position: 0px -6302px; }
+      .ui-icon.topbar-button.black.plus-open {
+        background-position: 0px -6327px; }
+      .ui-icon.topbar-button.black.plus-raw {
+        background-position: 0px -6352px; }
+      .ui-icon.topbar-button.black.revert {
+        background-position: 0px -6377px; }
+      .ui-icon.topbar-button.black.share {
+        background-position: 0px -6402px; }
+      .ui-icon.topbar-button.black.triangle {
+        background-position: 0px -6427px; }
+      .ui-icon.topbar-button.grey-70.ab-test {
+        background-position: -25px -6152px; }
+      .ui-icon.topbar-button.grey-70.aspects {
+        background-position: -25px -6177px; }
+      .ui-icon.topbar-button.grey-70.device-preview {
+        background-position: -25px -6202px; }
+      .ui-icon.topbar-button.grey-70.duplicate {
+        background-position: -25px -6227px; }
+      .ui-icon.topbar-button.grey-70.mode {
+        background-position: -25px -6252px; }
+      .ui-icon.topbar-button.grey-70.placeholder {
+        background-position: -25px -6277px; }
+      .ui-icon.topbar-button.grey-70.plus-closed {
+        background-position: -25px -6302px; }
+      .ui-icon.topbar-button.grey-70.plus-open {
+        background-position: -25px -6327px; }
+      .ui-icon.topbar-button.grey-70.plus-raw {
+        background-position: -25px -6352px; }
+      .ui-icon.topbar-button.grey-70.revert {
+        background-position: -25px -6377px; }
+      .ui-icon.topbar-button.grey-70.share {
+        background-position: -25px -6402px; }
+      .ui-icon.topbar-button.grey-70.triangle {
+        background-position: -25px -6427px; }
+      .ui-icon.topbar-button.white.ab-test {
+        background-position: -50px -6152px; }
+      .ui-icon.topbar-button.white.aspects {
+        background-position: -50px -6177px; }
+      .ui-icon.topbar-button.white.device-preview {
+        background-position: -50px -6202px; }
+      .ui-icon.topbar-button.white.duplicate {
+        background-position: -50px -6227px; }
+      .ui-icon.topbar-button.white.mode {
+        background-position: -50px -6252px; }
+      .ui-icon.topbar-button.white.placeholder {
+        background-position: -50px -6277px; }
+      .ui-icon.topbar-button.white.plus-closed {
+        background-position: -50px -6302px; }
+      .ui-icon.topbar-button.white.plus-open {
+        background-position: -50px -6327px; }
+      .ui-icon.topbar-button.white.plus-raw {
+        background-position: -50px -6352px; }
+      .ui-icon.topbar-button.white.revert {
+        background-position: -50px -6377px; }
+      .ui-icon.topbar-button.white.share {
+        background-position: -50px -6402px; }
+      .ui-icon.topbar-button.white.triangle {
+        background-position: -50px -6427px; }
+      .ui-icon.topbar-button.blue.ab-test {
+        background-position: -75px -6152px; }
+      .ui-icon.topbar-button.blue.aspects {
+        background-position: -75px -6177px; }
+      .ui-icon.topbar-button.blue.device-preview {
+        background-position: -75px -6202px; }
+      .ui-icon.topbar-button.blue.duplicate {
+        background-position: -75px -6227px; }
+      .ui-icon.topbar-button.blue.mode {
+        background-position: -75px -6252px; }
+      .ui-icon.topbar-button.blue.placeholder {
+        background-position: -75px -6277px; }
+      .ui-icon.topbar-button.blue.plus-closed {
+        background-position: -75px -6302px; }
+      .ui-icon.topbar-button.blue.plus-open {
+        background-position: -75px -6327px; }
+      .ui-icon.topbar-button.blue.plus-raw {
+        background-position: -75px -6352px; }
+      .ui-icon.topbar-button.blue.revert {
+        background-position: -75px -6377px; }
+      .ui-icon.topbar-button.blue.share {
+        background-position: -75px -6402px; }
+      .ui-icon.topbar-button.blue.triangle {
+        background-position: -75px -6427px; }
+    .ui-icon.topbar-action {
+      width: 44px;
+      height: 36px; }
+      .ui-icon.topbar-action.raw.browsing {
+        background-position: 0px -5742px; }
+      .ui-icon.topbar-action.raw.drafting {
+        background-position: 0px -5783px; }
+      .ui-icon.topbar-action.raw.exit-edit {
+        background-position: 0px -5824px; }
+      .ui-icon.topbar-action.raw.live-bolt {
+        background-position: 0px -5865px; }
+      .ui-icon.topbar-action.raw.live-edit {
+        background-position: 0px -5906px; }
+      .ui-icon.topbar-action.raw.more-options {
+        background-position: 0px -5947px; }
+      .ui-icon.topbar-action.raw.publishing-complete {
+        background-position: 0px -5988px; }
+      .ui-icon.topbar-action.raw.publishing-error {
+        background-position: 0px -6029px; }
+      .ui-icon.topbar-action.raw.publishing-spin {
+        background-position: 0px -6070px; }
+      .ui-icon.topbar-action.raw.revert {
+        background-position: 0px -6111px; }
+      .ui-icon.topbar-action.black.browsing {
+        background-position: -49px -5742px; }
+      .ui-icon.topbar-action.black.drafting {
+        background-position: -49px -5783px; }
+      .ui-icon.topbar-action.black.exit-edit {
+        background-position: -49px -5824px; }
+      .ui-icon.topbar-action.black.live-bolt {
+        background-position: -49px -5865px; }
+      .ui-icon.topbar-action.black.live-edit {
+        background-position: -49px -5906px; }
+      .ui-icon.topbar-action.black.more-options {
+        background-position: -49px -5947px; }
+      .ui-icon.topbar-action.black.publishing-complete {
+        background-position: -49px -5988px; }
+      .ui-icon.topbar-action.black.publishing-error {
+        background-position: -49px -6029px; }
+      .ui-icon.topbar-action.black.publishing-spin {
+        background-position: -49px -6070px; }
+      .ui-icon.topbar-action.black.revert {
+        background-position: -49px -6111px; }
+      .ui-icon.topbar-action.white.browsing {
+        background-position: -98px -5742px; }
+      .ui-icon.topbar-action.white.drafting {
+        background-position: -98px -5783px; }
+      .ui-icon.topbar-action.white.exit-edit {
+        background-position: -98px -5824px; }
+      .ui-icon.topbar-action.white.live-bolt {
+        background-position: -98px -5865px; }
+      .ui-icon.topbar-action.white.live-edit {
+        background-position: -98px -5906px; }
+      .ui-icon.topbar-action.white.more-options {
+        background-position: -98px -5947px; }
+      .ui-icon.topbar-action.white.publishing-complete {
+        background-position: -98px -5988px; }
+      .ui-icon.topbar-action.white.publishing-error {
+        background-position: -98px -6029px; }
+      .ui-icon.topbar-action.white.publishing-spin {
+        background-position: -98px -6070px; }
+      .ui-icon.topbar-action.white.revert {
+        background-position: -98px -6111px; }
+    .ui-icon.large {
+      width: 22px;
+      height: 22px; }
+      .ui-icon.large.black.accessibility {
+        background-position: 0px -788px; }
+      .ui-icon.large.black.add {
+        background-position: 0px -815px; }
+      .ui-icon.large.black.archive {
+        background-position: 0px -842px; }
+      .ui-icon.large.black.attachment {
+        background-position: 0px -869px; }
+      .ui-icon.large.black.bitmap {
+        background-position: 0px -896px; }
+      .ui-icon.large.black.blocks {
+        background-position: 0px -923px; }
+      .ui-icon.large.black.chart-line {
+        background-position: 0px -950px; }
+      .ui-icon.large.black.chart-pie {
+        background-position: 0px -977px; }
+      .ui-icon.large.black.code {
+        background-position: 0px -1004px; }
+      .ui-icon.large.black.collection {
+        background-position: 0px -1031px; }
+      .ui-icon.large.black.contrast {
+        background-position: 0px -1058px; }
+      .ui-icon.large.black.css {
+        background-position: 0px -1085px; }
+      .ui-icon.large.black.datarecord {
+        background-position: 0px -1112px; }
+      .ui-icon.large.black.date {
+        background-position: 0px -1139px; }
+      .ui-icon.large.black.design {
+        background-position: 0px -1166px; }
+      .ui-icon.large.black.dial {
+        background-position: 0px -1193px; }
+      .ui-icon.large.black.edit-tools {
+        background-position: 0px -1220px; }
+      .ui-icon.large.black.edit {
+        background-position: 0px -1247px; }
+      .ui-icon.large.black.favourite {
+        background-position: 0px -1274px; }
+      .ui-icon.large.black.file {
+        background-position: 0px -1301px; }
+      .ui-icon.large.black.folder {
+        background-position: 0px -1328px; }
+      .ui-icon.large.black.font {
+        background-position: 0px -1355px; }
+      .ui-icon.large.black.globe {
+        background-position: 0px -1382px; }
+      .ui-icon.large.black.group {
+        background-position: 0px -1409px; }
+      .ui-icon.large.black.hash {
+        background-position: 0px -1436px; }
+      .ui-icon.large.black.info {
+        background-position: 0px -1463px; }
+      .ui-icon.large.black.inline-tool {
+        background-position: 0px -1490px; }
+      .ui-icon.large.black.js {
+        background-position: 0px -1517px; }
+      .ui-icon.large.black.launch {
+        background-position: 0px -1544px; }
+      .ui-icon.large.black.link {
+        background-position: 0px -1571px; }
+      .ui-icon.large.black.list {
+        background-position: 0px -1598px; }
+      .ui-icon.large.black.location {
+        background-position: 0px -1625px; }
+      .ui-icon.large.black.media {
+        background-position: 0px -1652px; }
+      .ui-icon.large.black.message {
+        background-position: 0px -1679px; }
+      .ui-icon.large.black.multipage {
+        background-position: 0px -1706px; }
+      .ui-icon.large.black.next {
+        background-position: 0px -1733px; }
+      .ui-icon.large.black.notification {
+        background-position: 0px -1760px; }
+      .ui-icon.large.black.number {
+        background-position: 0px -1787px; }
+      .ui-icon.large.black.paths {
+        background-position: 0px -1814px; }
+      .ui-icon.large.black.permissions {
+        background-position: 0px -1841px; }
+      .ui-icon.large.black.php {
+        background-position: 0px -1868px; }
+      .ui-icon.large.black.placeholder {
+        background-position: 0px -1895px; }
+      .ui-icon.large.black.presentation {
+        background-position: 0px -1922px; }
+      .ui-icon.large.black.previous {
+        background-position: 0px -1949px; }
+      .ui-icon.large.black.properties {
+        background-position: 0px -1976px; }
+      .ui-icon.large.black.reorder {
+        background-position: 0px -2003px; }
+      .ui-icon.large.black.search {
+        background-position: 0px -2030px; }
+      .ui-icon.large.black.selection {
+        background-position: 0px -2057px; }
+      .ui-icon.large.black.settings {
+        background-position: 0px -2084px; }
+      .ui-icon.large.black.sidepanel-tool {
+        background-position: 0px -2111px; }
+      .ui-icon.large.black.sign-out {
+        background-position: 0px -2138px; }
+      .ui-icon.large.black.support {
+        background-position: 0px -2165px; }
+      .ui-icon.large.black.switch {
+        background-position: 0px -2192px; }
+      .ui-icon.large.black.system-user {
+        background-position: 0px -2219px; }
+      .ui-icon.large.black.table {
+        background-position: 0px -2246px; }
+      .ui-icon.large.black.tag {
+        background-position: 0px -2273px; }
+      .ui-icon.large.black.template-menu {
+        background-position: 0px -2300px; }
+      .ui-icon.large.black.template-zone {
+        background-position: 0px -2327px; }
+      .ui-icon.large.black.template {
+        background-position: 0px -2354px; }
+      .ui-icon.large.black.terminal {
+        background-position: 0px -2381px; }
+      .ui-icon.large.black.test {
+        background-position: 0px -2408px; }
+      .ui-icon.large.black.text {
+        background-position: 0px -2435px; }
+      .ui-icon.large.black.tick {
+        background-position: 0px -2462px; }
+      .ui-icon.large.black.trash {
+        background-position: 0px -2489px; }
+      .ui-icon.large.black.triangle {
+        background-position: 0px -2516px; }
+      .ui-icon.large.black.trophy {
+        background-position: 0px -2543px; }
+      .ui-icon.large.black.user-closed {
+        background-position: 0px -2570px; }
+      .ui-icon.large.black.user-open {
+        background-position: 0px -2597px; }
+      .ui-icon.large.black.user-reverse {
+        background-position: 0px -2624px; }
+      .ui-icon.large.black.vector {
+        background-position: 0px -2651px; }
+      .ui-icon.large.black.video {
+        background-position: 0px -2678px; }
+      .ui-icon.large.white.accessibility {
+        background-position: -27px -788px; }
+      .ui-icon.large.white.add {
+        background-position: -27px -815px; }
+      .ui-icon.large.white.archive {
+        background-position: -27px -842px; }
+      .ui-icon.large.white.attachment {
+        background-position: -27px -869px; }
+      .ui-icon.large.white.bitmap {
+        background-position: -27px -896px; }
+      .ui-icon.large.white.blocks {
+        background-position: -27px -923px; }
+      .ui-icon.large.white.chart-line {
+        background-position: -27px -950px; }
+      .ui-icon.large.white.chart-pie {
+        background-position: -27px -977px; }
+      .ui-icon.large.white.code {
+        background-position: -27px -1004px; }
+      .ui-icon.large.white.collection {
+        background-position: -27px -1031px; }
+      .ui-icon.large.white.contrast {
+        background-position: -27px -1058px; }
+      .ui-icon.large.white.css {
+        background-position: -27px -1085px; }
+      .ui-icon.large.white.datarecord {
+        background-position: -27px -1112px; }
+      .ui-icon.large.white.date {
+        background-position: -27px -1139px; }
+      .ui-icon.large.white.design {
+        background-position: -27px -1166px; }
+      .ui-icon.large.white.dial {
+        background-position: -27px -1193px; }
+      .ui-icon.large.white.edit-tools {
+        background-position: -27px -1220px; }
+      .ui-icon.large.white.edit {
+        background-position: -27px -1247px; }
+      .ui-icon.large.white.favourite {
+        background-position: -27px -1274px; }
+      .ui-icon.large.white.file {
+        background-position: -27px -1301px; }
+      .ui-icon.large.white.folder {
+        background-position: -27px -1328px; }
+      .ui-icon.large.white.font {
+        background-position: -27px -1355px; }
+      .ui-icon.large.white.globe {
+        background-position: -27px -1382px; }
+      .ui-icon.large.white.group {
+        background-position: -27px -1409px; }
+      .ui-icon.large.white.hash {
+        background-position: -27px -1436px; }
+      .ui-icon.large.white.info {
+        background-position: -27px -1463px; }
+      .ui-icon.large.white.inline-tool {
+        background-position: -27px -1490px; }
+      .ui-icon.large.white.js {
+        background-position: -27px -1517px; }
+      .ui-icon.large.white.launch {
+        background-position: -27px -1544px; }
+      .ui-icon.large.white.link {
+        background-position: -27px -1571px; }
+      .ui-icon.large.white.list {
+        background-position: -27px -1598px; }
+      .ui-icon.large.white.location {
+        background-position: -27px -1625px; }
+      .ui-icon.large.white.media {
+        background-position: -27px -1652px; }
+      .ui-icon.large.white.message {
+        background-position: -27px -1679px; }
+      .ui-icon.large.white.multipage {
+        background-position: -27px -1706px; }
+      .ui-icon.large.white.next {
+        background-position: -27px -1733px; }
+      .ui-icon.large.white.notification {
+        background-position: -27px -1760px; }
+      .ui-icon.large.white.number {
+        background-position: -27px -1787px; }
+      .ui-icon.large.white.paths {
+        background-position: -27px -1814px; }
+      .ui-icon.large.white.permissions {
+        background-position: -27px -1841px; }
+      .ui-icon.large.white.php {
+        background-position: -27px -1868px; }
+      .ui-icon.large.white.placeholder {
+        background-position: -27px -1895px; }
+      .ui-icon.large.white.presentation {
+        background-position: -27px -1922px; }
+      .ui-icon.large.white.previous {
+        background-position: -27px -1949px; }
+      .ui-icon.large.white.properties {
+        background-position: -27px -1976px; }
+      .ui-icon.large.white.reorder {
+        background-position: -27px -2003px; }
+      .ui-icon.large.white.search {
+        background-position: -27px -2030px; }
+      .ui-icon.large.white.selection {
+        background-position: -27px -2057px; }
+      .ui-icon.large.white.settings {
+        background-position: -27px -2084px; }
+      .ui-icon.large.white.sidepanel-tool {
+        background-position: -27px -2111px; }
+      .ui-icon.large.white.sign-out {
+        background-position: -27px -2138px; }
+      .ui-icon.large.white.support {
+        background-position: -27px -2165px; }
+      .ui-icon.large.white.switch {
+        background-position: -27px -2192px; }
+      .ui-icon.large.white.system-user {
+        background-position: -27px -2219px; }
+      .ui-icon.large.white.table {
+        background-position: -27px -2246px; }
+      .ui-icon.large.white.tag {
+        background-position: -27px -2273px; }
+      .ui-icon.large.white.template-menu {
+        background-position: -27px -2300px; }
+      .ui-icon.large.white.template-zone {
+        background-position: -27px -2327px; }
+      .ui-icon.large.white.template {
+        background-position: -27px -2354px; }
+      .ui-icon.large.white.terminal {
+        background-position: -27px -2381px; }
+      .ui-icon.large.white.test {
+        background-position: -27px -2408px; }
+      .ui-icon.large.white.text {
+        background-position: -27px -2435px; }
+      .ui-icon.large.white.tick {
+        background-position: -27px -2462px; }
+      .ui-icon.large.white.trash {
+        background-position: -27px -2489px; }
+      .ui-icon.large.white.triangle {
+        background-position: -27px -2516px; }
+      .ui-icon.large.white.trophy {
+        background-position: -27px -2543px; }
+      .ui-icon.large.white.user-closed {
+        background-position: -27px -2570px; }
+      .ui-icon.large.white.user-open {
+        background-position: -27px -2597px; }
+      .ui-icon.large.white.user-reverse {
+        background-position: -27px -2624px; }
+      .ui-icon.large.white.vector {
+        background-position: -27px -2651px; }
+      .ui-icon.large.white.video {
+        background-position: -27px -2678px; }
+    .ui-icon.medium {
+      width: 18px;
+      height: 18px; }
+      .ui-icon.medium.black.accessibility {
+        background-position: 0px -2705px; }
+      .ui-icon.medium.black.add {
+        background-position: 0px -2728px; }
+      .ui-icon.medium.black.archive {
+        background-position: 0px -2751px; }
+      .ui-icon.medium.black.attachment {
+        background-position: 0px -2774px; }
+      .ui-icon.medium.black.bitmap {
+        background-position: 0px -2797px; }
+      .ui-icon.medium.black.chart-pie {
+        background-position: 0px -2820px; }
+      .ui-icon.medium.black.code {
+        background-position: 0px -2843px; }
+      .ui-icon.medium.black.collection {
+        background-position: 0px -2866px; }
+      .ui-icon.medium.black.contrast {
+        background-position: 0px -2889px; }
+      .ui-icon.medium.black.css {
+        background-position: 0px -2912px; }
+      .ui-icon.medium.black.date {
+        background-position: 0px -2935px; }
+      .ui-icon.medium.black.description {
+        background-position: 0px -2958px; }
+      .ui-icon.medium.black.design {
+        background-position: 0px -2981px; }
+      .ui-icon.medium.black.edit-tools {
+        background-position: 0px -3004px; }
+      .ui-icon.medium.black.edit {
+        background-position: 0px -3027px; }
+      .ui-icon.medium.black.favourite {
+        background-position: 0px -3050px; }
+      .ui-icon.medium.black.file {
+        background-position: 0px -3073px; }
+      .ui-icon.medium.black.folder {
+        background-position: 0px -3096px; }
+      .ui-icon.medium.black.font {
+        background-position: 0px -3119px; }
+      .ui-icon.medium.black.global {
+        background-position: 0px -3142px; }
+      .ui-icon.medium.black.group {
+        background-position: 0px -3165px; }
+      .ui-icon.medium.black.hash {
+        background-position: 0px -3188px; }
+      .ui-icon.medium.black.info {
+        background-position: 0px -3211px; }
+      .ui-icon.medium.black.inline-tool {
+        background-position: 0px -3234px; }
+      .ui-icon.medium.black.js {
+        background-position: 0px -3257px; }
+      .ui-icon.medium.black.launch {
+        background-position: 0px -3280px; }
+      .ui-icon.medium.black.line-chart {
+        background-position: 0px -3303px; }
+      .ui-icon.medium.black.link {
+        background-position: 0px -3326px; }
+      .ui-icon.medium.black.list-dial {
+        background-position: 0px -3349px; }
+      .ui-icon.medium.black.list {
+        background-position: 0px -3372px; }
+      .ui-icon.medium.black.location {
+        background-position: 0px -3395px; }
+      .ui-icon.medium.black.media {
+        background-position: 0px -3418px; }
+      .ui-icon.medium.black.message {
+        background-position: 0px -3441px; }
+      .ui-icon.medium.black.multipage {
+        background-position: 0px -3464px; }
+      .ui-icon.medium.black.next {
+        background-position: 0px -3487px; }
+      .ui-icon.medium.black.notification {
+        background-position: 0px -3510px; }
+      .ui-icon.medium.black.number {
+        background-position: 0px -3533px; }
+      .ui-icon.medium.black.permissions {
+        background-position: 0px -3556px; }
+      .ui-icon.medium.black.perspectives {
+        background-position: 0px -3579px; }
+      .ui-icon.medium.black.php {
+        background-position: 0px -3602px; }
+      .ui-icon.medium.black.placeholder {
+        background-position: 0px -3625px; }
+      .ui-icon.medium.black.presentation {
+        background-position: 0px -3648px; }
+      .ui-icon.medium.black.previous {
+        background-position: 0px -3671px; }
+      .ui-icon.medium.black.properties {
+        background-position: 0px -3694px; }
+      .ui-icon.medium.black.reorder {
+        background-position: 0px -3717px; }
+      .ui-icon.medium.black.roles {
+        background-position: 0px -3740px; }
+      .ui-icon.medium.black.search {
+        background-position: 0px -3763px; }
+      .ui-icon.medium.black.selection {
+        background-position: 0px -3786px; }
+      .ui-icon.medium.black.settings {
+        background-position: 0px -3809px; }
+      .ui-icon.medium.black.sidepanel-tool {
+        background-position: 0px -3832px; }
+      .ui-icon.medium.black.sign-out {
+        background-position: 0px -3855px; }
+      .ui-icon.medium.black.support {
+        background-position: 0px -3878px; }
+      .ui-icon.medium.black.switch {
+        background-position: 0px -3901px; }
+      .ui-icon.medium.black.system-user {
+        background-position: 0px -3924px; }
+      .ui-icon.medium.black.table {
+        background-position: 0px -3947px; }
+      .ui-icon.medium.black.tag {
+        background-position: 0px -3970px; }
+      .ui-icon.medium.black.template-zone {
+        background-position: 0px -3993px; }
+      .ui-icon.medium.black.template {
+        background-position: 0px -4016px; }
+      .ui-icon.medium.black.templates {
+        background-position: 0px -4039px; }
+      .ui-icon.medium.black.test {
+        background-position: 0px -4062px; }
+      .ui-icon.medium.black.text {
+        background-position: 0px -4085px; }
+      .ui-icon.medium.black.tick {
+        background-position: 0px -4108px; }
+      .ui-icon.medium.black.trash {
+        background-position: 0px -4131px; }
+      .ui-icon.medium.black.trophy {
+        background-position: 0px -4154px; }
+      .ui-icon.medium.black.user-closed {
+        background-position: 0px -4177px; }
+      .ui-icon.medium.black.user-open {
+        background-position: 0px -4200px; }
+      .ui-icon.medium.black.vector {
+        background-position: 0px -4223px; }
+      .ui-icon.medium.black.video {
+        background-position: 0px -4246px; }
+      .ui-icon.medium.white.accessibility {
+        background-position: -23px -2705px; }
+      .ui-icon.medium.white.add {
+        background-position: -23px -2728px; }
+      .ui-icon.medium.white.archive {
+        background-position: -23px -2751px; }
+      .ui-icon.medium.white.attachment {
+        background-position: -23px -2774px; }
+      .ui-icon.medium.white.bitmap {
+        background-position: -23px -2797px; }
+      .ui-icon.medium.white.chart-pie {
+        background-position: -23px -2820px; }
+      .ui-icon.medium.white.code {
+        background-position: -23px -2843px; }
+      .ui-icon.medium.white.collection {
+        background-position: -23px -2866px; }
+      .ui-icon.medium.white.contrast {
+        background-position: -23px -2889px; }
+      .ui-icon.medium.white.css {
+        background-position: -23px -2912px; }
+      .ui-icon.medium.white.date {
+        background-position: -23px -2935px; }
+      .ui-icon.medium.white.description {
+        background-position: -23px -2958px; }
+      .ui-icon.medium.white.design {
+        background-position: -23px -2981px; }
+      .ui-icon.medium.white.edit-tools {
+        background-position: -23px -3004px; }
+      .ui-icon.medium.white.edit {
+        background-position: -23px -3027px; }
+      .ui-icon.medium.white.favourite {
+        background-position: -23px -3050px; }
+      .ui-icon.medium.white.file {
+        background-position: -23px -3073px; }
+      .ui-icon.medium.white.folder {
+        background-position: -23px -3096px; }
+      .ui-icon.medium.white.font {
+        background-position: -23px -3119px; }
+      .ui-icon.medium.white.global {
+        background-position: -23px -3142px; }
+      .ui-icon.medium.white.group {
+        background-position: -23px -3165px; }
+      .ui-icon.medium.white.hash {
+        background-position: -23px -3188px; }
+      .ui-icon.medium.white.info {
+        background-position: -23px -3211px; }
+      .ui-icon.medium.white.inline-tool {
+        background-position: -23px -3234px; }
+      .ui-icon.medium.white.js {
+        background-position: -23px -3257px; }
+      .ui-icon.medium.white.launch {
+        background-position: -23px -3280px; }
+      .ui-icon.medium.white.line-chart {
+        background-position: -23px -3303px; }
+      .ui-icon.medium.white.link {
+        background-position: -23px -3326px; }
+      .ui-icon.medium.white.list-dial {
+        background-position: -23px -3349px; }
+      .ui-icon.medium.white.list {
+        background-position: -23px -3372px; }
+      .ui-icon.medium.white.location {
+        background-position: -23px -3395px; }
+      .ui-icon.medium.white.media {
+        background-position: -23px -3418px; }
+      .ui-icon.medium.white.message {
+        background-position: -23px -3441px; }
+      .ui-icon.medium.white.multipage {
+        background-position: -23px -3464px; }
+      .ui-icon.medium.white.next {
+        background-position: -23px -3487px; }
+      .ui-icon.medium.white.notification {
+        background-position: -23px -3510px; }
+      .ui-icon.medium.white.number {
+        background-position: -23px -3533px; }
+      .ui-icon.medium.white.permissions {
+        background-position: -23px -3556px; }
+      .ui-icon.medium.white.perspectives {
+        background-position: -23px -3579px; }
+      .ui-icon.medium.white.php {
+        background-position: -23px -3602px; }
+      .ui-icon.medium.white.placeholder {
+        background-position: -23px -3625px; }
+      .ui-icon.medium.white.presentation {
+        background-position: -23px -3648px; }
+      .ui-icon.medium.white.previous {
+        background-position: -23px -3671px; }
+      .ui-icon.medium.white.properties {
+        background-position: -23px -3694px; }
+      .ui-icon.medium.white.reorder {
+        background-position: -23px -3717px; }
+      .ui-icon.medium.white.roles {
+        background-position: -23px -3740px; }
+      .ui-icon.medium.white.search {
+        background-position: -23px -3763px; }
+      .ui-icon.medium.white.selection {
+        background-position: -23px -3786px; }
+      .ui-icon.medium.white.settings {
+        background-position: -23px -3809px; }
+      .ui-icon.medium.white.sidepanel-tool {
+        background-position: -23px -3832px; }
+      .ui-icon.medium.white.sign-out {
+        background-position: -23px -3855px; }
+      .ui-icon.medium.white.support {
+        background-position: -23px -3878px; }
+      .ui-icon.medium.white.switch {
+        background-position: -23px -3901px; }
+      .ui-icon.medium.white.system-user {
+        background-position: -23px -3924px; }
+      .ui-icon.medium.white.table {
+        background-position: -23px -3947px; }
+      .ui-icon.medium.white.tag {
+        background-position: -23px -3970px; }
+      .ui-icon.medium.white.template-zone {
+        background-position: -23px -3993px; }
+      .ui-icon.medium.white.template {
+        background-position: -23px -4016px; }
+      .ui-icon.medium.white.templates {
+        background-position: -23px -4039px; }
+      .ui-icon.medium.white.test {
+        background-position: -23px -4062px; }
+      .ui-icon.medium.white.text {
+        background-position: -23px -4085px; }
+      .ui-icon.medium.white.tick {
+        background-position: -23px -4108px; }
+      .ui-icon.medium.white.trash {
+        background-position: -23px -4131px; }
+      .ui-icon.medium.white.trophy {
+        background-position: -23px -4154px; }
+      .ui-icon.medium.white.user-closed {
+        background-position: -23px -4177px; }
+      .ui-icon.medium.white.user-open {
+        background-position: -23px -4200px; }
+      .ui-icon.medium.white.vector {
+        background-position: -23px -4223px; }
+      .ui-icon.medium.white.video {
+        background-position: -23px -4246px; }
+      .ui-icon.medium.blue.accessibility {
+        background-position: -46px -2705px; }
+      .ui-icon.medium.blue.add {
+        background-position: -46px -2728px; }
+      .ui-icon.medium.blue.archive {
+        background-position: -46px -2751px; }
+      .ui-icon.medium.blue.attachment {
+        background-position: -46px -2774px; }
+      .ui-icon.medium.blue.bitmap {
+        background-position: -46px -2797px; }
+      .ui-icon.medium.blue.chart-pie {
+        background-position: -46px -2820px; }
+      .ui-icon.medium.blue.code {
+        background-position: -46px -2843px; }
+      .ui-icon.medium.blue.collection {
+        background-position: -46px -2866px; }
+      .ui-icon.medium.blue.contrast {
+        background-position: -46px -2889px; }
+      .ui-icon.medium.blue.css {
+        background-position: -46px -2912px; }
+      .ui-icon.medium.blue.date {
+        background-position: -46px -2935px; }
+      .ui-icon.medium.blue.description {
+        background-position: -46px -2958px; }
+      .ui-icon.medium.blue.design {
+        background-position: -46px -2981px; }
+      .ui-icon.medium.blue.edit-tools {
+        background-position: -46px -3004px; }
+      .ui-icon.medium.blue.edit {
+        background-position: -46px -3027px; }
+      .ui-icon.medium.blue.favourite {
+        background-position: -46px -3050px; }
+      .ui-icon.medium.blue.file {
+        background-position: -46px -3073px; }
+      .ui-icon.medium.blue.folder {
+        background-position: -46px -3096px; }
+      .ui-icon.medium.blue.font {
+        background-position: -46px -3119px; }
+      .ui-icon.medium.blue.global {
+        background-position: -46px -3142px; }
+      .ui-icon.medium.blue.group {
+        background-position: -46px -3165px; }
+      .ui-icon.medium.blue.hash {
+        background-position: -46px -3188px; }
+      .ui-icon.medium.blue.info {
+        background-position: -46px -3211px; }
+      .ui-icon.medium.blue.inline-tool {
+        background-position: -46px -3234px; }
+      .ui-icon.medium.blue.js {
+        background-position: -46px -3257px; }
+      .ui-icon.medium.blue.launch {
+        background-position: -46px -3280px; }
+      .ui-icon.medium.blue.line-chart {
+        background-position: -46px -3303px; }
+      .ui-icon.medium.blue.link {
+        background-position: -46px -3326px; }
+      .ui-icon.medium.blue.list-dial {
+        background-position: -46px -3349px; }
+      .ui-icon.medium.blue.list {
+        background-position: -46px -3372px; }
+      .ui-icon.medium.blue.location {
+        background-position: -46px -3395px; }
+      .ui-icon.medium.blue.media {
+        background-position: -46px -3418px; }
+      .ui-icon.medium.blue.message {
+        background-position: -46px -3441px; }
+      .ui-icon.medium.blue.multipage {
+        background-position: -46px -3464px; }
+      .ui-icon.medium.blue.next {
+        background-position: -46px -3487px; }
+      .ui-icon.medium.blue.notification {
+        background-position: -46px -3510px; }
+      .ui-icon.medium.blue.number {
+        background-position: -46px -3533px; }
+      .ui-icon.medium.blue.permissions {
+        background-position: -46px -3556px; }
+      .ui-icon.medium.blue.perspectives {
+        background-position: -46px -3579px; }
+      .ui-icon.medium.blue.php {
+        background-position: -46px -3602px; }
+      .ui-icon.medium.blue.placeholder {
+        background-position: -46px -3625px; }
+      .ui-icon.medium.blue.presentation {
+        background-position: -46px -3648px; }
+      .ui-icon.medium.blue.previous {
+        background-position: -46px -3671px; }
+      .ui-icon.medium.blue.properties {
+        background-position: -46px -3694px; }
+      .ui-icon.medium.blue.reorder {
+        background-position: -46px -3717px; }
+      .ui-icon.medium.blue.roles {
+        background-position: -46px -3740px; }
+      .ui-icon.medium.blue.search {
+        background-position: -46px -3763px; }
+      .ui-icon.medium.blue.selection {
+        background-position: -46px -3786px; }
+      .ui-icon.medium.blue.settings {
+        background-position: -46px -3809px; }
+      .ui-icon.medium.blue.sidepanel-tool {
+        background-position: -46px -3832px; }
+      .ui-icon.medium.blue.sign-out {
+        background-position: -46px -3855px; }
+      .ui-icon.medium.blue.support {
+        background-position: -46px -3878px; }
+      .ui-icon.medium.blue.switch {
+        background-position: -46px -3901px; }
+      .ui-icon.medium.blue.system-user {
+        background-position: -46px -3924px; }
+      .ui-icon.medium.blue.table {
+        background-position: -46px -3947px; }
+      .ui-icon.medium.blue.tag {
+        background-position: -46px -3970px; }
+      .ui-icon.medium.blue.template-zone {
+        background-position: -46px -3993px; }
+      .ui-icon.medium.blue.template {
+        background-position: -46px -4016px; }
+      .ui-icon.medium.blue.templates {
+        background-position: -46px -4039px; }
+      .ui-icon.medium.blue.test {
+        background-position: -46px -4062px; }
+      .ui-icon.medium.blue.text {
+        background-position: -46px -4085px; }
+      .ui-icon.medium.blue.tick {
+        background-position: -46px -4108px; }
+      .ui-icon.medium.blue.trash {
+        background-position: -46px -4131px; }
+      .ui-icon.medium.blue.trophy {
+        background-position: -46px -4154px; }
+      .ui-icon.medium.blue.user-closed {
+        background-position: -46px -4177px; }
+      .ui-icon.medium.blue.user-open {
+        background-position: -46px -4200px; }
+      .ui-icon.medium.blue.vector {
+        background-position: -46px -4223px; }
+      .ui-icon.medium.blue.video {
+        background-position: -46px -4246px; }
+      .ui-icon.medium.turquoise.accessibility {
+        background-position: -69px -2705px; }
+      .ui-icon.medium.turquoise.add {
+        background-position: -69px -2728px; }
+      .ui-icon.medium.turquoise.archive {
+        background-position: -69px -2751px; }
+      .ui-icon.medium.turquoise.attachment {
+        background-position: -69px -2774px; }
+      .ui-icon.medium.turquoise.bitmap {
+        background-position: -69px -2797px; }
+      .ui-icon.medium.turquoise.chart-pie {
+        background-position: -69px -2820px; }
+      .ui-icon.medium.turquoise.code {
+        background-position: -69px -2843px; }
+      .ui-icon.medium.turquoise.collection {
+        background-position: -69px -2866px; }
+      .ui-icon.medium.turquoise.contrast {
+        background-position: -69px -2889px; }
+      .ui-icon.medium.turquoise.css {
+        background-position: -69px -2912px; }
+      .ui-icon.medium.turquoise.date {
+        background-position: -69px -2935px; }
+      .ui-icon.medium.turquoise.description {
+        background-position: -69px -2958px; }
+      .ui-icon.medium.turquoise.design {
+        background-position: -69px -2981px; }
+      .ui-icon.medium.turquoise.edit-tools {
+        background-position: -69px -3004px; }
+      .ui-icon.medium.turquoise.edit {
+        background-position: -69px -3027px; }
+      .ui-icon.medium.turquoise.favourite {
+        background-position: -69px -3050px; }
+      .ui-icon.medium.turquoise.file {
+        background-position: -69px -3073px; }
+      .ui-icon.medium.turquoise.folder {
+        background-position: -69px -3096px; }
+      .ui-icon.medium.turquoise.font {
+        background-position: -69px -3119px; }
+      .ui-icon.medium.turquoise.global {
+        background-position: -69px -3142px; }
+      .ui-icon.medium.turquoise.group {
+        background-position: -69px -3165px; }
+      .ui-icon.medium.turquoise.hash {
+        background-position: -69px -3188px; }
+      .ui-icon.medium.turquoise.info {
+        background-position: -69px -3211px; }
+      .ui-icon.medium.turquoise.inline-tool {
+        background-position: -69px -3234px; }
+      .ui-icon.medium.turquoise.js {
+        background-position: -69px -3257px; }
+      .ui-icon.medium.turquoise.launch {
+        background-position: -69px -3280px; }
+      .ui-icon.medium.turquoise.line-chart {
+        background-position: -69px -3303px; }
+      .ui-icon.medium.turquoise.link {
+        background-position: -69px -3326px; }
+      .ui-icon.medium.turquoise.list-dial {
+        background-position: -69px -3349px; }
+      .ui-icon.medium.turquoise.list {
+        background-position: -69px -3372px; }
+      .ui-icon.medium.turquoise.location {
+        background-position: -69px -3395px; }
+      .ui-icon.medium.turquoise.media {
+        background-position: -69px -3418px; }
+      .ui-icon.medium.turquoise.message {
+        background-position: -69px -3441px; }
+      .ui-icon.medium.turquoise.multipage {
+        background-position: -69px -3464px; }
+      .ui-icon.medium.turquoise.next {
+        background-position: -69px -3487px; }
+      .ui-icon.medium.turquoise.notification {
+        background-position: -69px -3510px; }
+      .ui-icon.medium.turquoise.number {
+        background-position: -69px -3533px; }
+      .ui-icon.medium.turquoise.permissions {
+        background-position: -69px -3556px; }
+      .ui-icon.medium.turquoise.perspectives {
+        background-position: -69px -3579px; }
+      .ui-icon.medium.turquoise.php {
+        background-position: -69px -3602px; }
+      .ui-icon.medium.turquoise.placeholder {
+        background-position: -69px -3625px; }
+      .ui-icon.medium.turquoise.presentation {
+        background-position: -69px -3648px; }
+      .ui-icon.medium.turquoise.previous {
+        background-position: -69px -3671px; }
+      .ui-icon.medium.turquoise.properties {
+        background-position: -69px -3694px; }
+      .ui-icon.medium.turquoise.reorder {
+        background-position: -69px -3717px; }
+      .ui-icon.medium.turquoise.roles {
+        background-position: -69px -3740px; }
+      .ui-icon.medium.turquoise.search {
+        background-position: -69px -3763px; }
+      .ui-icon.medium.turquoise.selection {
+        background-position: -69px -3786px; }
+      .ui-icon.medium.turquoise.settings {
+        background-position: -69px -3809px; }
+      .ui-icon.medium.turquoise.sidepanel-tool {
+        background-position: -69px -3832px; }
+      .ui-icon.medium.turquoise.sign-out {
+        background-position: -69px -3855px; }
+      .ui-icon.medium.turquoise.support {
+        background-position: -69px -3878px; }
+      .ui-icon.medium.turquoise.switch {
+        background-position: -69px -3901px; }
+      .ui-icon.medium.turquoise.system-user {
+        background-position: -69px -3924px; }
+      .ui-icon.medium.turquoise.table {
+        background-position: -69px -3947px; }
+      .ui-icon.medium.turquoise.tag {
+        background-position: -69px -3970px; }
+      .ui-icon.medium.turquoise.template-zone {
+        background-position: -69px -3993px; }
+      .ui-icon.medium.turquoise.template {
+        background-position: -69px -4016px; }
+      .ui-icon.medium.turquoise.templates {
+        background-position: -69px -4039px; }
+      .ui-icon.medium.turquoise.test {
+        background-position: -69px -4062px; }
+      .ui-icon.medium.turquoise.text {
+        background-position: -69px -4085px; }
+      .ui-icon.medium.turquoise.tick {
+        background-position: -69px -4108px; }
+      .ui-icon.medium.turquoise.trash {
+        background-position: -69px -4131px; }
+      .ui-icon.medium.turquoise.trophy {
+        background-position: -69px -4154px; }
+      .ui-icon.medium.turquoise.user-closed {
+        background-position: -69px -4177px; }
+      .ui-icon.medium.turquoise.user-open {
+        background-position: -69px -4200px; }
+      .ui-icon.medium.turquoise.vector {
+        background-position: -69px -4223px; }
+      .ui-icon.medium.turquoise.video {
+        background-position: -69px -4246px; }
+      .ui-icon.medium.orange.accessibility {
+        background-position: -92px -2705px; }
+      .ui-icon.medium.orange.add {
+        background-position: -92px -2728px; }
+      .ui-icon.medium.orange.archive {
+        background-position: -92px -2751px; }
+      .ui-icon.medium.orange.attachment {
+        background-position: -92px -2774px; }
+      .ui-icon.medium.orange.bitmap {
+        background-position: -92px -2797px; }
+      .ui-icon.medium.orange.chart-pie {
+        background-position: -92px -2820px; }
+      .ui-icon.medium.orange.code {
+        background-position: -92px -2843px; }
+      .ui-icon.medium.orange.collection {
+        background-position: -92px -2866px; }
+      .ui-icon.medium.orange.contrast {
+        background-position: -92px -2889px; }
+      .ui-icon.medium.orange.css {
+        background-position: -92px -2912px; }
+      .ui-icon.medium.orange.date {
+        background-position: -92px -2935px; }
+      .ui-icon.medium.orange.description {
+        background-position: -92px -2958px; }
+      .ui-icon.medium.orange.design {
+        background-position: -92px -2981px; }
+      .ui-icon.medium.orange.edit-tools {
+        background-position: -92px -3004px; }
+      .ui-icon.medium.orange.edit {
+        background-position: -92px -3027px; }
+      .ui-icon.medium.orange.favourite {
+        background-position: -92px -3050px; }
+      .ui-icon.medium.orange.file {
+        background-position: -92px -3073px; }
+      .ui-icon.medium.orange.folder {
+        background-position: -92px -3096px; }
+      .ui-icon.medium.orange.font {
+        background-position: -92px -3119px; }
+      .ui-icon.medium.orange.global {
+        background-position: -92px -3142px; }
+      .ui-icon.medium.orange.group {
+        background-position: -92px -3165px; }
+      .ui-icon.medium.orange.hash {
+        background-position: -92px -3188px; }
+      .ui-icon.medium.orange.info {
+        background-position: -92px -3211px; }
+      .ui-icon.medium.orange.inline-tool {
+        background-position: -92px -3234px; }
+      .ui-icon.medium.orange.js {
+        background-position: -92px -3257px; }
+      .ui-icon.medium.orange.launch {
+        background-position: -92px -3280px; }
+      .ui-icon.medium.orange.line-chart {
+        background-position: -92px -3303px; }
+      .ui-icon.medium.orange.link {
+        background-position: -92px -3326px; }
+      .ui-icon.medium.orange.list-dial {
+        background-position: -92px -3349px; }
+      .ui-icon.medium.orange.list {
+        background-position: -92px -3372px; }
+      .ui-icon.medium.orange.location {
+        background-position: -92px -3395px; }
+      .ui-icon.medium.orange.media {
+        background-position: -92px -3418px; }
+      .ui-icon.medium.orange.message {
+        background-position: -92px -3441px; }
+      .ui-icon.medium.orange.multipage {
+        background-position: -92px -3464px; }
+      .ui-icon.medium.orange.next {
+        background-position: -92px -3487px; }
+      .ui-icon.medium.orange.notification {
+        background-position: -92px -3510px; }
+      .ui-icon.medium.orange.number {
+        background-position: -92px -3533px; }
+      .ui-icon.medium.orange.permissions {
+        background-position: -92px -3556px; }
+      .ui-icon.medium.orange.perspectives {
+        background-position: -92px -3579px; }
+      .ui-icon.medium.orange.php {
+        background-position: -92px -3602px; }
+      .ui-icon.medium.orange.placeholder {
+        background-position: -92px -3625px; }
+      .ui-icon.medium.orange.presentation {
+        background-position: -92px -3648px; }
+      .ui-icon.medium.orange.previous {
+        background-position: -92px -3671px; }
+      .ui-icon.medium.orange.properties {
+        background-position: -92px -3694px; }
+      .ui-icon.medium.orange.reorder {
+        background-position: -92px -3717px; }
+      .ui-icon.medium.orange.roles {
+        background-position: -92px -3740px; }
+      .ui-icon.medium.orange.search {
+        background-position: -92px -3763px; }
+      .ui-icon.medium.orange.selection {
+        background-position: -92px -3786px; }
+      .ui-icon.medium.orange.settings {
+        background-position: -92px -3809px; }
+      .ui-icon.medium.orange.sidepanel-tool {
+        background-position: -92px -3832px; }
+      .ui-icon.medium.orange.sign-out {
+        background-position: -92px -3855px; }
+      .ui-icon.medium.orange.support {
+        background-position: -92px -3878px; }
+      .ui-icon.medium.orange.switch {
+        background-position: -92px -3901px; }
+      .ui-icon.medium.orange.system-user {
+        background-position: -92px -3924px; }
+      .ui-icon.medium.orange.table {
+        background-position: -92px -3947px; }
+      .ui-icon.medium.orange.tag {
+        background-position: -92px -3970px; }
+      .ui-icon.medium.orange.template-zone {
+        background-position: -92px -3993px; }
+      .ui-icon.medium.orange.template {
+        background-position: -92px -4016px; }
+      .ui-icon.medium.orange.templates {
+        background-position: -92px -4039px; }
+      .ui-icon.medium.orange.test {
+        background-position: -92px -4062px; }
+      .ui-icon.medium.orange.text {
+        background-position: -92px -4085px; }
+      .ui-icon.medium.orange.tick {
+        background-position: -92px -4108px; }
+      .ui-icon.medium.orange.trash {
+        background-position: -92px -4131px; }
+      .ui-icon.medium.orange.trophy {
+        background-position: -92px -4154px; }
+      .ui-icon.medium.orange.user-closed {
+        background-position: -92px -4177px; }
+      .ui-icon.medium.orange.user-open {
+        background-position: -92px -4200px; }
+      .ui-icon.medium.orange.vector {
+        background-position: -92px -4223px; }
+      .ui-icon.medium.orange.video {
+        background-position: -92px -4246px; }
+      .ui-icon.medium.pink.accessibility {
+        background-position: -115px -2705px; }
+      .ui-icon.medium.pink.add {
+        background-position: -115px -2728px; }
+      .ui-icon.medium.pink.archive {
+        background-position: -115px -2751px; }
+      .ui-icon.medium.pink.attachment {
+        background-position: -115px -2774px; }
+      .ui-icon.medium.pink.bitmap {
+        background-position: -115px -2797px; }
+      .ui-icon.medium.pink.chart-pie {
+        background-position: -115px -2820px; }
+      .ui-icon.medium.pink.code {
+        background-position: -115px -2843px; }
+      .ui-icon.medium.pink.collection {
+        background-position: -115px -2866px; }
+      .ui-icon.medium.pink.contrast {
+        background-position: -115px -2889px; }
+      .ui-icon.medium.pink.css {
+        background-position: -115px -2912px; }
+      .ui-icon.medium.pink.date {
+        background-position: -115px -2935px; }
+      .ui-icon.medium.pink.description {
+        background-position: -115px -2958px; }
+      .ui-icon.medium.pink.design {
+        background-position: -115px -2981px; }
+      .ui-icon.medium.pink.edit-tools {
+        background-position: -115px -3004px; }
+      .ui-icon.medium.pink.edit {
+        background-position: -115px -3027px; }
+      .ui-icon.medium.pink.favourite {
+        background-position: -115px -3050px; }
+      .ui-icon.medium.pink.file {
+        background-position: -115px -3073px; }
+      .ui-icon.medium.pink.folder {
+        background-position: -115px -3096px; }
+      .ui-icon.medium.pink.font {
+        background-position: -115px -3119px; }
+      .ui-icon.medium.pink.global {
+        background-position: -115px -3142px; }
+      .ui-icon.medium.pink.group {
+        background-position: -115px -3165px; }
+      .ui-icon.medium.pink.hash {
+        background-position: -115px -3188px; }
+      .ui-icon.medium.pink.info {
+        background-position: -115px -3211px; }
+      .ui-icon.medium.pink.inline-tool {
+        background-position: -115px -3234px; }
+      .ui-icon.medium.pink.js {
+        background-position: -115px -3257px; }
+      .ui-icon.medium.pink.launch {
+        background-position: -115px -3280px; }
+      .ui-icon.medium.pink.line-chart {
+        background-position: -115px -3303px; }
+      .ui-icon.medium.pink.link {
+        background-position: -115px -3326px; }
+      .ui-icon.medium.pink.list-dial {
+        background-position: -115px -3349px; }
+      .ui-icon.medium.pink.list {
+        background-position: -115px -3372px; }
+      .ui-icon.medium.pink.location {
+        background-position: -115px -3395px; }
+      .ui-icon.medium.pink.media {
+        background-position: -115px -3418px; }
+      .ui-icon.medium.pink.message {
+        background-position: -115px -3441px; }
+      .ui-icon.medium.pink.multipage {
+        background-position: -115px -3464px; }
+      .ui-icon.medium.pink.next {
+        background-position: -115px -3487px; }
+      .ui-icon.medium.pink.notification {
+        background-position: -115px -3510px; }
+      .ui-icon.medium.pink.number {
+        background-position: -115px -3533px; }
+      .ui-icon.medium.pink.permissions {
+        background-position: -115px -3556px; }
+      .ui-icon.medium.pink.perspectives {
+        background-position: -115px -3579px; }
+      .ui-icon.medium.pink.php {
+        background-position: -115px -3602px; }
+      .ui-icon.medium.pink.placeholder {
+        background-position: -115px -3625px; }
+      .ui-icon.medium.pink.presentation {
+        background-position: -115px -3648px; }
+      .ui-icon.medium.pink.previous {
+        background-position: -115px -3671px; }
+      .ui-icon.medium.pink.properties {
+        background-position: -115px -3694px; }
+      .ui-icon.medium.pink.reorder {
+        background-position: -115px -3717px; }
+      .ui-icon.medium.pink.roles {
+        background-position: -115px -3740px; }
+      .ui-icon.medium.pink.search {
+        background-position: -115px -3763px; }
+      .ui-icon.medium.pink.selection {
+        background-position: -115px -3786px; }
+      .ui-icon.medium.pink.settings {
+        background-position: -115px -3809px; }
+      .ui-icon.medium.pink.sidepanel-tool {
+        background-position: -115px -3832px; }
+      .ui-icon.medium.pink.sign-out {
+        background-position: -115px -3855px; }
+      .ui-icon.medium.pink.support {
+        background-position: -115px -3878px; }
+      .ui-icon.medium.pink.switch {
+        background-position: -115px -3901px; }
+      .ui-icon.medium.pink.system-user {
+        background-position: -115px -3924px; }
+      .ui-icon.medium.pink.table {
+        background-position: -115px -3947px; }
+      .ui-icon.medium.pink.tag {
+        background-position: -115px -3970px; }
+      .ui-icon.medium.pink.template-zone {
+        background-position: -115px -3993px; }
+      .ui-icon.medium.pink.template {
+        background-position: -115px -4016px; }
+      .ui-icon.medium.pink.templates {
+        background-position: -115px -4039px; }
+      .ui-icon.medium.pink.test {
+        background-position: -115px -4062px; }
+      .ui-icon.medium.pink.text {
+        background-position: -115px -4085px; }
+      .ui-icon.medium.pink.tick {
+        background-position: -115px -4108px; }
+      .ui-icon.medium.pink.trash {
+        background-position: -115px -4131px; }
+      .ui-icon.medium.pink.trophy {
+        background-position: -115px -4154px; }
+      .ui-icon.medium.pink.user-closed {
+        background-position: -115px -4177px; }
+      .ui-icon.medium.pink.user-open {
+        background-position: -115px -4200px; }
+      .ui-icon.medium.pink.vector {
+        background-position: -115px -4223px; }
+      .ui-icon.medium.pink.video {
+        background-position: -115px -4246px; }
+    .ui-icon.small {
+      width: 16px;
+      height: 16px; }
+      .ui-icon.small.black.accessibility {
+        background-position: 0px -4356px; }
+      .ui-icon.small.black.add {
+        background-position: 0px -4377px; }
+      .ui-icon.small.black.archive {
+        background-position: 0px -4398px; }
+      .ui-icon.small.black.attachment {
+        background-position: 0px -4419px; }
+      .ui-icon.small.black.bitmap {
+        background-position: 0px -4440px; }
+      .ui-icon.small.black.chart-pie {
+        background-position: 0px -4461px; }
+      .ui-icon.small.black.code {
+        background-position: 0px -4482px; }
+      .ui-icon.small.black.collection {
+        background-position: 0px -4503px; }
+      .ui-icon.small.black.contrast {
+        background-position: 0px -4524px; }
+      .ui-icon.small.black.css {
+        background-position: 0px -4545px; }
+      .ui-icon.small.black.date {
+        background-position: 0px -4566px; }
+      .ui-icon.small.black.design {
+        background-position: 0px -4587px; }
+      .ui-icon.small.black.edit-tools {
+        background-position: 0px -4608px; }
+      .ui-icon.small.black.edit {
+        background-position: 0px -4629px; }
+      .ui-icon.small.black.favourite {
+        background-position: 0px -4650px; }
+      .ui-icon.small.black.file {
+        background-position: 0px -4671px; }
+      .ui-icon.small.black.folder {
+        background-position: 0px -4692px; }
+      .ui-icon.small.black.font {
+        background-position: 0px -4713px; }
+      .ui-icon.small.black.global {
+        background-position: 0px -4734px; }
+      .ui-icon.small.black.group {
+        background-position: 0px -4755px; }
+      .ui-icon.small.black.hash {
+        background-position: 0px -4776px; }
+      .ui-icon.small.black.info {
+        background-position: 0px -4797px; }
+      .ui-icon.small.black.inline-tool {
+        background-position: 0px -4818px; }
+      .ui-icon.small.black.js {
+        background-position: 0px -4839px; }
+      .ui-icon.small.black.launch {
+        background-position: 0px -4860px; }
+      .ui-icon.small.black.line-chart {
+        background-position: 0px -4881px; }
+      .ui-icon.small.black.link {
+        background-position: 0px -4902px; }
+      .ui-icon.small.black.list-dial {
+        background-position: 0px -4923px; }
+      .ui-icon.small.black.list {
+        background-position: 0px -4944px; }
+      .ui-icon.small.black.location {
+        background-position: 0px -4965px; }
+      .ui-icon.small.black.media {
+        background-position: 0px -4986px; }
+      .ui-icon.small.black.message {
+        background-position: 0px -5007px; }
+      .ui-icon.small.black.multipage {
+        background-position: 0px -5028px; }
+      .ui-icon.small.black.next {
+        background-position: 0px -5049px; }
+      .ui-icon.small.black.notification {
+        background-position: 0px -5070px; }
+      .ui-icon.small.black.number {
+        background-position: 0px -5091px; }
+      .ui-icon.small.black.permissions {
+        background-position: 0px -5112px; }
+      .ui-icon.small.black.php {
+        background-position: 0px -5133px; }
+      .ui-icon.small.black.placeholder {
+        background-position: 0px -5154px; }
+      .ui-icon.small.black.presentation {
+        background-position: 0px -5175px; }
+      .ui-icon.small.black.previous {
+        background-position: 0px -5196px; }
+      .ui-icon.small.black.properties {
+        background-position: 0px -5217px; }
+      .ui-icon.small.black.reorder {
+        background-position: 0px -5238px; }
+      .ui-icon.small.black.search {
+        background-position: 0px -5259px; }
+      .ui-icon.small.black.selection {
+        background-position: 0px -5280px; }
+      .ui-icon.small.black.settings {
+        background-position: 0px -5301px; }
+      .ui-icon.small.black.sidepanel-tool {
+        background-position: 0px -5322px; }
+      .ui-icon.small.black.sign-out {
+        background-position: 0px -5343px; }
+      .ui-icon.small.black.support {
+        background-position: 0px -5364px; }
+      .ui-icon.small.black.switch {
+        background-position: 0px -5385px; }
+      .ui-icon.small.black.system-user {
+        background-position: 0px -5406px; }
+      .ui-icon.small.black.table {
+        background-position: 0px -5427px; }
+      .ui-icon.small.black.tag {
+        background-position: 0px -5448px; }
+      .ui-icon.small.black.template-zone {
+        background-position: 0px -5469px; }
+      .ui-icon.small.black.template {
+        background-position: 0px -5490px; }
+      .ui-icon.small.black.templates {
+        background-position: 0px -5511px; }
+      .ui-icon.small.black.test {
+        background-position: 0px -5532px; }
+      .ui-icon.small.black.text {
+        background-position: 0px -5553px; }
+      .ui-icon.small.black.tick {
+        background-position: 0px -5574px; }
+      .ui-icon.small.black.trash {
+        background-position: 0px -5595px; }
+      .ui-icon.small.black.trophy {
+        background-position: 0px -5616px; }
+      .ui-icon.small.black.unique {
+        background-position: 0px -5637px; }
+      .ui-icon.small.black.user-closed {
+        background-position: 0px -5658px; }
+      .ui-icon.small.black.user-open {
+        background-position: 0px -5679px; }
+      .ui-icon.small.black.vector {
+        background-position: 0px -5700px; }
+      .ui-icon.small.black.video {
+        background-position: 0px -5721px; }
+      .ui-icon.small.white.accessibility {
+        background-position: -21px -4356px; }
+      .ui-icon.small.white.add {
+        background-position: -21px -4377px; }
+      .ui-icon.small.white.archive {
+        background-position: -21px -4398px; }
+      .ui-icon.small.white.attachment {
+        background-position: -21px -4419px; }
+      .ui-icon.small.white.bitmap {
+        background-position: -21px -4440px; }
+      .ui-icon.small.white.chart-pie {
+        background-position: -21px -4461px; }
+      .ui-icon.small.white.code {
+        background-position: -21px -4482px; }
+      .ui-icon.small.white.collection {
+        background-position: -21px -4503px; }
+      .ui-icon.small.white.contrast {
+        background-position: -21px -4524px; }
+      .ui-icon.small.white.css {
+        background-position: -21px -4545px; }
+      .ui-icon.small.white.date {
+        background-position: -21px -4566px; }
+      .ui-icon.small.white.design {
+        background-position: -21px -4587px; }
+      .ui-icon.small.white.edit-tools {
+        background-position: -21px -4608px; }
+      .ui-icon.small.white.edit {
+        background-position: -21px -4629px; }
+      .ui-icon.small.white.favourite {
+        background-position: -21px -4650px; }
+      .ui-icon.small.white.file {
+        background-position: -21px -4671px; }
+      .ui-icon.small.white.folder {
+        background-position: -21px -4692px; }
+      .ui-icon.small.white.font {
+        background-position: -21px -4713px; }
+      .ui-icon.small.white.global {
+        background-position: -21px -4734px; }
+      .ui-icon.small.white.group {
+        background-position: -21px -4755px; }
+      .ui-icon.small.white.hash {
+        background-position: -21px -4776px; }
+      .ui-icon.small.white.info {
+        background-position: -21px -4797px; }
+      .ui-icon.small.white.inline-tool {
+        background-position: -21px -4818px; }
+      .ui-icon.small.white.js {
+        background-position: -21px -4839px; }
+      .ui-icon.small.white.launch {
+        background-position: -21px -4860px; }
+      .ui-icon.small.white.line-chart {
+        background-position: -21px -4881px; }
+      .ui-icon.small.white.link {
+        background-position: -21px -4902px; }
+      .ui-icon.small.white.list-dial {
+        background-position: -21px -4923px; }
+      .ui-icon.small.white.list {
+        background-position: -21px -4944px; }
+      .ui-icon.small.white.location {
+        background-position: -21px -4965px; }
+      .ui-icon.small.white.media {
+        background-position: -21px -4986px; }
+      .ui-icon.small.white.message {
+        background-position: -21px -5007px; }
+      .ui-icon.small.white.multipage {
+        background-position: -21px -5028px; }
+      .ui-icon.small.white.next {
+        background-position: -21px -5049px; }
+      .ui-icon.small.white.notification {
+        background-position: -21px -5070px; }
+      .ui-icon.small.white.number {
+        background-position: -21px -5091px; }
+      .ui-icon.small.white.permissions {
+        background-position: -21px -5112px; }
+      .ui-icon.small.white.php {
+        background-position: -21px -5133px; }
+      .ui-icon.small.white.placeholder {
+        background-position: -21px -5154px; }
+      .ui-icon.small.white.presentation {
+        background-position: -21px -5175px; }
+      .ui-icon.small.white.previous {
+        background-position: -21px -5196px; }
+      .ui-icon.small.white.properties {
+        background-position: -21px -5217px; }
+      .ui-icon.small.white.reorder {
+        background-position: -21px -5238px; }
+      .ui-icon.small.white.search {
+        background-position: -21px -5259px; }
+      .ui-icon.small.white.selection {
+        background-position: -21px -5280px; }
+      .ui-icon.small.white.settings {
+        background-position: -21px -5301px; }
+      .ui-icon.small.white.sidepanel-tool {
+        background-position: -21px -5322px; }
+      .ui-icon.small.white.sign-out {
+        background-position: -21px -5343px; }
+      .ui-icon.small.white.support {
+        background-position: -21px -5364px; }
+      .ui-icon.small.white.switch {
+        background-position: -21px -5385px; }
+      .ui-icon.small.white.system-user {
+        background-position: -21px -5406px; }
+      .ui-icon.small.white.table {
+        background-position: -21px -5427px; }
+      .ui-icon.small.white.tag {
+        background-position: -21px -5448px; }
+      .ui-icon.small.white.template-zone {
+        background-position: -21px -5469px; }
+      .ui-icon.small.white.template {
+        background-position: -21px -5490px; }
+      .ui-icon.small.white.templates {
+        background-position: -21px -5511px; }
+      .ui-icon.small.white.test {
+        background-position: -21px -5532px; }
+      .ui-icon.small.white.text {
+        background-position: -21px -5553px; }
+      .ui-icon.small.white.tick {
+        background-position: -21px -5574px; }
+      .ui-icon.small.white.trash {
+        background-position: -21px -5595px; }
+      .ui-icon.small.white.trophy {
+        background-position: -21px -5616px; }
+      .ui-icon.small.white.unique {
+        background-position: -21px -5637px; }
+      .ui-icon.small.white.user-closed {
+        background-position: -21px -5658px; }
+      .ui-icon.small.white.user-open {
+        background-position: -21px -5679px; }
+      .ui-icon.small.white.vector {
+        background-position: -21px -5700px; }
+      .ui-icon.small.white.video {
+        background-position: -21px -5721px; }
+      .ui-icon.small.red.accessibility {
+        background-position: -42px -4356px; }
+      .ui-icon.small.red.add {
+        background-position: -42px -4377px; }
+      .ui-icon.small.red.archive {
+        background-position: -42px -4398px; }
+      .ui-icon.small.red.attachment {
+        background-position: -42px -4419px; }
+      .ui-icon.small.red.bitmap {
+        background-position: -42px -4440px; }
+      .ui-icon.small.red.chart-pie {
+        background-position: -42px -4461px; }
+      .ui-icon.small.red.code {
+        background-position: -42px -4482px; }
+      .ui-icon.small.red.collection {
+        background-position: -42px -4503px; }
+      .ui-icon.small.red.contrast {
+        background-position: -42px -4524px; }
+      .ui-icon.small.red.css {
+        background-position: -42px -4545px; }
+      .ui-icon.small.red.date {
+        background-position: -42px -4566px; }
+      .ui-icon.small.red.design {
+        background-position: -42px -4587px; }
+      .ui-icon.small.red.edit-tools {
+        background-position: -42px -4608px; }
+      .ui-icon.small.red.edit {
+        background-position: -42px -4629px; }
+      .ui-icon.small.red.favourite {
+        background-position: -42px -4650px; }
+      .ui-icon.small.red.file {
+        background-position: -42px -4671px; }
+      .ui-icon.small.red.folder {
+        background-position: -42px -4692px; }
+      .ui-icon.small.red.font {
+        background-position: -42px -4713px; }
+      .ui-icon.small.red.global {
+        background-position: -42px -4734px; }
+      .ui-icon.small.red.group {
+        background-position: -42px -4755px; }
+      .ui-icon.small.red.hash {
+        background-position: -42px -4776px; }
+      .ui-icon.small.red.info {
+        background-position: -42px -4797px; }
+      .ui-icon.small.red.inline-tool {
+        background-position: -42px -4818px; }
+      .ui-icon.small.red.js {
+        background-position: -42px -4839px; }
+      .ui-icon.small.red.launch {
+        background-position: -42px -4860px; }
+      .ui-icon.small.red.line-chart {
+        background-position: -42px -4881px; }
+      .ui-icon.small.red.link {
+        background-position: -42px -4902px; }
+      .ui-icon.small.red.list-dial {
+        background-position: -42px -4923px; }
+      .ui-icon.small.red.list {
+        background-position: -42px -4944px; }
+      .ui-icon.small.red.location {
+        background-position: -42px -4965px; }
+      .ui-icon.small.red.media {
+        background-position: -42px -4986px; }
+      .ui-icon.small.red.message {
+        background-position: -42px -5007px; }
+      .ui-icon.small.red.multipage {
+        background-position: -42px -5028px; }
+      .ui-icon.small.red.next {
+        background-position: -42px -5049px; }
+      .ui-icon.small.red.notification {
+        background-position: -42px -5070px; }
+      .ui-icon.small.red.number {
+        background-position: -42px -5091px; }
+      .ui-icon.small.red.permissions {
+        background-position: -42px -5112px; }
+      .ui-icon.small.red.php {
+        background-position: -42px -5133px; }
+      .ui-icon.small.red.placeholder {
+        background-position: -42px -5154px; }
+      .ui-icon.small.red.presentation {
+        background-position: -42px -5175px; }
+      .ui-icon.small.red.previous {
+        background-position: -42px -5196px; }
+      .ui-icon.small.red.properties {
+        background-position: -42px -5217px; }
+      .ui-icon.small.red.reorder {
+        background-position: -42px -5238px; }
+      .ui-icon.small.red.search {
+        background-position: -42px -5259px; }
+      .ui-icon.small.red.selection {
+        background-position: -42px -5280px; }
+      .ui-icon.small.red.settings {
+        background-position: -42px -5301px; }
+      .ui-icon.small.red.sidepanel-tool {
+        background-position: -42px -5322px; }
+      .ui-icon.small.red.sign-out {
+        background-position: -42px -5343px; }
+      .ui-icon.small.red.support {
+        background-position: -42px -5364px; }
+      .ui-icon.small.red.switch {
+        background-position: -42px -5385px; }
+      .ui-icon.small.red.system-user {
+        background-position: -42px -5406px; }
+      .ui-icon.small.red.table {
+        background-position: -42px -5427px; }
+      .ui-icon.small.red.tag {
+        background-position: -42px -5448px; }
+      .ui-icon.small.red.template-zone {
+        background-position: -42px -5469px; }
+      .ui-icon.small.red.template {
+        background-position: -42px -5490px; }
+      .ui-icon.small.red.templates {
+        background-position: -42px -5511px; }
+      .ui-icon.small.red.test {
+        background-position: -42px -5532px; }
+      .ui-icon.small.red.text {
+        background-position: -42px -5553px; }
+      .ui-icon.small.red.tick {
+        background-position: -42px -5574px; }
+      .ui-icon.small.red.trash {
+        background-position: -42px -5595px; }
+      .ui-icon.small.red.trophy {
+        background-position: -42px -5616px; }
+      .ui-icon.small.red.unique {
+        background-position: -42px -5637px; }
+      .ui-icon.small.red.user-closed {
+        background-position: -42px -5658px; }
+      .ui-icon.small.red.user-open {
+        background-position: -42px -5679px; }
+      .ui-icon.small.red.vector {
+        background-position: -42px -5700px; }
+      .ui-icon.small.red.video {
+        background-position: -42px -5721px; }
+    .ui-icon.button {
+      width: 32px;
+      height: 32px; }
+      .ui-icon.button.black.add {
+        background-position: 0px 0px; }
+      .ui-icon.button.black.settings-sliders {
+        background-position: 0px -37px; }
+      .ui-icon.button.white.add {
+        background-position: -37px 0px; }
+      .ui-icon.button.white.settings-sliders {
+        background-position: -37px -37px; }
+    .ui-icon.code-editor {
+      width: 32px;
+      height: 32px; }
+      .ui-icon.code-editor.raw.collapse-panel {
+        background-position: 0px -74px; }
+      .ui-icon.code-editor.raw.expand-panel {
+        background-position: 0px -111px; }
+      .ui-icon.code-editor.raw.insert-media {
+        background-position: 0px -148px; }
+      .ui-icon.code-editor.raw.insert-properties {
+        background-position: 0px -185px; }
+      .ui-icon.code-editor.raw.recent {
+        background-position: 0px -222px; }
+    .ui-icon.codesniffer {
+      width: 32px;
+      height: 32px; }
+      .ui-icon.codesniffer.black.icon1 {
+        background-position: 0px -259px; }
+      .ui-icon.codesniffer.black.icon2 {
+        background-position: 0px -296px; }
+  

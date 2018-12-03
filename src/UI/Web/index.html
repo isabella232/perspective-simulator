@@ -8,8 +8,33 @@
     </head>
     <body>
         <div class="main">
-            <div class="row">
-                <div class="col-md-4 fileTreeWrapper">
+            <div class="toolbar">
+                <div class="UITopToolBar">
+                    <div class="UITopToolBar__perspectiveIcon">
+                        <div class="ui-icon platform perspective raw"></div>
+                    </div>
+                    <div class="UITopToolBar__systemInfoWrapper"><div class="UITopToolBar__systemInfo"><span>Perspective Simulator</span><span class="UITopToolBar__systemTag red">Development</span></div></div>
+                    <div class="UITopToolBar__actions">
+                        <div class="UITopToolBar__spacer">
+                            <!-- empty -->
+                        </div>
+                        <div class="UITopToolBar__publishing">
+
+                        </div>
+                        <div class="UITopToolBar__systemConfig">
+                            <div class="UIDialogButton"><button class="UIButton" style=""><div class="ui-icon platform settings grey-70 UIButton__icon"></div><span class="UIButton__label">System</span></button></div>
+                        </div>
+                        <div class="UITopToolBar__help">
+                            <div class="UIDialogButton"><button class="UIButton is-read-only" style=""><div class="ui-icon platform help grey-70 UIButton__icon"></div><span class="UIButton__label">Help</span></button></div>
+                        </div>
+                        <div class="UITopToolBar__userAccount">
+                            <div class="UIDialogButton"><button class="UIButton" style=""><span class="UIButton__label"><span class="UITopToolBar__userAccount-avatar">AU</span><span class="UITopToolBar__userAccount-userName">Admin User</span></span></button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="fileTreeWrapper">
                     <ui-tree id="fileTree">
                         <script type="application/json">
                         {
@@ -18,7 +43,7 @@
                         </script>
                     </ui-tree>
                 </div>
-                <div class="col-md-8 contentWrapper">
+                <div class="contentWrapper">
                     <ui-content id="fileContent"></ui-content>
                 </div>
             </div>
