@@ -8,7 +8,7 @@ $nodes = [
         'title'    => 'Projects',
         'content'  => 'Projects',
         'classes'  => [],
-        'icon'     => 'folder-close',
+        'icon'     => 'home',
     ],
 ];
 
