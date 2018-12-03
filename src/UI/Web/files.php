@@ -25,7 +25,9 @@ foreach ($projects as $projectPath) {
         'icon'     => 'briefcase',
     ];
 
-    $projectPath .= '/src';
+    if (is_dir($projectPath.'/src') === true) {
+        $projectPath .= '/src';
+    }
 
     // API
     $nodes[] = [
@@ -158,21 +160,12 @@ foreach ($projects as $projectPath) {
     ];
 
     if (is_dir($projectPath.'/CustomTypes/Data') === true) {
-        $nodes[] = [
-            'id'       => '/'.$projectName.'/CustomTypes/Data',
-            'parentid' => '/'.$projectName.'/CustomTypes',
-            'title'    => 'Data',
-            'content'  => 'Data',
-            'classes'  => [],
-            'icon'     => 'folder-close',
-        ];
-
         $types = glob($projectPath.'/CustomTypes/Data/*.json');
         foreach ($types as $typePath) {
             $typeName = substr(basename($typePath), 0, -5);
             $nodes[] = [
-                'id'       => '/'.$projectName.'/CustomTypes/Data'.$typeName,
-                'parentid' => '/'.$projectName.'/CustomTypes/Data',
+                'id'       => '/'.$projectName.'/CustomTypes'.$typeName,
+                'parentid' => '/'.$projectName.'/CustomTypes',
                 'title'    => $typeName,
                 'content'  => $typeName,
                 'classes'  => [],
