@@ -87,7 +87,7 @@ trait ReferenceObjectTrait
             }
 
             if ($reference['cardinality'] === '1:1') {
-                if (count($sourceValue) === 1 || count($targetValue) === 1 ) {
+                if (count($sourceValue) === 1 || count($targetValue) === 1) {
                     unset($this->references[$referenceid]);
                 }
             } else if ($reference['cardinality'] === '1:M') {
@@ -170,14 +170,15 @@ trait ReferenceObjectTrait
     /**
      * Validates if the reference can be set.
      *
-     * @param string $referenceid The id of the reference we are trying to set.
-     * @param array  $objects     The objects we are setting the reference against, used if we are setting the reference
-     *                            for the other side.
+     * @param string  $referenceid The id of the reference we are trying to set.
+     * @param array   $objects     The objects we are setting the reference against, used if we are setting the reference
+     *                             for the other side.
+     * @param boolean $reverse     Flag if we are checking the reverse side of a reference.
      *
      * @return boolean.
      * @throws \Exception When reference is invalid.
      */
-    final public function validateReference(string $referenceid, array $objects=[])
+    final public function validateReference(string $referenceid, array $objects=[], bool $reverse=false)
     {
         $valid     = false;
         $code      = $this->store->getCode();
@@ -245,22 +246,21 @@ trait ReferenceObjectTrait
                     $valid = true;
                 }
             }//end if
-
-            $valid = true;
-        } else {
-            // TODO:: review how this should validate the reverse reference.
-            $valid = true;
         }//end if
 
-        if ($valid === false && empty($objects) === false) {
-            // TODO:: review how this should validate the reverse reference.
+        if ($valid === false && empty($objects) === false && $reverse === false) {
             // Must be validating the reverse reference so check the objects to see if its valid.
+            // Don't run this again on the reverse check as it will end up looping.
             foreach ($objects as $object) {
-                $valid = $object->validateReference($referenceid, [$this]);
+                $valid = $object->validateReference($referenceid, [$this], true);
                 if ($valid === true) {
                     break;
                 }
             }
+        } else {
+            // If we've got this far on the reverse lookup then it must have been vaild from the initial check, so lets
+            // make it valid.
+            $valid = true;
         }
 
         return $valid;
@@ -291,7 +291,8 @@ trait ReferenceObjectTrait
             $storageClass = 'DataStore';
         } else {
             throw new \Exception(
-                sprintf('Invalid referenced object: invalid object type: %s'), get_class($object)
+                sprintf('Invalid referenced object: invalid object type: %s'),
+                get_class($object)
             );
         }
 
