@@ -63,14 +63,6 @@ if (isset($opts['c']) === true || isset($opts['clean']) === true) {
 
 $project = ($opts['p'] ?? $opts['project'] ?? null);
 
-if ((isset($opts['i']) === true
-    || isset($opts['install']) === true)
-    && is_dir(\PerspectiveSimulator\Libs\FileSystem::getSimulatorDir()) === true
-) {
-    echo 'Perspective Simulator already installed.'."\n";
-    exit;
-}
-
 $console = \PerspectiveSimulator\CLI\Console::getInstance();
 $args    = [
     'project' => $project,

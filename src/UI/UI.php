@@ -44,7 +44,7 @@ class UI
             Libs\Web::send404();
         }
 
-        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $ext = Libs\FileSystem::getExtension($path);
         if ($ext === 'php') {
             ob_start();
             include $path;

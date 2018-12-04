@@ -1027,11 +1027,11 @@ class FileSystem
      *
      * @return string
      */
-    public static function getExtension($fileName)
+    public static function getExtension(string $fileName)
     {
         if (is_string($fileName) === true) {
-            $name = strtolower(substr(strrchr($fileName, '.'), 1));
-            return $name;
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            return $ext;
         } else {
             return '';
         }
@@ -1352,7 +1352,7 @@ class FileSystem
      *
      * @return string
      */
-    public static function getMimeType($fileName)
+    public static function getMimeType(string $fileName)
     {
         $mimeType = 'application/octet-stream';
         $ext      = self::getExtension($fileName);

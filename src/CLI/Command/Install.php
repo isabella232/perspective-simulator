@@ -49,7 +49,8 @@ class Install
         if (is_dir($simulatorDir) === false) {
             Libs\FileSystem::mkdir($simulatorDir);
         } else {
-            // If the simulator directory exists then we must have alreay installed.
+            // If the simulator directory exists then we must have alreay installed. So lets just rebake the API and Queues.
+            $this->reInit();
             return;
         }
 
@@ -77,6 +78,29 @@ class Install
         }//end foreach
 
     }//end install()
+
+
+    /**
+     * Updates the API Router and Queues. Run when the simulator has already been installed and we are rerunning the
+     * -i or --install command.
+     *
+     * @return void
+     */
+    private function reInit()
+    {
+        $projectPath = Libs\FileSystem::getExportDir().'/projects/';
+        $projectDirs = scandir($projectPath);
+        foreach ($projectDirs as $project) {
+            $GLOBALS['project'] = $project;
+
+            $path = $projectPath.$project;
+            if (is_dir($path) === true && $project[0] !== '.') {
+                \PerspectiveSimulator\API::installAPI($project);
+                \PerspectiveSimulator\Queue\Queue::installQueues($project);
+            }
+        }//end foreach
+
+    }//end reInit()
 
 
     /**

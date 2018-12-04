@@ -80,7 +80,7 @@ class Clean
             throw new CLIException($e->getMessage());
         }//end try
 
-    }//end add()
+    }//end clean()
 
 
     /**
@@ -93,7 +93,7 @@ class Clean
     public function printHelp(string $filter=null)
     {
         $actions = [
-            '-c'        => [
+            '-c'      => [
                 'action'      => 'perspective -i',
                 'description' => 'Installs the simulator.',
                 'arguments'   => [],
