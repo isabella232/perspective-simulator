@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\UI;
+namespace PerspectiveSimulator\Requests;
 
 use \PerspectiveSimulator\Libs;
 

@@ -55,7 +55,7 @@ switch ($type) {
     break;
 
     case 'admin':
-        \PerspectiveSimulator\UI\UI::paint($path);
+        \PerspectiveSimulator\Requests\UI::paint($path);
     break;
 
     default:
