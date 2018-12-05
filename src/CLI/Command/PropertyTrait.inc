@@ -50,6 +50,7 @@ trait PropertyTrait
      * @var array
      */
     private $defaultSettings = [
+        'unique'    => [],
         'boolean'   => [],
         'datetime'  => ['display' => 'dmy'],
         'html'      => [

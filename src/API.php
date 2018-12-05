@@ -19,6 +19,65 @@ class API
 {
 
     /**
+     * Base router code.
+     *
+     * @var string
+     */
+    const router = '$dispatcher = \FastRoute\simpleDispatcher(function(\FastRoute\RouteCollector $r) {
+__ROUTES__
+        });
+
+        // Fetch method and URI from somewhere
+        // $httpMethod = $_SERVER[\'REQUEST_METHOD\'];
+        // $uri        = $_SERVER[\'REQUEST_URI\'];
+
+        // Strip query string (?foo=bar) and decode URI.
+        if (false !== $pos = strpos($path, \'?\')) {
+            $path = substr($path, 0, $pos);
+        }
+
+        $path = rawurldecode($path);
+        $routeInfo = $dispatcher->dispatch($httpMethod, $path);
+        switch ($routeInfo[0]) {
+            case \FastRoute\Dispatcher::NOT_FOUND:
+                // 404 Not Found.
+                header(\'HTTP/1.1 404 Not Found\');
+                exit();
+            break;
+
+            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                $allowedMethods = $routeInfo[1];
+                // 405 Method Not Allowed.
+                header(\'HTTP/1.1 405 Method Not Allowed\');
+                exit();
+            break;
+
+            case \FastRoute\Dispatcher::FOUND:
+                $handler     = $routeInfo[1];
+                $vars        = $routeInfo[2];
+                $requestBody = file_get_contents(\'php://input\');
+                $contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? \'\');
+
+                if (strpos($contentType, \'application/json\') !== false) {
+                    $requestBody = json_decode($requestBody, true);
+                }
+
+                __ROUTE_ARGUMENTS__
+
+                if (isset($arguments[$handler]) === true) {
+                    $vars = array_merge($vars, $arguments[$handler]);
+                }
+
+                $vars[] = $requestBody;
+                $api    = new API;
+                $output = call_user_func_array([$api, $handler], $vars);
+
+                header(\'Content-Type: application/json\');
+                echo json_encode($output);
+            break;
+        }//end switch';
+
+    /**
      * Supported http methods.
      *
      * @var array
@@ -158,64 +217,31 @@ class API
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(1, 'public static function process($path, $httpMethod, $queryParams)');
         $router .= Util::printCode(1, '{');
-        $router .= Util::printCode(2, '$operationid = null;');
-        $router .= Util::printCode(0, '');
-        $router .= Util::printCode(2, 'switch ($httpMethod) {');
 
+        $arguments = [];
+        $routeCode = '';
+        $argCode   = Util::printCode(0, '$arguments = [');
         foreach ($apis as $method => $paths) {
-            $case = 'case \''.$method.'\':';
+            $case = '\''.$method.'\'';
             if ($method === 'get') {
-                $case .= ' case \'head\':';
+                $case .= ', \'head\'';
             }
-
-            $router .= Util::printCode(3, $case);
 
             foreach ($paths as $id => $api) {
                 $api['path'] = ltrim($api['path'], '/');
 
-                $arguments = [];
+                $routeCode .= Util::printCode(3, '$r->addRoute(['.$case.'], \''.$api['path'].'\', \''.$api['operationid'].'\');');
+
+                $arguments[$api['operationid']] = [];
                 $allParams = [];
                 foreach ($api['parameters'] as $param) {
-                    $arguments[$param['name']]               = var_export(null, true);
-                    $allParams[$param['in']][$param['name']] = $param;
+                    $arguments[$api['operationid']][$param['name']] = var_export(null, true);
+                    $allParams[$param['in']][$param['name']]        = $param;
                 }
-
-                $pathParams = ($allParams['path'] ?? []);
-                if (empty($pathParams) === false) {
-                    $matchIndexes = [];
-                    preg_match_all(
-                        '/\{('.implode('|', array_keys($pathParams)).')\}/',
-                        $api['path'],
-                        $matchIndexes
-                    );
-
-                    $matchIndexes = array_flip($matchIndexes[1]);
-                    $api['path']  = preg_quote($api['path'], '~');
-
-                    foreach ($pathParams as $param) {
-                        $type = ($param['schema']['type'] ?? null);
-                        if ($type === 'number') {
-                            $replace = '([-+]?[0-9\.]+)';
-                        } else {
-                            $replace = '([^/]+)';
-                        }
-
-                        $api['path'] = str_replace('\{'.$param['name'].'\}', $replace, $api['path']);
-                    }
-
-                    $router .= Util::printCode(4, '$matches = [];');
-                    $router .= Util::printCode(4, 'if (preg_match(\'~^'.$api['path'].'$~\', $path, $matches) === 1) {');
-                    foreach ($pathParams as $param) {
-                        $matchIndex                = ($matchIndexes[$param['name']] + 1);
-                        $arguments[$param['name']] = '$matches['.$matchIndex.']';
-                    }
-                } else {
-                    $router .= Util::printCode(4, 'if ($path === \''.$api['path'].'\') {');
-                }//end if
 
                 $queryParams = ($allParams['query'] ?? []);
                 foreach ($queryParams as $param) {
-                    $arguments[$param['name']] = '$queryParams[\''.$param['name'].'\'] ?? null';
+                    $arguments[$api['operationid']][$param['name']] = '$queryParams[\''.$param['name'].'\'] ?? null';
                 }
 
                 $headerParams = ($allParams['header'] ?? []);
@@ -224,46 +250,28 @@ class API
                     $serverIndex = str_replace(' ', '_', $serverIndex);
                     $serverIndex = 'HTTP_'.strtoupper($serverIndex);
 
-                    $arguments[$param['name']] = '$_SERVER[\''.$serverIndex.'\'] ?? null';
+                    $arguments[$api['operationid']][$param['name']] = '$_SERVER[\''.$serverIndex.'\'] ?? null';
                 }
 
                 $cookieParams = ($allParams['cookie'] ?? []);
                 foreach ($cookieParams as $param) {
-                    $arguments[$param['name']] = '$_COOKIE[\''.$param['name'].'\'] ?? null';
+                    $arguments[$api['operationid']][$param['name']] = '$_COOKIE[\''.$param['name'].'\'] ?? null';
                 }
 
-                $router .= Util::printCode(5, '$operationid  = \''.$api['operationid'].'\';');
-                $router .= Util::printCode(5, '$arguments    = [');
-                foreach ($arguments as $argIndex => $argValue) {
-                    $router .= Util::printCode(6, '\''.$argIndex.'\' => '.$argValue.',');
+                foreach ($arguments[$api['operationid']] as $argIndex => $argValue) {
+                    $argCode .= Util::printCode(5, '\''.$api['operationid'].'\' => [');
+                    $argCode .= Util::printCode(6, '\''.$argIndex.'\' => '.$argValue.',');
+                    $argCode .= Util::printCode(5, '],');
                 }
-
-                $router .= Util::printCode(5, '];');
-                $router .= Util::printCode(5, 'break;');
-                $router .= Util::printCode(4, '}');
             }//end foreach
         }//end foreach
 
-        $router .= Util::printCode(2, '}//end switch');
-        $router .= Util::printCode(0, '');
-        $router .= Util::printCode(2, 'if ($operationid !== null) {');
-        $router .= Util::printCode(3, '$requestBody = file_get_contents(\'php://input\');');
-        $router .= Util::printCode(
-            3,
-            '$contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? \'\');'
-        );
-        $router .= Util::printCode(3, 'if (strpos($contentType, \'application/json\') !== false) {');
-        $router .= Util::printCode(4, '$requestBody = json_decode($requestBody, true);');
-        $router .= Util::printCode(3, '}');
-        $router .= Util::printCode(3, '$arguments[] = $requestBody;');
-        $router .= Util::printCode(3, '$api = new API;');
-        $router .= Util::printCode(3, '$output = call_user_func_array([$api, $operationid], $arguments);');
-        $router .= Util::printCode(3, 'header(\'Content-Type: application/json\');');
-        $router .= Util::printCode(3, 'echo json_encode($output);');
-        $router .= Util::printCode(2, '} else {');
-        $router .= Util::printCode(3, 'header(\'HTTP/1.1 404 Not Found\');');
-        $router .= Util::printCode(3, 'exit();');
-        $router .= Util::printCode(2, '}');
+        $argCode .= Util::printCode(4, '];');
+
+        $routesCode = str_replace('__ROUTE_ARGUMENTS__', $argCode, self::router);
+        $routesCode = str_replace('__ROUTES__', $routeCode, $routesCode);
+
+        $router .= Util::printCode(2, $routesCode);
         $router .= Util::printCode(1, '}//end process');
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(0, '');
