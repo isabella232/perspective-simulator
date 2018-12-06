@@ -124,23 +124,21 @@ __ROUTES__
 
 
     /**
-     * Import YAML spec.
+     * Parses the YAML API file and returns its paths as an array.
      *
-     * @param string $project The project we are using.
+     * @param string $path File path of the yaml file.
      *
-     * @return boolean
-     * @throws \Exception When unable to get API Paths.
+     * @return array
+     * @throws \Exception When error occurs or there is no file to parse.
      */
-    public static function installAPI(string $project)
+    private static function parseYaml(string $path)
     {
-        $apiFile = self::getAPIPath($project).'/api.yaml';
-        if (file_exists($apiFile) === false) {
-            // No api file so nothing to do here.
-            return true;
+        if (file_exists($path) === false) {
+            throw new \Exception(sprintf('YAML file doesn\'t exist at the location "%s".', $path));
         }
 
-        $yaml = file_get_contents($apiFile);
         ini_set('yaml.decode_php', 0);
+        $yaml   = file_get_contents($path);
         $parsed = yaml_parse($yaml);
         if ($parsed === false || empty($parsed['paths']) === true) {
             throw new \Exception('Failed to parse API specficiation');
@@ -185,6 +183,139 @@ __ROUTES__
                 }//end if
             }//end foreach
         }//end foreach
+
+        return $apis;
+
+    }//end parseYaml()
+
+
+    /**
+     * Import YAML spec.
+     *
+     * @param string $project The project we are using.
+     *
+     * @return boolean
+     * @throws \Exception When unable to get API Paths.
+     */
+    public static function installAPI(string $project)
+    {
+        $showPrompt = false;
+        if (php_sapi_name() === 'cli') {
+            $showPrompt = true;
+        }
+
+        $apiFile = self::getAPIPath($project).'/api.yaml';
+        if (file_exists($apiFile) === false) {
+            // No api to install so just return now.
+            return true;
+        }
+
+        $apis = self::parseYaml($apiFile);
+
+        $currentAPIs       = [];
+        $simulatorYamlFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/api.yaml';
+        if (file_exists($simulatorYamlFile) === true) {
+            $currentAPIs = self::parseYaml($simulatorYamlFile);
+        }
+        $newFile = file_get_contents($apiFile);
+        file_put_contents($simulatorYamlFile, $newFile);
+
+        $currentByPathOperation = [];
+        $currentByOperationid   = [];
+        if (empty($currentAPIs) === false) {
+            foreach ($currentAPIs as $method => $paths) {
+                foreach ($paths as $id => $current) {
+                    $currentByOperationid[$current['operationid']] = $current;
+                    $currentByPathOperation[$current['path']][$current['http_method']] = $current;
+                }
+            }
+        }
+
+        $updatedIDs    = [];
+        $newPaths      = [];
+        $renamedPaths  = [];
+        $deletedPaths  = [];
+        foreach ($apis as $method => $paths) {
+            foreach ($paths as $id => $api) {
+                $path       = $api['path'];
+                $current    = null;
+                if (isset($currentByPathOperation[$path][$api['http_method']]) === true) {
+                    $current = $currentByPathOperation[$path][$api['http_method']];
+                } else if (isset($currentByOperationid[$api['operationid']]) === true) {
+                    $current = $currentByOperationid[$api['operationid']];
+                }
+
+                if ($current !== null) {
+                    $updatedIDs[] = $current['operationid'];
+                    if ($current['path'] !== $api['path']
+                        || $current['http_method'] !== $api['http_method']
+                        || $current['operationid'] !== $api['operationid']
+                    ) {
+                        $renamedPaths[] = [
+                            'oldOperationid' => $current['operationid'],
+                            'newOperationid' => $api['operationid'],
+                        ];
+                    }
+                } else {
+                    $newPaths[] = [
+                        'http_method' => $api['http_method'],
+                        'path'        => $api['path'],
+                        'operationid' => $api['operationid'],
+                    ];
+                }//end if
+            }//end foreach
+        }//end foreach
+
+        $currentIDs = array_keys($currentByOperationid);
+        $deletedIDs = array_diff($currentIDs, $updatedIDs);
+        foreach ($deletedIDs as $deleteID) {
+            $deletedPaths[] = $deleteID;
+        }
+
+        if (empty($renamedPaths) === false) {
+            if ($showPrompt === true) {
+                $renamedMessage = "The following API operations will be renamed:\n";
+                foreach ($renamedPaths as $id => $path) {
+                    $count = ($id + 1);
+                    if (strtolower($path['oldOperationid']) !== strtolower($path['newOperationid'])) {
+                        $renamedMessage .= $count.'. '.$path['oldOperationid'].' => '.$path['newOperationid'];
+                    }
+                }
+
+                $confirm = \PerspectiveSimulator\CLI\Prompt::confirm($renamedMessage."\n");
+                if ($confirm === false) {
+                    exit();
+                }
+            }
+
+            foreach ($renamedPaths as $path) {
+                if ($path['oldOperationid'] !== $path['newOperationid']) {
+                    $source = self::getAPIPath($project).'/Operations/'.$path['oldOperationid'].'.php';
+                    $dest   = self::getAPIPath($project).'/Operations/'.$path['newOperationid'].'.php';
+                    \PerspectiveSimulator\Libs\FileSystem::move($source, $dest);
+                }
+            }
+        }
+
+        if (empty($deletedPaths) === false) {
+            if ($showPrompt === true) {
+                $deleteMessage = "The following API operations will be deleted:\n";
+                foreach ($deletedPaths as $op) {
+                    $count = ($id + 1);
+                    $deleteMessage .= $count.'. '.$op;
+                }
+
+                $confirm = \PerspectiveSimulator\CLI\Prompt::confirm($deleteMessage."\n");
+                if ($confirm === false) {
+                    exit();
+                }
+            }
+
+            foreach ($deletedPaths as $opId) {
+                $file = self::getAPIPath($project).'/Operations/'.$opId.'.php';
+                \PerspectiveSimulator\Libs\FileSystem::delete($file);
+            }
+        }
 
         // Bake the simulator router and API functions.
         self::bakeRouter($apis, $project);
