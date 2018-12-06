@@ -27,11 +27,6 @@ class API
 __ROUTES__
         });
 
-        // Fetch method and URI from somewhere
-        // $httpMethod = $_SERVER[\'REQUEST_METHOD\'];
-        // $uri        = $_SERVER[\'REQUEST_URI\'];
-
-        // Strip query string (?foo=bar) and decode URI.
         if (false !== $pos = strpos($path, \'?\')) {
             $path = substr($path, 0, $pos);
         }
@@ -235,8 +230,10 @@ __ROUTES__
                 $arguments[$api['operationid']] = [];
                 $allParams = [];
                 foreach ($api['parameters'] as $param) {
-                    $arguments[$api['operationid']][$param['name']] = var_export(null, true);
-                    $allParams[$param['in']][$param['name']]        = $param;
+                    if ($param['in'] !== 'path') {
+                        $arguments[$api['operationid']][$param['name']] = var_export(null, true);
+                        $allParams[$param['in']][$param['name']]        = $param;
+                    }
                 }
 
                 $queryParams = ($allParams['query'] ?? []);
