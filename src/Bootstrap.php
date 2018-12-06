@@ -54,6 +54,8 @@ class Bootstrap
         class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
         class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
         class_alias('PerspectiveSimulator\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
+        class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
+        class_alias('PerspectiveSimulator\View\ViewBase', '\View');
 
         if (class_exists('\Authentication') === false) {
             class_alias('PerspectiveSimulator\Authentication', '\Authentication');

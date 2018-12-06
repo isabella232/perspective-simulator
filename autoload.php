@@ -27,6 +27,16 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/APIRouter.php';
             }
 
+            if (substr($class, -11) === '\WebHandler' && substr_count($class, '\\') === 1) {
+                $project = substr($class, 0, strpos($class, '\\'));
+                $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/WebHandler.php';
+            }
+
+            if (substr($class, -11) === '\ViewRouter' && substr_count($class, '\\') === 1) {
+                $project = substr($class, 0, strpos($class, '\\'));
+                $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/ViewRouter.php';
+            }
+
             if (substr($class, -9) === '\JobQueue' && substr_count($class, '\\') === 1) {
                 $project = substr($class, 0, strpos($class, '\\'));
                 $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/JobQueue.php';

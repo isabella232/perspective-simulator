@@ -54,6 +54,12 @@ switch ($type) {
        \PerspectiveSimulator\Requests\CDN::serveFile($path);
     break;
 
+    case 'web':
+        $method = strtolower(($_SERVER['REQUEST_METHOD'] ?? ''));
+        $class  = $project.'\ViewRouter';
+        $class::process('/'.$path, strtoupper($method));
+    break;
+
     case 'admin':
         \PerspectiveSimulator\Requests\UI::paint($path);
     break;
