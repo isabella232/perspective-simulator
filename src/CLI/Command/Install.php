@@ -74,6 +74,7 @@ class Install
 
                 \PerspectiveSimulator\API::installAPI($project);
                 \PerspectiveSimulator\Queue\Queue::installQueues($project);
+                \PerspectiveSimulator\View\View::installViews($project);
             }
         }//end foreach
 
