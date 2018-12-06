@@ -66,6 +66,25 @@ switch ($type) {
         \PerspectiveSimulator\Requests\UI::paint($path);
     break;
 
+    case 'tests':
+        $dir = \PerspectiveSimulator\Libs\FileSystem::getExportDir().'/projects/'.$project.'/tests/'.$path;
+
+        if (file_exists($dir) === false) {
+            \PerspectiveSimulator\Libs\Web::send404();
+        }
+
+        $ext = \PerspectiveSimulator\Libs\FileSystem::getExtension($path);
+        if ($ext === 'php') {
+            ob_start();
+            include $dir;
+            $contents = trim(ob_get_contents());
+            ob_end_clean();
+            echo $contents;
+        } else {
+            \PerspectiveSimulator\Libs\FileSystem::serveFile($dir);
+        }
+    break;
+
     default:
         return;
     break;
