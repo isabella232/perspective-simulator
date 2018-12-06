@@ -48,6 +48,8 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                     $path = __DIR__.$ds.'src'.$ds.'Storage'.$ds.'Types'.$ds.$parts[2].'.php';
                 } else  if ($parts[1] === 'ObjectType') {
                     $path = __DIR__.$ds.'src'.$ds.'Objects'.$ds.'Types'.$ds.$parts[2].'.php';
+                } else  if ($parts[1] === 'PropertyType') {
+                    $path = __DIR__.$ds.'src'.$ds.'Property'.$ds.'Types'.$ds.$parts[2].'.php';
                 }
             }
 

@@ -10,20 +10,15 @@
 
 namespace PerspectiveSimulator\PropertyType;
 
+require_once dirname(__FILE__, 2).'/NumberTrait.inc';
+
+use \PerspectiveSimulator\Property\NumberTrait as NumberTrait;
 /**
  * Integer Class.
  */
 class Integer extends Property
 {
 
-    final public function increment(int $offset=1)
-    {
-
-    }
-
-    final public function decrement(int $offset=1)
-    {
-
-    }
+    use NumberTrait;
 
 }//end class
