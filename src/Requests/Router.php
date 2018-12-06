@@ -10,6 +10,8 @@
 
 namespace PerspectiveSimulator\Requests;
 
+ini_set('error_log', dirname(__DIR__, 5).'/simulator/error_log');
+
 include dirname(__DIR__, 4).'/autoload.php';
 
 $path = $_SERVER['REQUEST_URI'];
