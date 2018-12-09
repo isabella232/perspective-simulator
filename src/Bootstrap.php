@@ -91,7 +91,7 @@ class Bootstrap
 
                 $propName = strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Data/'.$file));
-                StorageFactory::createDataRecordProperty($propName, $propInfo['type']);
+                StorageFactory::createDataRecordProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
             }
         }
 
@@ -107,7 +107,7 @@ class Bootstrap
 
                 $propName = strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
-                StorageFactory::createDeployementProperty($propName, $propInfo['type']);
+                StorageFactory::createDeployementProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
             }
         }
 
@@ -123,7 +123,7 @@ class Bootstrap
 
                 $propName = strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/User/'.$file));
-                StorageFactory::createUserProperty($propName, $propInfo['type']);
+                StorageFactory::createUserProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
             }
         }
 

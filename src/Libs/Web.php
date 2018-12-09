@@ -83,4 +83,23 @@ class Web
     }//end send404()
 
 
+    /**
+     * Turns a string into a valid web path.
+     *
+     * @param string $path String to fix.
+     *
+     * @return string
+     */
+    public static function makeValidWebPathString($path)
+    {
+        $path = strtolower($path);
+        $path = preg_replace('/&[^;]+;/', '', $path);
+        $path = preg_replace('/[^a-z0-9\\s\-\.]/', '', $path);
+        $path = preg_replace('/[\\s-]+/', '-', $path);
+        $path = trim($path, '-');
+        return $path;
+
+    }//end makeValidWebPathString()
+
+
 }//end class

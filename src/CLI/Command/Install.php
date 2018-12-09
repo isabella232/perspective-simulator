@@ -98,6 +98,7 @@ class Install
             if (is_dir($path) === true && $project[0] !== '.') {
                 \PerspectiveSimulator\API::installAPI($project);
                 \PerspectiveSimulator\Queue\Queue::installQueues($project);
+                \PerspectiveSimulator\View\View::installViews($project);
             }
         }//end foreach
 

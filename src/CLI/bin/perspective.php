@@ -1,4 +1,3 @@
-#!/usr/bin/env php 
 <?php
 /**
  * Perspective command for the perspective simulator

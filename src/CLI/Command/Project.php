@@ -54,6 +54,25 @@ class Project
 
 
     /**
+     * Generates the namespace from the name.
+     *
+     * @param string $name The name we are going to convert to namespace format.
+     *
+     * @return string
+     */
+    private function generateNamespace(string $name)
+    {
+        $namespace = str_replace(' ', '', $name);
+        $namespace = preg_replace('/[^a-zA-Z0-9\_\-]/', '', $namespace);
+        $namespace = preg_replace('/-+/', '', $namespace);
+
+        $this->validateProjectNamespace($namespace);
+
+        return $namespace;
+
+    }//end generateNamespace()
+
+    /**
      * Sets the args array.
      *
      * @param string $action Action that will be performed later.
@@ -66,9 +85,9 @@ class Project
         switch ($action) {
             case 'add':
                 $this->args['name']      = ($args[0] ?? Prompt::textInput('Project name'));
-                $this->args['namespace'] = ($args[1] ?? Prompt::textInput('Project namespace', $this->args['name']));
+                $this->args['namespace'] = ($args[1] ?? Prompt::textInput('Project namespace', $this->generateNamespace($this->args['name'])));
                 $this->args['path']      = strtolower(
-                    ($args[3] ?? Prompt::textInput('Project path', strtolower($this->args['name'])))
+                    ($args[3] ?? Prompt::textInput('Project path', Libs\Web::makeValidWebPathString(strtolower($this->args['name']))))
                 );
                 $this->args['type']      = 'api';
             break;
@@ -213,6 +232,11 @@ class Project
                 if (is_dir($projectDir.'/'.$folder) === false) {
                     Libs\FileSystem::mkdir($projectDir.'/'.$folder);
                 }
+            }
+
+            $testDir = Libs\FileSystem::getExportDir().'/projects/'.$this->args['namespace'].'/tests';
+            if (is_dir($testDir) === false) {
+                Libs\FileSystem::mkdir($testDir);
             }
 
             \PerspectiveSimulator\API::installAPI($project);
