@@ -47,6 +47,12 @@ trait AspectedObjectWriteTrait
             }
 
             $this->store->setUniqueDataRecord($propertyCode, $value, $this);
+        } else if ($prop['type'] === 'image' || $prop['type'] === 'file') {
+            if ($typeName === 'Deployment') {
+                $typeName = 'Project';
+            }
+
+            $value = self::prepareFileImagePropertyValue($value, $typeName, $propertyCode);
         }
 
         $this->properties[$propertyCode] = $value;

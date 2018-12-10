@@ -85,6 +85,10 @@ switch ($type) {
         }
     break;
 
+    case 'property':
+       \PerspectiveSimulator\Requests\Property::serveFile($path);
+    break;
+
     default:
         return;
     break;

@@ -123,4 +123,91 @@ trait ObjectTrait
     }//end load()
 
 
+    /**
+     * Prepares the value of a file and image property.
+     *
+     * @param array  $value        The value of the property to validate and prepare.
+     * @param string $propertyType The type of the property.
+     *
+     * @return array
+     * @throws \Exception Thrown when the value array is invalid.
+     */
+    private static function prepareFileImagePropertyValue($value, $propertyType, $propertyCode)
+    {
+        if (is_array($value) === true) {
+            // Expecting the structure of file upload array.
+            $requiredFields = [
+                'name',
+                'type',
+                'tmp_name',
+                'error',
+                'size',
+            ];
+            foreach ($requiredFields as $field) {
+                if (array_key_exists($field, $value) === false) {
+                    $errMsg = sprintf(
+                        'Expecting \'%s\' field but not found in the value.',
+                        $field
+                    );
+                    throw new \Exception($errMsg);
+                }
+            }
+
+            $uploadedFilepath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/properties/'.$propertyType;
+            Libs\FileSystem::mkdir($uploadedFilepath, true);
+            $ext            = Libs\FileSystem::getExtension($value['name']);
+            $targetFilepath = $uploadedFilepath.'/'.$propertyCode.'.'.$ext;
+            if (move_uploaded_file($value['tmp_name'], $targetFilepath) === false) {
+                throw new \Exception('Failed to get the upload file.');
+            }
+
+            return '/property/'.$GLOBALS['project'].'/'.$propertyType.'/'.$propertyCode.'.'.$ext;
+        } else if (is_string($value) === true) {
+            // Expecting the base64 string.
+            if (preg_match('#^data:[a-z]+/([a-z]+);base64,[\w=+/]++#', $value) !== 1) {
+                throw new \Exception('The string value for File/Image property should be a valid base64 string.');
+            }
+
+            return $value;
+        }//end if
+
+    }//end prepareFileImagePropertyValue()
+
+
+    /**
+     * Get the property type object.
+     *
+     * @param string $propertyCode The property code.
+     *
+     * @return object
+     */
+    final public function property(string $propertyCode)
+    {
+        $propertyType = \PerspectiveSimulator\Storage\StorageManager::getStoreType($this);
+        $functionName = 'get'.$propertyType.'Property';
+        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
+        if ($prop === null) {
+            throw new \Exception('Property "'.$propertyCode.'" does not exist');
+        }
+
+        $className    = 'PerspectiveSimulator\PropertyType\\'.ucfirst($prop['type']);
+        if (class_exists($className) === false) {
+            // Running an eval instead of creating a file for each property.
+            eval('namespace PerspectiveSimulator\PropertyType;
+                class '.ucfirst($propertyType).' extends Property {}'
+            );
+        }
+
+        try {
+            $propertyObject = new $className($this, $propertyCode, $propertyType);
+        } catch (\Throwable $e) {
+            // Inside a try catch to ensure we set this flag back to false.
+            throw $e;
+        }
+
+        return $propertyObject;
+
+    }//end property()
+
+
 }

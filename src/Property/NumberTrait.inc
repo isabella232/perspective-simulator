@@ -21,10 +21,17 @@ trait NumberTrait
      * Increments the number/integer value by the offset.
      *
      * @param mixed $offset The amount to increment by.
-     * @return mixed.
+     * @return void.
      */
-    final public function increment($offset=1)
+    final public function increment($value=1)
     {
+        if ($value < 1) {
+            throw new \Exception('Decrement value must be greater than 0');
+        }
+
+        $oldValue = $this->getValue();
+        $newValue = ($oldValue + $value);
+        $this->setValue($newValue);
 
     }//end increment()
 
@@ -35,8 +42,15 @@ trait NumberTrait
      * @param mixed $offset The amount to increment by.
      * @return mixed.
      */
-    final public function decrement(int $offset=1)
+    final public function decrement(int $value=1)
     {
+        if ($value < 1) {
+            throw new \Exception('Decrement value must be greater than 0');
+        }
+
+        $oldValue = $this->getValue();
+        $newValue = ($oldValue - $value);
+        $this->setValue($newValue);
 
     }//end decrement()
 

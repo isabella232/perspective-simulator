@@ -86,30 +86,34 @@ trait AspectedObjectTrait
             return $this->properties[$propertyCode];
         }
 
+        if ($prop['type'] === 'image' || $prop['type'] === 'file') {
+            if ($typeName === 'Deployment') {
+                $typeName = 'Project';
+            }
+
+            $propFiles = \PerspectiveSimulator\Libs\FileSystem::listDirectory(
+                \PerspectiveSimulator\Libs\FileSystem::getProjectDir().'/Properties/'.$typeName,
+                [],
+                false,
+                false
+            );
+
+            foreach ($propFiles as $file) {
+                if ($file[0] === '.'
+                    || substr($file, -5) === '.json'
+                ) {
+                    continue;
+                }
+
+                $prop['default'] = $file;
+            }
+
+            return '/property/'.$GLOBALS['project'].'/'.$typeName.'/'.$prop['default'];
+        }
+
         return $prop['default'];
 
     }//end getValue()
-
-
-    /**
-     * Gets the shadow value of a given property for a given page in a given aspect.
-     *
-     * This method can also be used to retrieve multiple shadow values for multiple pages and so has a number of return
-     * value formats.
-     *
-     * @param string $propertyCode The property code that is being retrieved.
-     * @param string $shadowid     The shadow ID that the value is being retrieved from. If passing an array, the array
-     *                             must be a single-dimensional list of shadow IDs. If NULL, all values with a shadow ID
-     *                             will be returned for all passed page IDs. i.e., no shadow ID filtering will take place.
-     *
-     * @return mixed
-     * @throws InvalidDataException When propertyid is not known.
-     */
-    final public function getShadowValue(string $propertyCode, string $shadowid=null)
-    {
-        // TODO: Implement this.
-
-    }//end getShadowValue()
 
 
 }

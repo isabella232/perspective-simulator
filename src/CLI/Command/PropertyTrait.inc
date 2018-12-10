@@ -94,6 +94,18 @@ trait PropertyTrait
         ],
         'text'      => ['multiline' => false],
         'userid'    => ['multiple' => false],
+        'image'     => [
+            'maxFileSize'     => null,
+            'dimensions'      => [],
+            'decorative'      => false,
+            'constraint'      => 0,
+            'isWebAccessible' => false,
+        ],
+        'file'      => [
+            'maxFileSize'       => null,
+            'allowedExtensions' => [],
+            'isWebAccessible'   => false,
+        ],
     ];
 
 
@@ -238,7 +250,7 @@ trait PropertyTrait
      */
     public function delete()
     {
-        $msg  = Terminal::formatText(
+        $msg = Terminal::formatText(
             'This will delete the property.',
             ['bold']
         );
@@ -278,18 +290,14 @@ trait PropertyTrait
                 'action'      => sprintf('perspective [-p] add property %s', $type),
                 'description' => 'Adds a new property to the project',
                 'arguments'   => [
-                    'required' => [
-                        'propertyCode' => 'The property code for the new property.',
-                    ],
+                    'required' => ['propertyCode' => 'The property code for the new property.'],
                 ],
             ],
             'delete' => [
                 'action'      => sprintf('perspective [-p] delete property %s', $type),
                 'description' => 'Deletes a  property from the project',
                 'arguments'   => [
-                    'required' => [
-                        'propertyCode' => 'The property code for the new property.',
-                    ],
+                    'required' => ['propertyCode' => 'The property code for the new property.'],
                 ],
             ],
             'rename' => [

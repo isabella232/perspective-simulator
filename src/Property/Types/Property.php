@@ -57,13 +57,12 @@ abstract class Property
      *
      * @param object  $owner        The owner object (storage type or object type).
      * @param string  $propertyCode The property code.
-     * @param integer $propertyid   ID of the property.
      * @param string  $systemType   The property system type.
      *
      * @return void
      * @throws \Exception When invalid owner.
      */
-    final public function __construct($owner, string $propertyCode, int $propertyid, string $systemType)
+    final public function __construct($owner, string $propertyCode, string $systemType)
     {
         // We need to validate the owner instances before calling validateConstructor.
         if ($owner instanceof \PerspectiveSimulator\StorageType\UserStore
@@ -80,7 +79,6 @@ abstract class Property
         }
 
         $this->id         = $propertyCode;
-        $this->propertyid = $propertyid;
         $this->systemType = $systemType;
 
         $this->construct();
