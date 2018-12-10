@@ -4,13 +4,14 @@
 perspective [options] <action> <command> <arguments>
 ```
 ## Options
-| Long option | Short option | Description                                                               |
-| :---------: | :----------: | :------------------------------------------------------------------------ |
-|  --project  |      -p      | Specifies the project to perform the action on.                           |
-|   --help    |      -h      | Shows the help screen for the action.                                     |
-|  --install  |      -i      | Installs the simulator, runs only when simulator directory doesn't exist. |
-|  --server   |      -S      | Starts the PHP development server for the simulator.                      |
-|  --clean    |      -c      | Cleans a projects simulator directory.                                    |
+| Long option | Short option | Description                                                                         |
+| :---------: | :----------: | :---------------------------------------------------------------------------------- |
+|  --project  |      -p      | Specifies the project to perform the action on.                                     |
+|   --help    |      -h      | Shows the help screen for the action.                                               |
+|  --install  |      -i      | Installs the simulator, runs only when simulator directory doesn't exist.           |
+|  --server   |      -S      | Starts the PHP development server for the simulator.                                |
+|  --clean    |      -c      | Cleans a projects simulator directory.                                              |
+|  --init     |              | Creates a new project, has optional --repo-url argument to set git repo on creation |
 
 ## Comands
 1. [API Actions](./api.md)

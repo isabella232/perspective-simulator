@@ -29,16 +29,13 @@ class Property
      */
     public static function serveFile(string $path)
     {
-        $simDir      = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/property';
+        $simDir      = Libs\FileSystem::getStorageDir().'/properties';
         $filePath    = $simDir.'/'.urldecode($path);
         $pathParts   = explode('/', $filePath);
         $file        = array_pop($pathParts);
         $type        = array_pop($pathParts);
         $defaultPath = Libs\FileSystem::getProjectDir().'/Properties/'.$type.'/'.$file;
-error_log(var_export([
-    '$filePath' => file_exists($filePath),
-    '$defaultPath' => file_exists($defaultPath)
-],1));
+
         if (file_exists($filePath) === false && file_exists($defaultPath) === false) {
             Libs\Web::send404();
         } else if (file_exists($filePath) === false && file_exists($defaultPath) === true) {

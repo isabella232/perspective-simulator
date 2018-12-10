@@ -153,7 +153,7 @@ trait ObjectTrait
                 }
             }
 
-            $uploadedFilepath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/properties/'.$propertyType;
+            $uploadedFilepath = Libs\FileSystem::getStorageDir().'/properties/'.$propertyType;
             Libs\FileSystem::mkdir($uploadedFilepath, true);
             $ext            = Libs\FileSystem::getExtension($value['name']);
             $targetFilepath = $uploadedFilepath.'/'.$propertyCode.'.'.$ext;
