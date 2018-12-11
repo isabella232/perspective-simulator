@@ -101,6 +101,7 @@ trait AspectedObjectTrait
             foreach ($propFiles as $file) {
                 if ($file[0] === '.'
                     || substr($file, -5) === '.json'
+                    || strpos($file, $propertyCode) !== 0
                 ) {
                     continue;
                 }
