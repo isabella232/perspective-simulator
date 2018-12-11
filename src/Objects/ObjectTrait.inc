@@ -154,7 +154,10 @@ trait ObjectTrait
             }
 
             $uploadedFilepath = Libs\FileSystem::getStorageDir().'/properties/'.$propertyType;
-            Libs\FileSystem::mkdir($uploadedFilepath, true);
+            if (is_dir($uploadedFilepath) === false) {
+                Libs\FileSystem::mkdir($uploadedFilepath, true);
+            }
+
             $ext            = Libs\FileSystem::getExtension($value['name']);
             $targetFilepath = $uploadedFilepath.'/'.$propertyCode.'.'.$ext;
             if (move_uploaded_file($value['tmp_name'], $targetFilepath) === false) {
