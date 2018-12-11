@@ -141,6 +141,10 @@ class Queue
             'unhandledFailureCount' => 0,
         ];
 
+        if (isset(self::$queue[$name]) === false) {
+            self::$queue[$name] = [];
+        }
+
         self::$queue[$name][] = [
             'jobData'               => $jobData,
             'createSuccessCallback' => $successCallback,
@@ -163,7 +167,7 @@ class Queue
      * @param string $project    The project we are in.
      * @param array  $queueNames The names of the ques we want to process.
      *
-     * @return void
+     * @return array
      */
     public static function processQueue(string $project, array $queueNames=[])
     {
@@ -171,10 +175,11 @@ class Queue
             return;
         }
 
+        $results = [];
         if (empty($queueNames) === true) {
             foreach (self::$queue as $queueNameStr => $sameTopicQueues) {
                 foreach ($sameTopicQueues as $jobData) {
-                    self::processJob($project, $queueNameStr, $jobData['jobData']['userSuppliedData']);
+                    $results[] = self::processJob($project, $queueNameStr, $jobData['jobData']['userSuppliedData']);
                 }
 
                 unset(self::$queue[$queueNameStr]);
@@ -189,7 +194,7 @@ class Queue
                     $userSuppliedData = null;
 
                     foreach (self::$queue[$queueNameStr] as $jobData) {
-                        self::processJob($project, $queueNameStr, $jobData['jobData']['userSuppliedData']);
+                        $results[] = self::processJob($project, $queueNameStr, $jobData['jobData']['userSuppliedData']);
                     }
 
                     unset(self::$queue[$queueNameStr]);
@@ -198,6 +203,8 @@ class Queue
         }
 
         self::save();
+
+        return $results;
 
     }//end processQueue()
 
@@ -213,6 +220,7 @@ class Queue
      */
     private static function processJob(string $project, string $queueName, $data)
     {
+        $results        = [];
         $className      = '\\'.$project.'\\JobQueue';
         $queueNameParts = explode('.', $queueName);
         foreach ($queueNameParts as $name) {
@@ -225,9 +233,11 @@ class Queue
                 continue;
             }
 
-            $job = new Job($data, 0);
-            $className::$name($job);
+            $job       = new Job($data, 0);
+            $results[] = $className::$name($job);
         }
+
+        return $results;
 
     }//end processJob()
 

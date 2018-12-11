@@ -33,6 +33,13 @@ class Bootstrap
      */
     private static $writeEnabled = true;
 
+    /**
+     * Notifications enabled flag.
+     *
+     * @var boolean
+     */
+    private static $notificationsEnabled = true;
+
 
     /**
      * Loads classes for the project.
@@ -63,6 +70,7 @@ class Bootstrap
             class_alias('PerspectiveSimulator\Requests\Request', '\Request');
             class_alias('PerspectiveSimulator\Requests\Session', '\Session');
             class_alias('PerspectiveSimulator\Queue\Queue', '\Queue');
+            class_alias('PerspectiveSimulator\Libs\Email', '\Email');
         }
 
         // Add data stores.
@@ -132,6 +140,7 @@ class Bootstrap
         StorageFactory::createUserProperty('__last-name__', 'text');
 
         \PerspectiveSimulator\Requests\Session::load();
+        \PerspectiveSimulator\Queue\Queue::load();
 
     }//end load()
 
@@ -206,6 +215,42 @@ class Bootstrap
         self::$writeEnabled = true;
 
     }//end enableWrite()
+
+
+    /**
+     * Gets the is write enabled flag.
+     *
+     * @return boolean
+     */
+    public static function isNotificationsEnabled()
+    {
+        return self::$notificationsEnabled;
+
+    }//end isNotificationsEnabled()
+
+
+    /**
+     * Disables writing of data to filesystem.
+     *
+     * @return void
+     */
+    public static function disableNotifications()
+    {
+        self::$notificationsEnabled = false;
+
+    }//end disableNotifications()
+
+
+    /**
+     * Enables writing of data to filesystem.
+     *
+     * @return void
+     */
+    public static function enableNotifications()
+    {
+        self::$notificationsEnabled = true;
+
+    }//end enableNotifications()
 
 
 }//end class
