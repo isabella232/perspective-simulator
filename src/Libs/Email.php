@@ -18,6 +18,8 @@ use PerspectiveSimulator\Bootstrap;
 class Email
 {
 
+    private static $sentEmails = [];
+
 
     /**
      * Validate an email address using regular expression.
@@ -79,15 +81,28 @@ class Email
             $ret     = mail($to, $subject, $message, $headers);
             return $ret;
         } else {
-            return [
+            self::$sentEmails[] = [
                 'to'      => $to,
                 'from'    => $from,
                 'subject' => $subject,
                 'message' => $message,
             ];
+            return true;
         }
 
     }//end send()
+
+
+    /**
+     * Returns an array of emails that would have been sent.
+     *
+     * @return array
+     */
+    public static function getSentEmails()
+    {
+        return self::$sentEmails;
+
+    }//end getSentEmails()
 
 
 }//end class
