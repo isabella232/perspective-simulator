@@ -16,6 +16,13 @@ namespace PerspectiveSimulator\Requests;
 class Request
 {
 
+    /**
+     * Cahced object for the project this way we can set values with read/write disabled.
+     *
+     * @var array
+     */
+    private static $deployments = [];
+
 
     /**
      * Checks if we are in author, for simulator always return true.
@@ -37,13 +44,18 @@ class Request
      */
     public static function getDeployment()
     {
+        $project = $GLOBALS['project'];
+        if (isset(self::$deployments[$project]) === true) {
+            return self::$deployments[$project];
+        }
+
         try {
-            $deploymentObject = new \PerspectiveSimulator\ObjectType\Deployment($GLOBALS['project']);
+            self::$deployments[$project] = new \PerspectiveSimulator\ObjectType\Deployment($project);
         } catch (\Exception $e) {
             throw new \Exception('Unable to create new deployment object');
         }
 
-        return $deploymentObject;
+        return self::$deployments[$project];
 
     }//end getDeployment()
 
