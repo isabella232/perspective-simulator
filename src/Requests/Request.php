@@ -42,7 +42,7 @@ class Request
      * @return object
      * @throws \Exception When fails to create new deployment object.
      */
-    public static function getDeployment()
+    public static function getProjectInstance()
     {
         $project = $GLOBALS['project'];
         if (isset(self::$deployments[$project]) === true) {
@@ -50,14 +50,14 @@ class Request
         }
 
         try {
-            self::$deployments[$project] = new \PerspectiveSimulator\ObjectType\Deployment($project);
+            self::$deployments[$project] = new \PerspectiveSimulator\ObjectType\ProjectInstance($project);
         } catch (\Exception $e) {
             throw new \Exception('Unable to create new deployment object');
         }
 
         return self::$deployments[$project];
 
-    }//end getDeployment()
+    }//end getProjectInstance()
 
 
 }//end class

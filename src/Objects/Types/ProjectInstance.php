@@ -1,6 +1,6 @@
 <?php
 /**
- * Deployment class for Perspective Simulator.
+ * ProjectInstance class for Perspective Simulator.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -23,9 +23,9 @@ use \PerspectiveSimulator\Objects\ObjectReadInterface as ObjectReadInterface;
 use \PerspectiveSimulator\Objects\ObjectWriteInterface as ObjectWriteInterface;
 
 /**
- * Deployment Class
+ * ProjectInstance Class
  */
-class Deployment implements ObjectReadInterface, ObjectWriteInterface
+class ProjectInstance implements ObjectReadInterface, ObjectWriteInterface
 {
 
     use AspectedObjectTrait;
