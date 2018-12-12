@@ -155,9 +155,9 @@ include_once $proot.'/vendor/autoload.php';
 
 
 if (isset($opts['S']) === true || isset($opts['server']) === true) {
-    $host = ($opts['S'] ?? $opts['server'] ?? 'localhost:8000');
+    $host = ($opts['S'] ?? $opts['server'] ?? '0.0.0.0:8000');
     if (empty($host) === true) {
-        $host = 'localhost:8000';
+        $host = '0.0.0.0:8000';
     }
 
     \PerspectiveSimulator\CLI\Terminal::printLine(sprintf('Perspective Simulator listening on: http://%s', $host));
