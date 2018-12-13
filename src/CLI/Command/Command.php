@@ -32,7 +32,6 @@ class Command extends \Symfony\Component\Console\Command\Command
     {
         $project = ($input->getOption('project') ?? null);
         $project = ltrim($project, '=');
-        print_r($project);
         if ($project === null) {
             // Workout the current project and if the simulator is installed so we can run our actions.
             $simPath      = '/vendor/Perspective/Simulator';

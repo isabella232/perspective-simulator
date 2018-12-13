@@ -82,7 +82,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         ]);
 
         try {
-            $path = $input->getArgument['path'];
+            $path = $input->getArgument('path');
             if (Libs\FileSystem::getExtension($path) !== 'yaml') {
                 throw new \Exception('Only yaml API specification files are supported.');
             }

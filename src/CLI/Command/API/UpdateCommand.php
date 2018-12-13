@@ -77,10 +77,15 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         try {
             if ($input->getArgument('path') !== null) {
-                $this->add();
-            } else {
-                \PerspectiveSimulator\API::installAPI($GLOBALS['project']);
+                $path = $input->getArgument('path');
+                if (Libs\FileSystem::getExtension($path) !== 'yaml') {
+                    throw new \Exception('Only yaml API specification files are supported.');
+                }
+
+                copy($path, $this->storeDir.'api.yaml');
             }
+
+            \PerspectiveSimulator\API::installAPI($GLOBALS['project']);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
