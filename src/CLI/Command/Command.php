@@ -30,9 +30,9 @@ class Command extends \Symfony\Component\Console\Command\Command
      */
     final public function inProject(InputInterface $input, OutputInterface $output)
     {
-        $project = ($input->getOption('project') ?? null);
+        $project = ($input->getOption('project') ?? '');
         $project = ltrim($project, '=');
-        if ($project === null) {
+        if (empty($project) === true) {
             // Workout the current project and if the simulator is installed so we can run our actions.
             $simPath      = '/vendor/Perspective/Simulator';
             $cwd          = getcwd();
