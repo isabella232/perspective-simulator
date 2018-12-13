@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Libs;
 class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'storeage:add-reference';
+    protected static $defaultName = 'storage:add-reference';
 
     /**
      * Readable type for command object.

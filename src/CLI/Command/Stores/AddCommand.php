@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Libs;
 class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'storeage:add';
+    protected static $defaultName = 'storage:add';
 
     /**
      * Readable type for command object.

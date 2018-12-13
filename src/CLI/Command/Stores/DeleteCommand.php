@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Libs;
 class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'storeage:detete';
+    protected static $defaultName = 'storage:detete';
 
     /**
      * Readable type for command object.

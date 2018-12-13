@@ -139,7 +139,7 @@ __ROUTES__
 
         ini_set('yaml.decode_php', 0);
         $yaml   = file_get_contents($path);
-        $parsed = yaml_parse($yaml);
+        $parsed = \Symfony\Component\Yaml\Yaml::parse($yaml);
         if ($parsed === false || empty($parsed['paths']) === true) {
             throw new \Exception('Failed to parse API specficiation');
         }

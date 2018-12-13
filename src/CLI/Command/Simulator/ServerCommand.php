@@ -57,7 +57,7 @@ class ServerCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Workout the current project and if the simulator is installed so we can run our actions.
-        $simPath = '/vendor/Perspective/Simulator';
+        $simPath = '/vendor/perspective/simulator';
         $cwd     = getcwd();
         $proot   = $cwd;
         $sim     = true;
@@ -83,6 +83,9 @@ class ServerCommand extends \PerspectiveSimulator\CLI\Command\Command
             'Press Ctrl-C to quit.',
             '',
         ]);
+
+        $router = $proot.'/vendor/perspective/simulator/src/Requests/Router.php';
+        exec('php -S '.$host.' '.$router);
 
     }//end execute()
 

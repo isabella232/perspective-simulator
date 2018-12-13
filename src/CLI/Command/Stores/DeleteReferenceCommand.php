@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Libs;
 class DeleteReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'storeage:delete-reference';
+    protected static $defaultName = 'storage:delete-reference';
 
     /**
      * Readable type for command object.

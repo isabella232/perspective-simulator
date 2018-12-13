@@ -22,7 +22,7 @@ use \PerspectiveSimulator\Libs;
 class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'storeage:rename';
+    protected static $defaultName = 'storage:rename';
 
     /**
      * Readable type for command object.
