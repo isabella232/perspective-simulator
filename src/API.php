@@ -386,11 +386,11 @@ __ROUTES__
                     $arguments[$api['operationid']][$param['name']] = '$_COOKIE[\''.$param['name'].'\'] ?? null';
                 }
 
+                $argCode .= Util::printCode(5, '\''.$api['operationid'].'\' => [');
                 foreach ($arguments[$api['operationid']] as $argIndex => $argValue) {
-                    $argCode .= Util::printCode(5, '\''.$api['operationid'].'\' => [');
                     $argCode .= Util::printCode(6, '\''.$argIndex.'\' => '.$argValue.',');
-                    $argCode .= Util::printCode(5, '],');
                 }
+                $argCode .= Util::printCode(5, '],');
             }//end foreach
         }//end foreach
 
