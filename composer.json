@@ -10,6 +10,5 @@
         "ext-yaml": "*",
         "nikic/fast-route": "^1.3",
         "twig/twig": "^2.0"
-    },
-    "bin": ["./src/CLI/bin/perspective"]
+    }
 }
