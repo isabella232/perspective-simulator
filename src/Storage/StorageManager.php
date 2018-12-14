@@ -35,8 +35,8 @@ class StorageManager
             || $class === 'PerspectiveSimulator\\ObjectType\\User'
         ) {
             return 'User';
-        } else if (is_subclass_of($object, 'PerspectiveSimulator\\ObjectType\\Deployment') === true
-            || $class === 'PerspectiveSimulator\\ObjectType\\Deployment'
+        } else if (is_subclass_of($object, 'PerspectiveSimulator\\ObjectType\\ProjectInstance') === true
+            || $class === 'PerspectiveSimulator\\ObjectType\\ProjectInstance'
         ) {
             return 'Deployment';
         }
