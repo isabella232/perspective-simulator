@@ -1,6 +1,6 @@
 <?php
 /**
- * ObjectWriteInterface
+ * ObjectReadInterface
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -11,13 +11,31 @@
 namespace PerspectiveSimulator\Objects;
 
 /**
- * ObjectWriteInterface
+ * ObjectReadInterface
  */
-interface ObjectWriteInterface
+interface ObjectInterface
 {
 
 
     /**
+     * Gets the value of a given property.
+     *
+     * @param string $propertyCode The code of the property that is being retrieved.
+     *
+     * @return mixed
+     */
+    public function getValue(string $propertyCode);
+
+
+    /**
+     * Load from file cache.
+     *
+     * @return boolean
+     */
+    public function load();
+
+
+    /*
      * Sets the value of a given property.
      *
      * @param string $propertyCode The code of the property that the value is being set into.

@@ -140,7 +140,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $helper = $this->getHelper('question');
 
-        $name = null;
+        $name = ($input->getArgument('name') ?? null);
         if (empty($input->getArgument('name')) === true) {
             $question = new \Symfony\Component\Console\Question\Question('Please enter a Project name: ');
             $name     = $helper->ask($input, $output, $question);

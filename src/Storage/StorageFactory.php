@@ -10,6 +10,7 @@
 
 namespace PerspectiveSimulator\Storage;
 
+use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\StorageType\DataStore;
 use \PerspectiveSimulator\StorageType\UserStore;
 
@@ -46,10 +47,14 @@ class StorageFactory
      *
      * @return void
      */
-    public static function createDataStore(string $name)
+    public static function createDataStore(string $name, string $project)
     {
-        if (isset(self::$stores['data'][$name]) === false) {
-            self::$stores['data'][$name] = new DataStore($name);
+        if (isset(self::$stores['data'][$project]) === false) {
+            self::$stores['data'][$project] = [];
+        }
+
+        if (isset(self::$stores['data'][$project][$name]) === false) {
+            self::$stores['data'][$project][$name] = new DataStore($name);
         }
 
     }//end createDataStore()
@@ -62,10 +67,14 @@ class StorageFactory
      *
      * @return void
      */
-    public static function createUserStore(string $name)
+    public static function createUserStore(string $name, string $project)
     {
+        if (isset(self::$stores['user'][$project]) === false) {
+            self::$stores['user'][$project] = [];
+        }
+
         if (isset(self::$stores['user'][$name]) === false) {
-            self::$stores['user'][$name] = new UserStore($name);
+            self::$stores['user'][$project][$name] = new UserStore($name);
         }
 
     }//end createUserStore()
@@ -118,7 +127,7 @@ class StorageFactory
      *
      * @return void
      */
-    public static function createDeployementProperty(string $code, string $type, $default=null)
+    public static function createProjectProperty(string $code, string $type, $default=null)
     {
         self::$props['project'][$code] = [
             'type'    => $type,
@@ -163,11 +172,11 @@ class StorageFactory
      *
      * @return mixed.
      */
-    public static function getDeploymentProperty(string $code)
+    public static function getProjectProperty(string $code)
     {
         return (self::$props['project'][$code] ?? null);
 
-    }//end getDeploymentProperty()
+    }//end getProjectProperty()
 
 
     /**
@@ -180,11 +189,12 @@ class StorageFactory
      */
     public static function getDataStore(string $name)
     {
-        if (isset(self::$stores['data'][$name]) === false) {
+        $project = self::getProjectPrefix();
+        if (isset(self::$stores['data'][$project][$name]) === false) {
             throw new \Exception('Data store "'.$name.'" does not exist');
         }
 
-        return self::$stores['data'][$name];
+        return self::$stores['data'][$project][$name];
 
     }//end getDataStore()
 
@@ -199,13 +209,23 @@ class StorageFactory
      */
     public static function getUserStore(string $name)
     {
-        if (isset(self::$stores['user'][$name]) === false) {
+        $project = self::getProjectPrefix();
+        if (isset(self::$stores['user'][$project][$name]) === false) {
             throw new \Exception('User store "'.$name.'" does not exist');
         }
 
-        return self::$stores['user'][$name];
+        return self::$stores['user'][$project][$name];
 
     }//end getUserStore()
+
+
+    private static function getProjectPrefix()
+    {
+        $bt = debug_backtrace(false, 4);
+        $classParts = explode('\\', $bt[3]['class']);
+        return $classParts[0].'\\'.$classParts[1];
+
+    }//end getProjectPrefix()
 
 
 }//end class

@@ -81,7 +81,14 @@ class Queue
             $project = $GLOBASL['project'];
         }
 
-        return \PerspectiveSimulator\Libs\FileSystem::getProjectDir($project).'/Queues';
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $project = str_replace('\\', '/', $project);
+            $dir     = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
+
+            return $dir.'/vendor/'.$project.'/src/Queues';
+        } else {
+            return \PerspectiveSimulator\Libs\FileSystem::getProjectDir($project).'/Queues';
+        }
 
     }//end getQueuePath()
 
@@ -303,7 +310,14 @@ class Queue
 
             $queueClass .= Libs\Util::printCode(0, '}');
 
-            $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/JobQueue.php';
+            $prefix = Bootstrap::generatePrefix($project);
+            if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+                $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-jobqueue.php';
+            } else {
+                $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-jobqueue.php';
+            }
+
+
             file_put_contents($queueFile, $queueClass);
         }//end if
 

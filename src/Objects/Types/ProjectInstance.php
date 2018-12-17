@@ -11,27 +11,20 @@
 namespace PerspectiveSimulator\ObjectType;
 
 require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
-require_once dirname(__FILE__, 2).'/AspectedObjectWriteTrait.inc';
-require_once dirname(__FILE__, 2).'/ObjectReadInterface.inc';
-require_once dirname(__FILE__, 2).'/ObjectWriteInterface.inc';
+require_once dirname(__FILE__, 2).'/ObjectInterface.inc';
 
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
 use \PerspectiveSimulator\Objects\AspectedObjectTrait as AspectedObjectTrait;
-use \PerspectiveSimulator\Objects\AspectedObjectWriteTrait as AspectedObjectWriteTrait;
-use \PerspectiveSimulator\Objects\ObjectReadInterface as ObjectReadInterface;
-use \PerspectiveSimulator\Objects\ObjectWriteInterface as ObjectWriteInterface;
+use \PerspectiveSimulator\Objects\ObjectInterface as ObjectInterface;
 
 /**
  * ProjectInstance Class
  */
-class ProjectInstance implements ObjectReadInterface, ObjectWriteInterface
+class ProjectInstance implements ObjectInterface
 {
 
     use AspectedObjectTrait;
-
-    use AspectedObjectWriteTrait;
-
 
 
     /**

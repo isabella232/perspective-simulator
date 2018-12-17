@@ -50,9 +50,19 @@ class Bootstrap
      */
     public static function load(string $project)
     {
-        $project            = ucfirst($project);
-        $GLOBALS['project'] = $project;
-        $projectDir         = Libs\FileSystem::getProjectDir();
+        $projectParts = explode('/', $project);
+        if (count($projectParts) > 1) {
+            $GLOBALS['project'] = $projectParts[1];
+        } else {
+            $projectParts = explode('\\', $project);
+            if (count($projectParts) > 1) {
+                $GLOBALS['project'] = $projectParts[1];
+            } else {
+                $GLOBALS['project'] = $project;
+            }
+        }
+
+        $projectDir = Libs\FileSystem::getProjectDir();
 
         // Register an autoloader for the project.
         $loader = include dirname(__DIR__, 3).'/autoload.php';
@@ -87,6 +97,8 @@ class Bootstrap
             StorageFactory::createUserStore($storeName, $project);
         }
 
+        $prefix = self::generatePrefix($project);
+
         // Add data record properties.
         if (is_dir($projectDir.'/Properties/Data') === true) {
             $files = scandir($projectDir.'/Properties/Data');
@@ -97,7 +109,7 @@ class Bootstrap
                     continue;
                 }
 
-                $propName = strtolower(substr($file, 0, -5));
+                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Data/'.$file));
                 StorageFactory::createDataRecordProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
             }
@@ -113,9 +125,9 @@ class Bootstrap
                     continue;
                 }
 
-                $propName = strtolower(substr($file, 0, -5));
+                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
-                StorageFactory::createDeployementProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
+                StorageFactory::createProjectProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
             }
         }
 
@@ -129,7 +141,7 @@ class Bootstrap
                     continue;
                 }
 
-                $propName = strtolower(substr($file, 0, -5));
+                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/User/'.$file));
                 StorageFactory::createUserProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
             }
@@ -141,6 +153,8 @@ class Bootstrap
 
         \PerspectiveSimulator\Requests\Session::load();
         \PerspectiveSimulator\Queue\Queue::load();
+
+        self::loadDependencies($project);
 
     }//end load()
 
@@ -251,6 +265,126 @@ class Bootstrap
         self::$notificationsEnabled = true;
 
     }//end enableNotifications()
+
+
+    /**
+     * Generates a prefix.
+     *
+     * @param string $project The project to get the prefix for.
+     *
+     * @return string
+     */
+    public static function generatePrefix(string $project)
+    {
+        $project = str_replace('\\', '-', $project);
+        $project = str_replace('/', '-', $project);
+        return strtolower($project);
+
+    }//end generatePrefix()
+
+
+    /**
+     * Loads a projects dependencies to the simulator.
+     *
+     * @param string $mainProject The project we are loading dependencies for.
+     *
+     * @return void
+     */
+    private static function loadDependencies(string $mainProject)
+    {
+        $path     = substr(Libs\FileSystem::getProjectDir(), 0, -4);
+        $composer = $path.'/composer.json';
+        if (file_exists($composer) === true) {
+            $requirements     = [];
+            $composerContents = Libs\Util::jsonDecode(file_get_contents($composer));
+            if (isset($composerContents['require']) === true) {
+                $requirements = array_merge($requirements, $composerContents['require']);
+            }
+
+            if (isset($composerContents['require-dev']) === true) {
+                $requirements = array_merge($requirements, $composerContents['require-dev']);
+            }
+
+            if (empty($requirements) === true) {
+                // No dependencies to load so just return.
+                return;
+            }
+
+            foreach ($requirements as $requirement => $version) {
+                $project    = str_replace('/', '\\', $requirement);
+                $projectDir = $path.'/vendor/'.str_replace('\\', '/', $requirement).'/src';
+                $prefix     = self::generatePrefix($project);
+
+                class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
+                class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
+                class_alias('PerspectiveSimulator\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
+                class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
+
+                // Add data stores.
+                $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
+                foreach ($dirs as $dir) {
+                    $storeName = strtolower(basename($dir));
+                    StorageFactory::createDataStore($storeName, $project);
+                }
+
+                // Add user stores.
+                $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
+                foreach ($dirs as $dir) {
+                    $storeName = strtolower(basename($dir));
+                    StorageFactory::createUserStore($storeName, $project);
+                }
+
+                // Add data record properties.
+                if (is_dir($projectDir.'/Properties/Data') === true) {
+                    $files = scandir($projectDir.'/Properties/Data');
+                    foreach ($files as $file) {
+                        if ($file[0] === '.'
+                            || substr($file, -5) !== '.json'
+                        ) {
+                            continue;
+                        }
+
+                        $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
+                        $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Data/'.$file));
+                        StorageFactory::createDataRecordProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
+                    }
+                }
+
+                // Add project properties.
+                if (is_dir($projectDir.'/Properties/Project') === true) {
+                    $files = scandir($projectDir.'/Properties/Project');
+                    foreach ($files as $file) {
+                        if ($file[0] === '.'
+                            || substr($file, -5) !== '.json'
+                        ) {
+                            continue;
+                        }
+
+                        $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
+                        $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
+                        StorageFactory::createProjectProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
+                    }
+                }
+
+                // Add user properties.
+                if (is_dir($projectDir.'/Properties/User') === true) {
+                    $files = scandir($projectDir.'/Properties/User');
+                    foreach ($files as $file) {
+                        if ($file[0] === '.'
+                            || substr($file, -5) !== '.json'
+                        ) {
+                            continue;
+                        }
+
+                        $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
+                        $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/User/'.$file));
+                        StorageFactory::createUserProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
+                    }
+                }
+            }//end foreach
+        }//end if
+
+    }//end loadDependencies()
 
 
 }//end class

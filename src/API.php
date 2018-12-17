@@ -10,6 +10,7 @@
 
 namespace PerspectiveSimulator;
 
+use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs\Util;
 
 /**
@@ -95,7 +96,14 @@ __ROUTES__
      */
     public static function getAPIPath(string $project)
     {
-        return \PerspectiveSimulator\Libs\FileSystem::getProjectDir($project).'/API';
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $project = str_replace('\\', '/', $project);
+            $dir     = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
+
+            return $dir.'/vendor/'.$project.'/src/API';
+        } else {
+            return \PerspectiveSimulator\Libs\FileSystem::getProjectDir($project).'/API';
+        }
 
     }//end getAPIPath()
 
@@ -212,8 +220,9 @@ __ROUTES__
 
         $apis = self::parseYaml($apiFile);
 
+        $prefix            = Bootstrap::generatePrefix($project);
         $currentAPIs       = [];
-        $simulatorYamlFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/api.yaml';
+        $simulatorYamlFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-api.yaml';
         if (file_exists($simulatorYamlFile) === true) {
             $currentAPIs = self::parseYaml($simulatorYamlFile);
         }
@@ -405,7 +414,13 @@ __ROUTES__
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(0, '}//end class');
 
-        $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/APIRouter.php';
+        $prefix = Bootstrap::generatePrefix($project);
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-apirouter.php';
+        } else {
+            $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-apirouter.php';
+        }
+
         file_put_contents($routerFile, $router);
 
     }//end bakeRouter()
@@ -529,7 +544,13 @@ __ROUTES__
 
         $function .= Util::printCode(0, '}//end class');
 
-        $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/API.php';
+        $prefix = Bootstrap::generatePrefix($project);
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-api.php';
+        } else {
+            $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-api.php';
+        }
+
         file_put_contents($functionFile, $function);
 
     }//end bakeAPIFunctions()

@@ -12,19 +12,17 @@ namespace PerspectiveSimulator\ObjectType;
 
 require_once dirname(__FILE__, 2).'/ObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
-require_once dirname(__FILE__, 2).'/ObjectReadInterface.inc';
-require_once dirname(__FILE__, 2).'/ObjectWriteInterface.inc';
+require_once dirname(__FILE__, 2).'/ObjectInterface.inc';
 
 use \PerspectiveSimulator\Storage;
 use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
 use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
-use \PerspectiveSimulator\Objects\ObjectReadInterface as ObjectReadInterface;
-use \PerspectiveSimulator\Objects\ObjectWriteInterface as ObjectWriteInterface;
+use \PerspectiveSimulator\Objects\ObjectInterface as ObjectInterface;
 
 /**
  * User class.
  */
-class User implements ObjectReadInterface, ObjectWriteInterface
+class User implements ObjectInterface
 {
 
     use ObjectTrait;

@@ -13,7 +13,7 @@ namespace PerspectiveSimulator\Objects;
 require_once dirname(__FILE__).'/ObjectTrait.inc';
 
 use \PerspectiveSimulator\Storage;
-
+use \PerspectiveSimulator\Bootstrap;
 
 /**
  * AspectedObjectTrait Trait.
@@ -76,6 +76,8 @@ trait AspectedObjectTrait
             throw new \Exception('Invalid property type');
         }
 
+        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
+
         $functionName = 'get'.$typeName.'Property';
         $prop         = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
@@ -87,12 +89,20 @@ trait AspectedObjectTrait
         }
 
         if ($prop['type'] === 'image' || $prop['type'] === 'file') {
-            if ($typeName === 'Deployment') {
-                $typeName = 'Project';
+            $propDir        = \PerspectiveSimulator\Libs\FileSystem::getProjectDir().'/Properties/'.$typeName;
+            $unprefixedCode = explode('-', $propertyCode);
+            $prefix         = array_shift($unprefixedCode);
+            if ($prefix === strtolower($GLOBALS['project'])) {
+                $unprefixedCode = implode('-', $unprefixedCode);
+            } else {
+                $prefix        .= '/'.array_shift($unprefixedCode);
+                $unprefixedCode = implode('-', $unprefixedCode);
+                $propDir        = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir(), 0, -4);
+                $propDir       .= '/vendor/'.$prefix.'/src/Properties/'.$typeName;
             }
 
             $propFiles = \PerspectiveSimulator\Libs\FileSystem::listDirectory(
-                \PerspectiveSimulator\Libs\FileSystem::getProjectDir().'/Properties/'.$typeName,
+                $propDir,
                 [],
                 false,
                 false
@@ -101,7 +111,7 @@ trait AspectedObjectTrait
             foreach ($propFiles as $file) {
                 if ($file[0] === '.'
                     || substr($file, -5) === '.json'
-                    || strpos($file, $propertyCode) !== 0
+                    || strpos($file, $unprefixedCode) !== 0
                 ) {
                     continue;
                 }
@@ -109,12 +119,72 @@ trait AspectedObjectTrait
                 $prop['default'] = $file;
             }
 
-            return '/property/'.$GLOBALS['project'].'/'.$typeName.'/'.$prop['default'];
+            return '/property/'.$GLOBALS['project'].'/'.$typeName.'/'.str_replace('/', '-', strtolower($prefix)).'-'.$prop['default'];
         }
 
         return $prop['default'];
 
     }//end getValue()
+
+
+    /**
+     * Sets the value of a given property for a given record in a given aspect.
+     *
+     * @param string $propertyCode The property code that the value is being set on.
+     * @param mixed  $value        The value to set into the property.
+     *
+     * @return void
+     * @throws \Exception When the propertyCode doesn't exist or the value isn't unique.
+     */
+    final public function setValue(string $propertyCode, $value)
+    {
+        $typeName = Storage\StorageManager::getStoreType($this);
+        if ($typeName === null) {
+            throw new \Exception('Invalid property type');
+        }
+
+        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
+
+        $functionName = 'get'.$typeName.'Property';
+        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
+        if ($prop === null) {
+            throw new \Exception('Property "'.$propertyCode.'" does not exist');
+        }
+
+        if ($prop['type'] === 'unique') {
+            $current = $this->store->getUniqueDataRecord($propertyCode, $value);
+            if ($current !== null) {
+                throw new \Exception('Unique value "'.$value.'" is already in use');
+            }
+
+            $this->store->setUniqueDataRecord($propertyCode, $value, $this);
+        } else if ($prop['type'] === 'image' || $prop['type'] === 'file') {
+            $value = self::prepareFileImagePropertyValue($value, $typeName, $propertyCode);
+        }
+
+        $this->properties[$propertyCode] = $value;
+
+        $this->save();
+
+    }//end setValue()
+
+
+    /**
+     * Deletes the set value of a given property for a given data record in a given aspect.
+     *
+     * @param string $propertyCode The property code that the value is being deleted from.
+     *
+     * @return void
+     * @throws \Exception When the propertyCode doesn't exist.
+     */
+    final public function deleteValue(string $propertyCode)
+    {
+        if (isset($this->properties[$propertyCode]) === true) {
+            unset($this->properties[$propertyCode]);
+            $this->save();
+        }
+
+    }//end deleteValue()
 
 
 }

@@ -29,12 +29,24 @@ class Property
      */
     public static function serveFile(string $path)
     {
-        $simDir      = Libs\FileSystem::getStorageDir().'/properties';
-        $filePath    = $simDir.'/'.urldecode($path);
-        $pathParts   = explode('/', $filePath);
-        $file        = array_pop($pathParts);
-        $type        = array_pop($pathParts);
-        $defaultPath = Libs\FileSystem::getProjectDir().'/Properties/'.$type.'/'.$file;
+        $simDir    = Libs\FileSystem::getStorageDir().'/properties';
+        $filePath  = $simDir.'/'.urldecode($path);
+        $pathParts = explode('/', $filePath);
+        $file      = array_pop($pathParts);
+        $type      = array_pop($pathParts);
+
+        $fileParts = explode('-', $file);
+        if ($fileParts[0] === strtolower($GLOBALS['project'])) {
+            array_shift($fileParts);
+            $defaultPath = Libs\FileSystem::getProjectDir().'/Properties/'.$type.'/'.implode('-', $fileParts);
+        } else {
+            $project = $fileParts[0].'/'.$fileParts[1];
+            array_shift($fileParts);
+            array_shift($fileParts);
+            $defaultPath = substr(Libs\FileSystem::getProjectDir(), 0, -4).'/vendor/'.$project.'/src/Properties/'.$type.'/'.implode('-', $fileParts);
+        }
+
+
 
         if (file_exists($filePath) === false && file_exists($defaultPath) === false) {
             Libs\Web::send404();

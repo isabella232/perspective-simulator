@@ -38,7 +38,7 @@ class StorageManager
         } else if (is_subclass_of($object, 'PerspectiveSimulator\\ObjectType\\ProjectInstance') === true
             || $class === 'PerspectiveSimulator\\ObjectType\\ProjectInstance'
         ) {
-            return 'Deployment';
+            return 'Project';
         }
 
         return null;

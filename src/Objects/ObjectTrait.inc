@@ -153,6 +153,17 @@ trait ObjectTrait
                 }
             }
 
+            $unprefixedCode = explode('-', $propertyCode);
+            $prefix         = array_shift($unprefixedCode);
+            if ($prefix === strtolower($GLOBALS['project'])) {
+                $unprefixedCode = implode('-', $unprefixedCode);
+            } else {
+                $prefix        .= '/'.array_shift($unprefixedCode);
+                $unprefixedCode = implode('-', $unprefixedCode);
+                $propDir        = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir(), 0, -4);
+                $propDir       .= '/vendor/'.$prefix.'/src/Properties/'.$typeName;
+            }
+
             $uploadedFilepath = Libs\FileSystem::getStorageDir().'/properties/'.$propertyType;
             if (is_dir($uploadedFilepath) === false) {
                 Libs\FileSystem::mkdir($uploadedFilepath, true);
@@ -188,6 +199,7 @@ trait ObjectTrait
     {
         $propertyType = \PerspectiveSimulator\Storage\StorageManager::getStoreType($this);
         $functionName = 'get'.$propertyType.'Property';
+        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
         $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
@@ -211,6 +223,42 @@ trait ObjectTrait
         return $propertyObject;
 
     }//end property()
+
+
+    /**
+     * Gets the prefixed property code.
+     *
+     * @param string $propertyCode The property code we want prefixed.
+     *
+     * @return string
+     */
+    final private function getPrefixedPropertyCode(string $propertyCode)
+    {
+        $bt = debug_backtrace(false);
+
+        // Remove the call to this and the call to the function that needs the property code prefixed.
+        array_shift($bt);
+        array_shift($bt);
+
+        $key = 0;
+        foreach ($bt as $id => $call) {
+            if ($call['function'] === 'eval') {
+                $key = ($id + 1);
+                break;
+            }
+        }
+
+        $called = $bt[$key];
+        if (strpos($called['class'], $GLOBALS['project']) === false) {
+            $classParts   = explode('\\', $called['class']);
+            $propertyCode = Bootstrap::generatePrefix($classParts[0].'\\'.$classParts[1]).'-'.$propertyCode;
+        } else {
+            $propertyCode = Bootstrap::generatePrefix($GLOBALS['project']).'-'.$propertyCode;
+        }
+
+        return $propertyCode;
+
+    }//end getPrefixedPropertyCode()
 
 
 }

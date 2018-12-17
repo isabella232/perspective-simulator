@@ -10,6 +10,7 @@
 
 namespace PerspectiveSimulator\View;
 
+use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs\Util;
 use \PerspectiveSimulator\Libs\FileSystem;
 
@@ -276,14 +277,23 @@ class View
      */
     public static function installViews(string $project)
     {
-        $routeFile = FileSystem::getProjectDir($project).'/web/routes.yaml';
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $project = str_replace('\\', '/', $project);
+            $dir     = substr(FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
+
+            $routeFile =$dir.'/vendor/'.$project.'/src/web/routes/yaml';
+        } else {
+            $routeFile = FileSystem::getProjectDir($project).'/web/routes.yaml';
+        }
+
         if (file_exists($routeFile) === false) {
             // No view routes so nothing to do.
             return true;
         }
 
         ini_set('yaml.decode_php', 0);
-        $routes = yaml_parse(file_get_contents($routeFile));
+        $yaml   = file_get_contents($routeFile);
+        $routes = \Symfony\Component\Yaml\Yaml::parse($yaml);
         if ($routes === false || empty($routes['routes']) === true) {
             throw new \Exception('Failed to parse View routes.');
         }
@@ -329,7 +339,13 @@ class View
         $code = str_replace('__CLASS_NAMESPACE__', $project, $code);
         $code = str_replace('__ROUTES__', $routeCode, $code);
 
-        $routerFile = FileSystem::getSimulatorDir().'/'.$project.'/ViewRouter.php';
+        $prefix = Bootstrap::generatePrefix($project);
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $routerFile = FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-viewrouter.php';
+        } else {
+            $routerFile = FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-viewrouter.php';
+        }
+
         file_put_contents($routerFile, $code);
 
     }//end bakeRouter()
@@ -369,7 +385,14 @@ class View
         }
 
         $code .= Util::printCode(0, '}//end class');
-        $handlerFile = FileSystem::getSimulatorDir().'/'.$project.'/WebHandler.php';
+
+        $prefix = Bootstrap::generatePrefix($project);
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $handlerFile = FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-webhandler.php';
+        } else {
+            $handlerFile = FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-webhandler.php';
+        }
+
         file_put_contents($handlerFile, $code);
 
     }//end bakeHandler()
