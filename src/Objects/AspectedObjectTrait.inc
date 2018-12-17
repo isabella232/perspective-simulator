@@ -92,10 +92,11 @@ trait AspectedObjectTrait
             $propDir        = \PerspectiveSimulator\Libs\FileSystem::getProjectDir().'/Properties/'.$typeName;
             $unprefixedCode = explode('-', $propertyCode);
             $prefix         = array_shift($unprefixedCode);
+            $prefix        .= '\\'.array_shift($unprefixedCode);
             if ($prefix === strtolower($GLOBALS['project'])) {
                 $unprefixedCode = implode('-', $unprefixedCode);
             } else {
-                $prefix        .= '/'.array_shift($unprefixedCode);
+                $prefix         = str_replace('\\', '/', $prefix);
                 $unprefixedCode = implode('-', $unprefixedCode);
                 $propDir        = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir(), 0, -4);
                 $propDir       .= '/vendor/'.$prefix.'/src/Properties/'.$typeName;
@@ -119,7 +120,8 @@ trait AspectedObjectTrait
                 $prop['default'] = $file;
             }
 
-            return '/property/'.$GLOBALS['project'].'/'.$typeName.'/'.str_replace('/', '-', strtolower($prefix)).'-'.$prop['default'];
+            $prefix = str_replace('/', '-', str_replace('\\', '-', $prefix));
+            return '/property/'.str_replace('\\', '/', $GLOBALS['project']).'/'.$typeName.'/'.strtolower($prefix).'-'.$prop['default'];
         }
 
         return $prop['default'];

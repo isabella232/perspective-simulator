@@ -336,7 +336,7 @@ class View
         }
 
         $code = file_get_contents($tempFile);
-        $code = str_replace('__CLASS_NAMESPACE__', $project, $code);
+        $code = str_replace('__CLASS_NAMESPACE__', str_replace('/', '\\', $project), $code);
         $code = str_replace('__ROUTES__', $routeCode, $code);
 
         $prefix = Bootstrap::generatePrefix($project);
@@ -361,7 +361,7 @@ class View
     private static function bakeHandler(string $project)
     {
         $code  = Util::printCode(0, '<?php');
-        $code .= Util::printCode(0, 'namespace '.$project.';');
+        $code .= Util::printCode(0, 'namespace '.str_replace('/', '\\', $project).';');
         $code .= Util::printCode(0, '');
         $code .= Util::printCode(0, 'class WebHandler');
         $code .= Util::printCode(0, '{');

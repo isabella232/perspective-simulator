@@ -155,10 +155,11 @@ trait ObjectTrait
 
             $unprefixedCode = explode('-', $propertyCode);
             $prefix         = array_shift($unprefixedCode);
+            $prefix        .= '\\'.array_shift($unprefixedCode);
             if ($prefix === strtolower($GLOBALS['project'])) {
                 $unprefixedCode = implode('-', $unprefixedCode);
             } else {
-                $prefix        .= '/'.array_shift($unprefixedCode);
+                $prefix         = str_replace('\\', '/', $prefix);
                 $unprefixedCode = implode('-', $unprefixedCode);
                 $propDir        = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir(), 0, -4);
                 $propDir       .= '/vendor/'.$prefix.'/src/Properties/'.$typeName;
@@ -175,7 +176,7 @@ trait ObjectTrait
                 throw new \Exception('Failed to get the upload file.');
             }
 
-            return '/property/'.$GLOBALS['project'].'/'.$propertyType.'/'.$propertyCode.'.'.$ext;
+            return '/property/'.str_replace('\\', '/', $GLOBALS['project']).'/'.$propertyType.'/'.$propertyCode.'.'.$ext;
         } else if (is_string($value) === true) {
             // Expecting the base64 string.
             if (preg_match('#^data:[a-z]+/([a-z]+);base64,[\w=+/]++#', $value) !== 1) {

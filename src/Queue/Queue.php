@@ -279,7 +279,7 @@ class Queue
         $queuePath = self::getQueuePath($project);
         if (is_dir($queuePath) === true) {
             $queueClass  = Libs\Util::printCode(0, '<?php');
-            $queueClass .= Libs\Util::printCode(0, 'namespace '.$project.';');
+            $queueClass .= Libs\Util::printCode(0, 'namespace '.str_replace('/', '\\', $project).';');
             $queueClass .= Libs\Util::printCode(0, '');
             $queueClass .= Libs\Util::printCode(0, 'class JobQueue');
             $queueClass .= Libs\Util::printCode(0, '{');

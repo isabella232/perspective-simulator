@@ -31,9 +31,9 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 }
 
                 if (isset($GLOBALS['project']) === true
-                    && file_exists(dirname(__DIR__, 3).'/projects/'.$GLOBALS['project'].'/vendor/autoload.php') === true
+                    && file_exists(dirname(__DIR__, 3).'/projects/'.str_replace('\\', '/', $GLOBALS['project']).'/vendor/autoload.php') === true
                 ) {
-                    self::$composerAutoloader = include dirname(__DIR__, 3).'/projects/'.$GLOBALS['project'].'/vendor/autoload.php';
+                    self::$composerAutoloader = include dirname(__DIR__, 3).'/projects/'.str_replace('\\', '/', $GLOBALS['project']).'/vendor/autoload.php';
                     if (self::$composerAutoloader instanceof \Composer\Autoload\ClassLoader) {
                         self::$composerAutoloader->unregister();
                         self::$composerAutoloader->register();
@@ -57,40 +57,26 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
 
             if ($path === false) {
                 $prefix = strtolower(str_replace('\\', '-', $class));
-                if (substr($class, -4) === '\API' && substr_count($class, '\\') === 1) {
-                    $project = substr($class, 0, strpos($class, '\\'));
-                    $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/'.$prefix.'.php';
-                } else if (isset($GLOBALS['project']) === true && substr($class, -4) === '\API' && strpos($class, $GLOBALS['project']) === false) {
-                    $path = dirname(__DIR__, 3).'/simulator/'.$GLOBALS['project'].'/'.$prefix.'.php';
+
+                if (substr($class, -4) === '\API' && substr_count($class, '\\') === 2) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
-                if (substr($class, -10) === '\APIRouter' && substr_count($class, '\\') === 1) {
-                    $project = substr($class, 0, strpos($class, '\\'));
-                    $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/'.$prefix.'.php';
-                } else if (isset($GLOBALS['project']) === true && substr($class, -10) === '\APIRouter' && strpos($class, $GLOBALS['project']) === false) {
-                    $path = dirname(__DIR__, 3).'/simulator/'.$GLOBALS['project'].'/'.$prefix.'.php';
+                if (substr($class, -10) === '\APIRouter' && substr_count($class, '\\') === 2) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
-                if (substr($class, -11) === '\WebHandler' && substr_count($class, '\\') === 1) {
-                    $project = substr($class, 0, strpos($class, '\\'));
-                    $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/'.$prefix.'.php';
-                } else if (isset($GLOBALS['project']) === true && substr($class, -11) === '\WebHandler' && strpos($class, $GLOBALS['project']) === false) {
-                    $path = dirname(__DIR__, 3).'/simulator/'.$GLOBALS['project'].'/'.$prefix.'.php';
+                if (substr($class, -11) === '\WebHandler' && substr_count($class, '\\') === 2) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
-                if (substr($class, -11) === '\ViewRouter' && substr_count($class, '\\') === 1) {
-                    $project = substr($class, 0, strpos($class, '\\'));
-                    $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/'.$prefix.'.php';
-                } else if (isset($GLOBALS['project']) === true && substr($class, -11) === '\ViewRouter' && strpos($class, $GLOBALS['project']) === false) {
-                    $path = dirname(__DIR__, 3).'/simulator/'.$GLOBALS['project'].'/'.$prefix.'.php';
+                if (substr($class, -11) === '\ViewRouter' && substr_count($class, '\\') === 2) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
 
-                if (substr($class, -9) === '\JobQueue' && substr_count($class, '\\') === 1) {
-                    $project = substr($class, 0, strpos($class, '\\'));
-                    $path    = dirname(__DIR__, 3).'/simulator/'.$project.'/'.$prefix.'.php';
-                } else if (isset($GLOBALS['project']) === true && substr($class, -9) === '\JobQueue' && strpos($class, $GLOBALS['project']) === false) {
-                    $path = dirname(__DIR__, 3).'/simulator/'.$GLOBALS['project'].'/'.$prefix.'.php';
+                if (substr($class, -9) === '\JobQueue' && substr_count($class, '\\') === 2) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
                 if (substr($class, 0, 21) === 'PerspectiveSimulator\\') {

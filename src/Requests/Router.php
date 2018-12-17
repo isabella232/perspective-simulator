@@ -29,11 +29,14 @@ $domain    = array_shift($pathParts);
 $type      = array_shift($pathParts);
 
 if ($type !== 'admin') {
-    $project = ucfirst(array_shift($pathParts));
+    $vendor = array_shift($pathParts);
+    $proj   = array_shift($pathParts);
 
-    if ($project !== null) {
-        \PerspectiveSimulator\Bootstrap::load($project);
+    if ($vendor !== null) {
+        \PerspectiveSimulator\Bootstrap::load($vendor.'\\'.$proj);
     }
+
+    $project = $vendor.'\\'.$proj;
 }
 
 $path = implode('/', $pathParts);
@@ -67,7 +70,7 @@ switch ($type) {
     break;
 
     case 'tests':
-        $dir = \PerspectiveSimulator\Libs\FileSystem::getExportDir().'/projects/'.$project.'/tests/'.$path;
+        $dir = \PerspectiveSimulator\Libs\FileSystem::getExportDir().'/projects/'.$vendor.'/'.$proj.'/tests/'.$path;
 
         if (file_exists($dir) === false) {
             \PerspectiveSimulator\Libs\Web::send404();

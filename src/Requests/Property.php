@@ -36,7 +36,9 @@ class Property
         $type      = array_pop($pathParts);
 
         $fileParts = explode('-', $file);
-        if ($fileParts[0] === strtolower($GLOBALS['project'])) {
+        $prefix    = $fileParts[0].'\\'.$fileParts[1];
+        if ($prefix === strtolower($GLOBALS['project'])) {
+            array_shift($fileParts);
             array_shift($fileParts);
             $defaultPath = Libs\FileSystem::getProjectDir().'/Properties/'.$type.'/'.implode('-', $fileParts);
         } else {

@@ -50,19 +50,9 @@ class Bootstrap
      */
     public static function load(string $project)
     {
-        $projectParts = explode('/', $project);
-        if (count($projectParts) > 1) {
-            $GLOBALS['project'] = $projectParts[1];
-        } else {
-            $projectParts = explode('\\', $project);
-            if (count($projectParts) > 1) {
-                $GLOBALS['project'] = $projectParts[1];
-            } else {
-                $GLOBALS['project'] = $project;
-            }
-        }
-
-        $projectDir = Libs\FileSystem::getProjectDir();
+        $GLOBALS['projectNamespace'] = $project;
+        $GLOBALS['project']          = str_replace('\\', '/', $project);
+        $projectDir                  = Libs\FileSystem::getProjectDir();
 
         // Register an autoloader for the project.
         $loader = include dirname(__DIR__, 3).'/autoload.php';

@@ -346,7 +346,7 @@ __ROUTES__
     private static function bakeRouter(array $apis, string $project)
     {
         $router  = Util::printCode(0, '<?php');
-        $router .= Util::printCode(0, 'namespace '.$project.';');
+        $router .= Util::printCode(0, 'namespace '.str_replace('/', '\\', $project).';');
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(0, 'class APIRouter {');
         $router .= Util::printCode(0, '');
@@ -437,7 +437,7 @@ __ROUTES__
     private static function bakeAPIFunctions(array $apis, string $project)
     {
         $function  = Util::printCode(0, '<?php');
-        $function .= Util::printCode(0, 'namespace '.$project.';');
+        $function .= Util::printCode(0, 'namespace '.str_replace('/', '\\', $project).';');
         $function .= Util::printCode(0, '');
         $function .= Util::printCode(0, 'class API');
         $function .= Util::printCode(0, '{');

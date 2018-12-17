@@ -1157,7 +1157,7 @@ class FileSystem
             return null;
         }
 
-        return self::getSimulatorDir().'/'.$project.'/storage';
+        return str_replace('\\', '/', self::getSimulatorDir().'/'.$project.'/storage');
 
     }//end getStorageDir()
 
@@ -1175,7 +1175,7 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
-        return self::getExportDir().'/projects/'.$project.'/src';
+        return str_replace('\\', '/', self::getExportDir().'/projects/'.$project.'/src');
 
     }//end getProjectDir()
 
@@ -1193,7 +1193,7 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
-        return self::getExportDir().'/projects/'.$project.'/src/CDN';
+        return str_replace('\\', '/', self::getExportDir().'/projects/'.$project.'/src/CDN');
 
     }//end getCDNDir()
 
