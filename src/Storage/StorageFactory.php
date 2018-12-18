@@ -49,7 +49,7 @@ class StorageFactory
      */
     public static function createDataStore(string $name, string $project)
     {
-        $project = strtolower($project);
+        $project = self::getProjectPrefix();
         if (isset(self::$stores['data'][$project]) === false) {
             self::$stores['data'][$project] = [];
         }
@@ -70,7 +70,7 @@ class StorageFactory
      */
     public static function createUserStore(string $name, string $project)
     {
-        $project = strtolower($project);
+        $project = self::getProjectPrefix();
         if (isset(self::$stores['user'][$project]) === false) {
             self::$stores['user'][$project] = [];
         }
