@@ -81,8 +81,9 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
                 $section->writeln('Installing project from "'.$path.'"');
             }
 
-            $vendorProject      = $composerInfo['name'];
-            $GLOBALS['project'] = $vendorProject;
+            $vendorProject               = $composerInfo['name'];
+            $GLOBALS['project']          = $vendorProject;
+            $GLOBALS['projectNamespace'] = str_replace('/', '\\', $vendorProject);
 
             $projects[$vendorProject] = str_replace('composer.json', 'src', $path);
             file_put_contents($simulatorDir.'/projects.json', Libs\Util::jsonEncode($projects));
