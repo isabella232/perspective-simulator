@@ -49,6 +49,7 @@ class StorageFactory
      */
     public static function createDataStore(string $name, string $project)
     {
+        $project = strtolower($project);
         if (isset(self::$stores['data'][$project]) === false) {
             self::$stores['data'][$project] = [];
         }
@@ -69,6 +70,7 @@ class StorageFactory
      */
     public static function createUserStore(string $name, string $project)
     {
+        $project = strtolower($project);
         if (isset(self::$stores['user'][$project]) === false) {
             self::$stores['user'][$project] = [];
         }
@@ -146,6 +148,11 @@ class StorageFactory
      */
     public static function getDataRecordProperty(string $code)
     {
+        $project = self::getProjectPrefix();
+        if (strpos($code, $project) === false) {
+            $code = $project.'-'.$code;
+        }
+
         return (self::$props['data'][$code] ?? null);
 
     }//end getDataRecordProperty()
@@ -160,6 +167,11 @@ class StorageFactory
      */
     public static function getUserProperty(string $code)
     {
+        $project = self::getProjectPrefix();
+        if (strpos($code, $project) === false) {
+            $code = $project.'-'.$code;
+        }
+
         return (self::$props['user'][$code] ?? null);
 
     }//end getUserProperty()
@@ -174,6 +186,11 @@ class StorageFactory
      */
     public static function getProjectProperty(string $code)
     {
+        $project = self::getProjectPrefix();
+        if (strpos($code, $project) === false) {
+            $code = $project.'-'.$code;
+        }
+
         return (self::$props['project'][$code] ?? null);
 
     }//end getProjectProperty()
@@ -219,11 +236,29 @@ class StorageFactory
     }//end getUserStore()
 
 
-    private static function getProjectPrefix()
+    public static function getProjectPrefix()
     {
-        $bt = debug_backtrace(false, 4);
-        $classParts = explode('\\', $bt[3]['class']);
-        return $classParts[0].'\\'.$classParts[1];
+        $bt = debug_backtrace(false);
+
+        // Remove the call to this and the call to the function that needs the property code prefixed.
+        array_shift($bt);
+        array_shift($bt);
+
+        $key = 0;
+        foreach ($bt as $id => $call) {
+            if ($call['function'] === 'eval') {
+                $key = ($id + 1);
+                break;
+            }
+        }
+
+        $called = $bt[$key];
+        if (isset($called['class']) === true && strpos(strtolower($GLOBALS['project']), strtolower($called['class'])) !== false) {
+            $classParts   = explode('\\', $called['class']);
+            return Bootstrap::generatePrefix($classParts[0].'\\'.$classParts[1]);
+        } else {
+            return Bootstrap::generatePrefix($GLOBALS['project']);
+        }
 
     }//end getProjectPrefix()
 

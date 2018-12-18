@@ -138,8 +138,8 @@ class Bootstrap
         }
 
         // Add default user properties.
-        StorageFactory::createUserProperty('__first-name__', 'text');
-        StorageFactory::createUserProperty('__last-name__', 'text');
+        StorageFactory::createUserProperty($prefix.'-__first-name__', 'text');
+        StorageFactory::createUserProperty($prefix.'-__last-name__', 'text');
 
         \PerspectiveSimulator\Requests\Session::load();
         \PerspectiveSimulator\Queue\Queue::load();

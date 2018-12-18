@@ -250,7 +250,7 @@ trait ObjectTrait
         }
 
         $called = $bt[$key];
-        if (strpos($called['class'], $GLOBALS['project']) === false) {
+        if (strpos(strtolower($called['class']), strtolower($GLOBALS['project'])) === false) {
             $classParts   = explode('\\', $called['class']);
             $propertyCode = Bootstrap::generatePrefix($classParts[0].'\\'.$classParts[1]).'-'.$propertyCode;
         } else {

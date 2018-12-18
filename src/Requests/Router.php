@@ -80,7 +80,7 @@ switch ($type) {
     break;
 
     case 'tests':
-        $dir = \PerspectiveSimulator\Libs\FileSystem::getExportDir().'/projects/'.$vendor.'/'.$proj.'/tests/'.$path;
+        $dir = \PerspectiveSimulator\Libs\FileSystem::getExportDir().'/projects/'.$GLOBALS['project'].'/tests/'.$path;
 
         if (file_exists($dir) === false) {
             \PerspectiveSimulator\Libs\Web::send404();

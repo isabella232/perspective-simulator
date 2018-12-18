@@ -145,7 +145,8 @@ trait AspectedObjectTrait
             throw new \Exception('Invalid property type');
         }
 
-        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
+        $unprefixedCode = $propertyCode;
+        $propertyCode   = $this->getPrefixedPropertyCode($propertyCode);
 
         $functionName = 'get'.$typeName.'Property';
         $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
@@ -154,12 +155,12 @@ trait AspectedObjectTrait
         }
 
         if ($prop['type'] === 'unique') {
-            $current = $this->store->getUniqueDataRecord($propertyCode, $value);
+            $current = $this->store->getUniqueDataRecord($unprefixedCode, $value);
             if ($current !== null) {
                 throw new \Exception('Unique value "'.$value.'" is already in use');
             }
 
-            $this->store->setUniqueDataRecord($propertyCode, $value, $this);
+            $this->store->setUniqueDataRecord($unprefixedCode, $value, $this);
         } else if ($prop['type'] === 'image' || $prop['type'] === 'file') {
             $value = self::prepareFileImagePropertyValue($value, $typeName, $propertyCode);
         }

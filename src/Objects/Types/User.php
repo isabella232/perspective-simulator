@@ -91,6 +91,8 @@ class User implements ObjectInterface
             throw new \Exception('Invalid property type');
         }
 
+        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
+
         $functionName = 'get'.$typeName.'Property';
         $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
@@ -118,6 +120,9 @@ class User implements ObjectInterface
             throw new \Exception('Invalid property type');
         }
 
+        $unprefixedCode = $propertyCode;
+        $propertyCode   = $this->getPrefixedPropertyCode($propertyCode);
+
         $functionName = 'get'.$typeName.'Property';
         $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
@@ -125,12 +130,12 @@ class User implements ObjectInterface
         }
 
         if ($prop['type'] === 'unique') {
-            $current = $this->store->getUniqueUserRecord($propertyCode, $value);
+            $current = $this->store->getUniqueUserRecord($unprefixedCode, $value);
             if ($current !== null) {
                 throw new \Exception('Unique value "'.$value.'" is already in use');
             }
 
-            $this->store->setUniqueDataRecord($propertyCode, $value, $this);
+            $this->store->setUniqueDataRecord($unprefixedCode, $value, $this);
         }
 
         $this->properties[$propertyCode] = $value;
@@ -266,64 +271,6 @@ class User implements ObjectInterface
         }
 
     }//end deleteValue()
-
-
-    /**
-     * Gets the shadow value of a given property for a given page in a given aspect.
-     *
-     * This method can also be used to retrieve multiple shadow values for multiple pages and so has a number of return
-     * value formats.
-     *
-     * @param string $propertyCode The property code that is being retrieved.
-     * @param string $shadowid     The shadow ID that the value is being retrieved from. If passing an array, the array
-     *                             must be a single-dimensional list of shadow IDs. If NULL, all values with a shadow ID
-     *                             will be returned for all passed page IDs. i.e., no shadow ID filtering will take place.
-     *
-     * @return mixed
-     * @throws InvalidDataException When propertyid is not known.
-     */
-    final public function getShadowValue(string $propertyCode, string $shadowid=null)
-    {
-        // TODO: Implement this.
-
-    }//end getShadowValue()
-
-
-    /**
-     * Sets the shadow value of a given property for a given data record in a given aspect.
-     *
-     * @param string $propertyCode The property code that the value is being set on.
-     * @param string $shadowid     The shadow ID to associate with the value.
-     * @param mixed  $value        The value to set into the property. The data type of the value must match the expected
-     *                             data type of the property.
-     * @param array  $aspect       The aspect defines a specific variation of the property value to set.
-     *
-     * @return void
-     * @throws InvalidDataException Thrown when propertyid is unknown.
-     * @throws ReadOnlyException    When request is in read only mode.
-     */
-    final public function setShadowValue(string $propertyCode, string $shadowid, $value)
-    {
-        // TODO: implement this.
-
-    }//end setShadowValue()
-
-
-    /**
-     * Deletes the shadow value of a given property for a given data record in a given aspect.
-     *
-     * @param string $propertyCode The property code that the value is being deleted from.
-     * @param string $shadowid     The shadow ID associated with the value.
-     *
-     * @return void
-     * @throws InvalidDataException When the propertyid is not known.
-     * @throws ReadOnlyException    When request is in read only mode.
-     */
-    final public function deleteShadowValue(string $propertyCode, string $shadowid)
-    {
-        // TODO: implement this.
-
-    }//end deleteShadowValue()
 
 
 }//end class

@@ -28,6 +28,7 @@ class Session
     public static function load()
     {
         if (Bootstrap::isReadEnabled() === false) {
+            $_SESSION = [];
             return false;
         }
 

@@ -120,6 +120,9 @@ class DataStore
      */
     final public function getUniqueDataRecord(string $propertyCode, string $value)
     {
+        $project      = \PerspectiveSimulator\Storage\StorageFactory::getProjectPrefix();
+        $propertyCode = $project.'-'.$propertyCode;
+
         return ($this->uniqueMap[$propertyCode][$value] ?? null);
 
     }//end getUniqueDataRecord()
@@ -136,6 +139,9 @@ class DataStore
      */
     final public function setUniqueDataRecord(string $propertyCode, string $value, $record)
     {
+        $project      = \PerspectiveSimulator\Storage\StorageFactory::getProjectPrefix();
+        $propertyCode = $project.'-'.$propertyCode;
+
         $this->uniqueMap[$propertyCode][$value] = $record;
         $this->save();
 
