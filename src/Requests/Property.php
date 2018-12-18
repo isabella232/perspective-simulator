@@ -36,7 +36,7 @@ class Property
         $type      = array_pop($pathParts);
 
         $fileParts = explode('-', $file);
-        $prefix    = $fileParts[0].'\\'.$fileParts[1];
+        $prefix    = $fileParts[0].'/'.$fileParts[1];
         if ($prefix === strtolower($GLOBALS['project'])) {
             array_shift($fileParts);
             array_shift($fileParts);

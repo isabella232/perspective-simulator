@@ -167,7 +167,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln([
-            'Create new project',
+            'Creating new project',
             '================================================',
             '',
         ]);
@@ -175,7 +175,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         try {
             $name      = $input->getArgument('name');
             $namespace = $input->getArgument('namespace');
-            $path      = ($input->getArgument('path') ?? $namespace);
+            $path      = ($input->getArgument('path') ?? str_replace('\\', '-', $namespace));
             $this->validateProjectNamespace($namespace);
             $this->validateProjectPath($path);
 
@@ -202,45 +202,61 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             Libs\FileSystem::mkdir($projectDir, true);
             file_put_contents($projectDir.'/project.json', Libs\Util::jsonEncode($settings));
 
-            // Install project for the simulator.
-            $simulatorDir       = Libs\FileSystem::getSimulatorDir();
-            $project            = $namespace;
-            $GLOBALS['project'] = $project;
+            $composer = [
+                'name'        => str_replace('\\', '/', $namespace),
+                'description' => 'Project for '.$namespace,
+            ];
+            file_put_contents(str_replace('src', '', $projectDir).'composer.json', Libs\Util::jsonEncode($settings));
 
-            if (is_dir($simulatorDir.'/'.$project) === false) {
-                Libs\FileSystem::mkdir($simulatorDir.'/'.$project);
-            }
-
-            $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
-
-            $storageDir = Libs\FileSystem::getStorageDir($project);
-            if (is_dir($storageDir) === false) {
-                Libs\FileSystem::mkdir($storageDir);
-            }
-
-            $folders = ['API', 'API/Operations', 'App', 'CDN', 'CustomTypes', 'Properties', 'Stores', 'Queues'];
+            $folders = [
+                'API',
+                'API/Operations',
+                'App',
+                'CDN',
+                'CustomTypes',
+                'Properties',
+                'Stores',
+                'Queues',
+                'web',
+                'web/handlers',
+                'web/views'
+            ];
             foreach ($folders as $folder) {
                 if (is_dir($projectDir.'/'.$folder) === false) {
                     Libs\FileSystem::mkdir($projectDir.'/'.$folder);
                 }
             }
 
-            $testDir = Libs\FileSystem::getExportDir().'/projects/'.$namespace.'/tests';
+            $testDir = Libs\FileSystem::getExportDir().'/projects/'.str_replace('\\', '/', $namespace).'/tests';
             if (is_dir($testDir) === false) {
                 Libs\FileSystem::mkdir($testDir);
             }
 
-            \PerspectiveSimulator\API::installAPI($project);
-            \PerspectiveSimulator\Queue\Queue::installQueues($project);
-            \PerspectiveSimulator\View\View::installViews($project);
+            // Install project for the simulator.
+            $this->getApplication()->find('simulator:install')->run($input, $output);
+
+            // $simulatorDir       = Libs\FileSystem::getSimulatorDir();
+            //
+            // $GLOBALS['project'] = str_replace('\\', '/', $namespace);
+
+            // if (is_dir($simulatorDir.'/'.$project) === false) {
+            //     Libs\FileSystem::mkdir($simulatorDir.'/'.$project, true);
+            // }
+
+            // $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
+
+            // $storageDir = Libs\FileSystem::getStorageDir($project);
+            // if (is_dir($storageDir) === false) {
+            //     Libs\FileSystem::mkdir($storageDir);
+            // }
+            // \PerspectiveSimulator\API::installAPI($project);
+            // \PerspectiveSimulator\Queue\Queue::installQueues($project);
+            // \PerspectiveSimulator\View\View::installViews($project);
         } catch (\Exception $e) {
             throw new CLIException($e->getMessage());
         }//end try
 
-        $output->writeln([
-            'New project created: '.$name,
-            '',
-        ]);
+        $output->writeln('New project created: '.$name);
 
     }//end execute()
 

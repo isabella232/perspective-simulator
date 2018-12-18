@@ -87,7 +87,7 @@ class View
                 break;
 
                 default:
-                    $class = $GLOBALS['project'].'\\Web\\Views\\'.str_replace('/', '\\', $viewid);
+                    $class = $GLOBALS['projectNamespace'].'\\Web\\Views\\'.str_replace('/', '\\', $viewid);
                     if (class_exists($class) === true) {
                         $viewClass = new $class();
                         $data = array_merge(

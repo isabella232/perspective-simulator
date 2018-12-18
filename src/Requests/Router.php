@@ -14,7 +14,7 @@ ini_set('error_log', dirname(__DIR__, 5).'/simulator/error_log');
 
 include dirname(__DIR__, 4).'/autoload.php';
 
-$path = $_SERVER['REQUEST_URI'];
+$path = strtolower($_SERVER['REQUEST_URI']);
 
 if ($path === '/favicon.ico') {
     return;
@@ -29,14 +29,24 @@ $domain    = array_shift($pathParts);
 $type      = array_shift($pathParts);
 
 if ($type !== 'admin') {
-    $vendor = array_shift($pathParts);
-    $proj   = array_shift($pathParts);
+    $v1 = array_shift($pathParts);
+    $v2 = array_shift($pathParts);
 
-    if ($vendor !== null) {
-        \PerspectiveSimulator\Bootstrap::load($vendor.'\\'.$proj);
+    $installedProjects = \PerspectiveSimulator\Libs\Util::jsonDecode(
+        file_get_contents(\PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/projects.json')
+    );
+
+    $vendor = null;
+    if (isset($installedProjects[$v1.'/'.$v2]) === true) {
+        $vendor = $v1.'\\'.$v2;
+    } else if (isset($installedProjects[$v1]) === true) {
+        $vendor    = $v1;
+        $pathParts = array_merge([$v2], $pathParts);
     }
 
-    $project = $vendor.'\\'.$proj;
+    if ($vendor !== null) {
+        \PerspectiveSimulator\Bootstrap::load($vendor);
+    }
 }
 
 $path = implode('/', $pathParts);
@@ -51,7 +61,7 @@ switch ($type) {
 
         $method = strtolower(($_SERVER['REQUEST_METHOD'] ?? ''));
 
-        $class = $project.'\APIRouter';
+        $class = $GLOBALS['projectNamespace'].'\APIRouter';
         $class::process($path, $method, $queryParams);
     break;
 
@@ -61,7 +71,7 @@ switch ($type) {
 
     case 'web':
         $method = strtolower(($_SERVER['REQUEST_METHOD'] ?? ''));
-        $class  = $project.'\ViewRouter';
+        $class  = $GLOBALS['projectNamespace'].'\ViewRouter';
         $class::process('/'.$path, strtoupper($method));
     break;
 

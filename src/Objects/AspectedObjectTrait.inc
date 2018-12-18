@@ -92,7 +92,7 @@ trait AspectedObjectTrait
             $propDir        = \PerspectiveSimulator\Libs\FileSystem::getProjectDir().'/Properties/'.$typeName;
             $unprefixedCode = explode('-', $propertyCode);
             $prefix         = array_shift($unprefixedCode);
-            $prefix        .= '\\'.array_shift($unprefixedCode);
+            $prefix        .= '/'.array_shift($unprefixedCode);
             if ($prefix === strtolower($GLOBALS['project'])) {
                 $unprefixedCode = implode('-', $unprefixedCode);
             } else {

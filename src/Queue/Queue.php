@@ -287,6 +287,10 @@ class Queue
             $queueClass .= Libs\Util::printCode(0, '');
 
             $files = scandir($queuePath);
+            if (empty($files) === true) {
+                // No queue files so just return.
+                return true;
+            }
 
             foreach ($files as $file) {
                 if ($file[0] === '.'

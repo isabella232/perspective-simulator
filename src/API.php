@@ -119,7 +119,8 @@ __ROUTES__
      */
     public static function getAPIFunction(string $project, string $action)
     {
-        $file = self::getAPIPath($project).'/Operations/'.$action.'.php';
+        $project = str_replace('\\', '/', $project);
+        $file    = self::getAPIPath($project).'/Operations/'.$action.'.php';
         if (is_file($file) === false) {
             throw new \Exception('API operation "'.$action.'" does not exist');
         }

@@ -155,7 +155,7 @@ trait ObjectTrait
 
             $unprefixedCode = explode('-', $propertyCode);
             $prefix         = array_shift($unprefixedCode);
-            $prefix        .= '\\'.array_shift($unprefixedCode);
+            $prefix        .= '/'.array_shift($unprefixedCode);
             if ($prefix === strtolower($GLOBALS['project'])) {
                 $unprefixedCode = implode('-', $unprefixedCode);
             } else {

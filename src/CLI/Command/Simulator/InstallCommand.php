@@ -55,6 +55,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $projects     = [];
         $genAuth      = false;
         $simulatorDir = Libs\FileSystem::getSimulatorDir();
         if (is_dir($simulatorDir) === false) {
@@ -63,59 +64,66 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectPath = Libs\FileSystem::getExportDir().'/projects/';
-        $projectDirs = scandir($projectPath);
-        foreach ($projectDirs as $vendor) {
-            $vendorDirs = scandir($projectPath.$vendor);
-            foreach ($vendorDirs as $project) {
-                if (is_dir($projectPath.$vendor) === true && $vendor[0] !== '.') {
-                    $vendorProject      = $vendor.'/'.$project;
-                    $GLOBALS['project'] = $vendorProject;
+        $projectDirs = Libs\FileSystem::listDirectory($projectPath, ['.json'], true, true, '/(composer)/');
+        foreach ($projectDirs as $path) {
+            if (strpos($path, 'vendor') !== false) {
+                // Must be a dependancy so skip it as it will already have been loaded by the top level project.
+                continue;
+            }
 
-                    $path = $projectPath.$vendor.'/'.$project;
-                    if (is_dir($path) === true && $project[0] !== '.') {
-                        if (is_dir($simulatorDir.'/'.$vendor.'/'.$project) === false) {
-                            Libs\FileSystem::mkdir($simulatorDir.'/'.$vendor.'/'.$project, true);
-                        }
+            $section      = $output->section();
+            $composerInfo = Libs\Util::jsonDecode(file_get_contents($path));
+            if (isset($composerInfo['name']) === false) {
+                // Invalid project so lets continue and print message.
+                $section->writeln('<error>Unable to install project from path "'.$path.'" missing name key in composer.json</error>');
+                continue;
+            } else {
+                $section->writeln('Installing project from "'.$path.'"');
+            }
 
-                        if ($genAuth === true) {
-                            $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
-                        }
+            $vendorProject      = $composerInfo['name'];
+            $GLOBALS['project'] = $vendorProject;
 
-                        $storageDir = Libs\FileSystem::getStorageDir($vendorProject);
-                        if (is_dir($storageDir) === false) {
-                            Libs\FileSystem::mkdir($storageDir);
-                        }
+            $projects[$vendorProject] = str_replace('composer.json', 'src', $path);
+            file_put_contents($simulatorDir.'/projects.json', Libs\Util::jsonEncode($projects));
 
-                        \PerspectiveSimulator\API::installAPI($vendorProject);
-                        \PerspectiveSimulator\Queue\Queue::installQueues($vendorProject);
-                        \PerspectiveSimulator\View\View::installViews($vendorProject);
+            if (is_dir($simulatorDir.'/'.$vendorProject) === false) {
+                Libs\FileSystem::mkdir($simulatorDir.'/'.$vendorProject, true);
+            }
 
-                        $composer = $path.'/composer.json';
-                        if (file_exists($composer) === true) {
-                            $composerContents = Libs\Util::jsonDecode(file_get_contents($composer));
-                            if (isset($composerContents['require']) === true) {
-                                foreach ($composerContents['require'] as $requirement => $version) {
-                                    $proj = str_replace('/', '\\', $requirement);
-                                    \PerspectiveSimulator\API::installAPI($proj);
-                                    \PerspectiveSimulator\Queue\Queue::installQueues($proj);
-                                    \PerspectiveSimulator\View\View::installViews($proj);
-                                }
-                            }
+            $authFile = $simulatorDir.'/'.$vendorProject.'/authentication.json';
+            if ($genAuth === true || file_exists($authFile) === false) {
+                $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
+            }
 
-                            if (isset($composerContents['require-dev']) === true) {
-                                foreach ($composerContents['require-dev'] as $requirement => $version) {
-                                    $proj = str_replace('/', '\\', $requirement);
-                                    \PerspectiveSimulator\API::installAPI($proj);
-                                    \PerspectiveSimulator\Queue\Queue::installQueues($proj);
-                                    \PerspectiveSimulator\View\View::installViews($proj);
-                                }
-                            }
-                        }
-                    }
-                }//end if
-            }//end foreach
+            $storageDir = Libs\FileSystem::getStorageDir($vendorProject);
+            if (is_dir($storageDir) === false) {
+                Libs\FileSystem::mkdir($storageDir);
+            }
+
+            \PerspectiveSimulator\API::installAPI($vendorProject);
+            \PerspectiveSimulator\Queue\Queue::installQueues($vendorProject);
+            \PerspectiveSimulator\View\View::installViews($vendorProject);
+
+                // Combine theses so one loop for both.
+            $requirements = [];
+            if (isset($composerInfo['require']) === true) {
+                $requirements = array_merge($requirements, $composerInfo['require']);
+            }
+
+            if (isset($composerInfo['require-dev']) === true) {
+                $requirements = array_merge($requirements, $composerInfo['require-dev']);
+            }
+
+            foreach ($requirements as $requirement => $version) {
+                $proj = str_replace('/', '\\', $requirement);
+                \PerspectiveSimulator\API::installAPI($proj);
+                \PerspectiveSimulator\Queue\Queue::installQueues($proj);
+                \PerspectiveSimulator\View\View::installViews($proj);
+            }
+
+            $section->overwrite('Installing project from "'.$path.'" <info>DONE</info>');
         }//end foreach
-
     }//end execute()
 
 

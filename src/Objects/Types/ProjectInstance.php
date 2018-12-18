@@ -36,7 +36,9 @@ class ProjectInstance implements ObjectInterface
      */
     final public function __construct(string $projectid)
     {
-        $this->id = $projectid;
+        $projectid = str_replace('\\', '-', $projectid);
+        $projectid = str_replace('/', '-', $projectid);
+        $this->id  = $projectid;
 
         if ($this->load() === false) {
             $this->save();

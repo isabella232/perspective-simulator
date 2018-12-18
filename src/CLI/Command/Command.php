@@ -34,46 +34,38 @@ class Command extends \Symfony\Component\Console\Command\Command
         $project = ltrim($project, '=');
         if (empty($project) === true) {
             // Workout the current project and if the simulator is installed so we can run our actions.
-            $simPath      = '/vendor/Perspective/Simulator';
-            $cwd          = getcwd();
-            $proot        = $cwd;
-            $project      = null;
-            $prevBasename = null;
-            while (file_exists($proot.$simPath) === false) {
-                if ($project === null) {
-                    $prevBasename = basename($proot);
-                }
-
+            $simPath = '/vendor/Perspective/Simulator';
+            $cwd     = getcwd();
+            $proot   = $cwd;
+            while (is_dir($proot.$simPath) === false) {
                 $proot = dirname($proot);
                 if ($proot === '/') {
-                    throw new \Expception('Perspective command must be run in a Perspective export.');
-                }
-
-                if (basename($proot) === 'projects' && $project === null) {
-                    $project = $prevBasename;
+                    $output->writeln('<error>Unable to find Perspective Simulator</error>');
+                    exit(1);
                 }
             }
 
-            if ($project === null) {
-                $projects    = [];
-                $projectPath = Libs\FileSystem::getExportDir().'/projects/';
-                $projectDirs = scandir($projectPath);
-                foreach ($projectDirs as $proj) {
-                    $path = $projectPath.$project;
-                    if (is_dir($path) === true && $proj[0] !== '.') {
-                        $projects[] = $proj;
-                    }
-                }//end foreach
+            $installedProjects = Libs\Util::jsonDecode(file_get_contents(Libs\FileSystem::getSimulatorDir().'/projects.json'));
+            $projects          = [];
+            foreach ($installedProjects as $proj => $path) {
+                $baseProjectPath = str_replace('/src', '', $path);
+                if (strrpos($cwd, $baseProjectPath) !== false) {
+                    $project = str_replace('/', '\\', $proj);
+                    break;
+                }
+                $projects[] = str_replace('/', '\\', $proj);
+            }//end foreach
 
+            if (empty($project) === true) {
                 $helper   = $this->getHelper('question');
                 $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
-                    'Please select which project you want to perform the action in (default: 0)',
+                    'Please select which project you want to perform the action in (default: <comment>0</comment>)',
                     $projects,
                     0
                 );
 
                 $project = $helper->ask($input, $output, $question);
-                $output->writeln('You have just selected: '.$project);
+                $output->writeln('The action will be performed on <info>'.$project.'</info>');
             }
         }
 

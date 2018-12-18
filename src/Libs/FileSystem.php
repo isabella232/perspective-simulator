@@ -1047,7 +1047,7 @@ class FileSystem
      *
      * @return boolean
      */
-    public static function mkdir(string $pathname, bool $recursive=false)
+    public static function mkdir(string $pathname, bool $recursive=true)
     {
         $pathname = rtrim($pathname, '/');
         $ret      = mkdir($pathname, self::$dirMask, $recursive);
@@ -1175,6 +1175,14 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
+        $project  = str_replace('\\', '/', $project);
+        $projects = Util::jsonDecode(file_get_contents(self::getSimulatorDir().'/projects.json'));
+
+        if (isset($projects[$project]) === true) {
+            return $projects[$project];
+        }
+
+        // Something must have gone wrong or the projects file so lets try to work it out.
         return str_replace('\\', '/', self::getExportDir().'/projects/'.$project.'/src');
 
     }//end getProjectDir()
@@ -1193,7 +1201,7 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
-        return str_replace('\\', '/', self::getExportDir().'/projects/'.$project.'/src/CDN');
+        return self::getProjectDir($project).'/CDN';
 
     }//end getCDNDir()
 
