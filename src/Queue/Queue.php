@@ -78,10 +78,10 @@ class Queue
     public static function getQueuePath(string $project=null)
     {
         if ($project === null) {
-            $project = $GLOBASL['project'];
+            $project = $GLOBASL['projectNamespace'];
         }
 
-        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+        if (strtolower($GLOBALS['projectNamespace']) !== strtolower($project)) {
             $project = str_replace('\\', '/', $project);
             $dir     = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
 
@@ -103,9 +103,8 @@ class Queue
     private static function validateQueues(array $queueNames)
     {
         $valid = true;
-
         foreach ($queueNames as $queueName) {
-            if (method_exists('\\'.$GLOBALS['project'].'\\JobQueue', $queueName) === false) {
+            if (method_exists(str_replace('/', '\\', $GLOBALS['project']).'\\JobQueue', $queueName) === false) {
                 $valid = false;
             }
         }
@@ -224,7 +223,8 @@ class Queue
      */
     private static function processJob(string $project, string $queueName, $data)
     {
-        $className      = '\\'.$project.'\\JobQueue';
+
+        $className      = str_replace('/', '\\', $project).'\\JobQueue';
         $queueNameParts = explode('.', $queueName);
         foreach ($queueNameParts as $name) {
             if (method_exists($className, $name) === false) {

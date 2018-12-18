@@ -122,6 +122,10 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
                 \PerspectiveSimulator\View\View::installViews($proj);
             }
 
+            $projectPath = str_replace('/composer.json', '', $path);
+            chdir($projectPath);
+            exec('composer install', $out, $ret);
+
             $section->overwrite('Installing project from "'.$path.'" <info>DONE</info>');
         }//end foreach
     }//end execute()

@@ -1175,9 +1175,8 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
-        $project  = str_replace('\\', '/', $project);
+        $project  = strtolower(str_replace('\\', '/', $project));
         $projects = Util::jsonDecode(file_get_contents(self::getSimulatorDir().'/projects.json'));
-
         if (isset($projects[$project]) === true) {
             return $projects[$project];
         }

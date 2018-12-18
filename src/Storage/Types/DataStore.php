@@ -67,7 +67,7 @@ class DataStore
         if ($type === null) {
             $type = 'PerspectiveSimulator\ObjectType\DataRecord';
         } else {
-            $type = $GLOBALS['project'].'\CustomTypes\Data\\'.$type;
+            $type = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.$type;
         }
 
         if ($parent !== null && isset($this->records[$parent]) === false) {

@@ -28,13 +28,13 @@ $pathParts = explode('/', $path);
 $domain    = array_shift($pathParts);
 $type      = array_shift($pathParts);
 
+$installedProjects = \PerspectiveSimulator\Libs\Util::jsonDecode(
+    file_get_contents(\PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/projects.json')
+);
+
 if ($type !== 'admin') {
     $v1 = array_shift($pathParts);
     $v2 = array_shift($pathParts);
-
-    $installedProjects = \PerspectiveSimulator\Libs\Util::jsonDecode(
-        file_get_contents(\PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/projects.json')
-    );
 
     $vendor = null;
     if (isset($installedProjects[strtolower($v1.'/'.$v2)]) === true) {
@@ -80,7 +80,7 @@ switch ($type) {
     break;
 
     case 'tests':
-        $dir = \PerspectiveSimulator\Libs\FileSystem::getExportDir().'/projects/'.$GLOBALS['project'].'/tests/'.$path;
+        $dir = str_replace('/src', '', $installedProjects[strtolower($GLOBALS['project'])]).'/tests/'.$path;
 
         if (file_exists($dir) === false) {
             \PerspectiveSimulator\Libs\Web::send404();

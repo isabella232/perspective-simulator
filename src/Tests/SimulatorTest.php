@@ -32,7 +32,7 @@ abstract class SimulatorTest extends \PHPUnit\Framework\TestCase
         Bootstrap::disableRead();
         Bootstrap::disableWrite();
         Bootstrap::disableNotifications();
-        Bootstrap::load($classParts[0]);
+        Bootstrap::load($classParts[0].'\\'.$classParts[1]);
 
     }//end setUpBeforeClass()
 

@@ -30,15 +30,25 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                     return;
                 }
 
-                if (isset($GLOBALS['project']) === true
-                    && file_exists(dirname(__DIR__, 3).'/projects/'.str_replace('\\', '/', $GLOBALS['project']).'/vendor/autoload.php') === true
-                ) {
-                    self::$composerAutoloader = include dirname(__DIR__, 3).'/projects/'.str_replace('\\', '/', $GLOBALS['project']).'/vendor/autoload.php';
-                    if (self::$composerAutoloader instanceof \Composer\Autoload\ClassLoader) {
-                        self::$composerAutoloader->unregister();
-                        self::$composerAutoloader->register();
+                $projectsFile = dirname(__DIR__, 3).'/simulator/projects.json';
+                if (file_exists($projectsFile) === true && isset($GLOBALS['project']) === true) {
+                    $projects          = json_decode(file_get_contents($projectsFile), true);
+                    $project           = strtolower(str_replace('\\', '/', $GLOBALS['project']));
+                    $projectAutoloader = null;
+                    if (isset($projects[$project]) === true) {
+                        $projectAutoloader = str_replace('/src', '/vendor/autoload.php', $projects[$project]);
+                    }
+
+                    if ($projectAutoloader !== null && file_exists($projectAutoloader) === true) {
+                        self::$composerAutoloader = include $projectAutoloader;
+                        if (self::$composerAutoloader instanceof \Composer\Autoload\ClassLoader) {
+                            self::$composerAutoloader->unregister();
+                            self::$composerAutoloader->register();
+                        } else {
+                            // Something went wrong, so keep going without the autoloader.
+                            self::$composerAutoloader = false;
+                        }
                     } else {
-                        // Something went wrong, so keep going without the autoloader.
                         self::$composerAutoloader = false;
                     }
                 } else {
