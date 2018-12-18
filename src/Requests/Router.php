@@ -14,7 +14,7 @@ ini_set('error_log', dirname(__DIR__, 5).'/simulator/error_log');
 
 include dirname(__DIR__, 4).'/autoload.php';
 
-$path = strtolower($_SERVER['REQUEST_URI']);
+$path = $_SERVER['REQUEST_URI'];
 
 if ($path === '/favicon.ico') {
     return;
@@ -37,9 +37,9 @@ if ($type !== 'admin') {
     );
 
     $vendor = null;
-    if (isset($installedProjects[$v1.'/'.$v2]) === true) {
+    if (isset($installedProjects[strtolower($v1.'/'.$v2)]) === true) {
         $vendor = $v1.'\\'.$v2;
-    } else if (isset($installedProjects[$v1]) === true) {
+    } else if (isset($installedProjects[strtolower($v1)]) === true) {
         $vendor    = $v1;
         $pathParts = array_merge([$v2], $pathParts);
     }

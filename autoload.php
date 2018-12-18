@@ -56,26 +56,27 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
             }
 
             if ($path === false) {
-                $prefix = strtolower(str_replace('\\', '-', $class));
+                $projectNs = strtolower($GLOBALS['projectNamespace']);
+                $prefix    = strtolower(str_replace('\\', '-', $class));
 
-                if ($class === $GLOBALS['projectNamespace'].'\API') {
+                if (strtolower($class) === $projectNs.'\\api') {
                     $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
-                if ($class === $GLOBALS['projectNamespace'].'\APIRouter') {
+                if (strtolower($class) === $projectNs.'\\apirouter') {
                     $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
-                if ($class === $GLOBALS['projectNamespace'].'\WebHandler') {
+                if (strtolower($class) === $projectNs.'\\webhandler') {
                     $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
-                if ($class === $GLOBALS['projectNamespace'].'\ViewRouter') {
+                if (strtolower($class) === $projectNs.'\\viewrouter') {
                     $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 
 
-                if ($class === $GLOBALS['projectNamespace'].'\JobQueue') {
+                if (strtolower($class) === $projectNs.'\\jobqueue') {
                     $path = dirname(__DIR__, 3).'/simulator/'.str_replace('\\', $ds, $GLOBALS['project']).'/'.$prefix.'.php';
                 }
 

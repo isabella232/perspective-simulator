@@ -205,7 +205,8 @@ class UserStore
             return false;
         }
 
-        $store = Libs\Util::jsonDecode(file_get_contents($filePath));
+        $store  = Libs\Util::jsonDecode(file_get_contents($filePath));
+        $prefix = Bootstrap::generatePrefix($GLOBALS['project']);
 
         foreach ($store['records'] as $recordid => $data) {
             $recordPath = dirname($filePath).'/'.$recordid.'.json';
@@ -215,8 +216,8 @@ class UserStore
                 $this,
                 $recordid,
                 $recordData['username'],
-                $recordData['properties']['__first-name__'],
-                $recordData['properties']['__last-name__']
+                $recordData['properties'][$prefix.'-__first-name__'],
+                $recordData['properties'][$prefix.'-__last-name__']
             );
 
             $this->records[$recordid] = $data;
