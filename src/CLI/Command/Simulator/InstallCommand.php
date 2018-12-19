@@ -106,7 +106,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
             \PerspectiveSimulator\Queue\Queue::installQueues($vendorProject);
             \PerspectiveSimulator\View\View::installViews($vendorProject);
 
-                // Combine theses so one loop for both.
+            // Combine theses so one loop for both.
             $requirements = [];
             if (isset($composerInfo['require']) === true) {
                 $requirements = array_merge($requirements, $composerInfo['require']);

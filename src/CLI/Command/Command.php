@@ -69,6 +69,7 @@ class Command extends \Symfony\Component\Console\Command\Command
             }
         }
 
+        $project = str_replace('/', '\\', $project);
         \PerspectiveSimulator\Bootstrap::load($project);
 
         return true;
