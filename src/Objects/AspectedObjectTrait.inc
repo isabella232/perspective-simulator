@@ -76,10 +76,11 @@ trait AspectedObjectTrait
             throw new \Exception('Invalid property type');
         }
 
-        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
+        $unprefixedCode = $propertyCode;
+        $propertyCode   = $this->getPrefixedPropertyCode($propertyCode);
 
         $functionName = 'get'.$typeName.'Property';
-        $prop         = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
+        $prop         = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $unprefixedCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
@@ -149,7 +150,7 @@ trait AspectedObjectTrait
         $propertyCode   = $this->getPrefixedPropertyCode($propertyCode);
 
         $functionName = 'get'.$typeName.'Property';
-        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
+        $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $unprefixedCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
