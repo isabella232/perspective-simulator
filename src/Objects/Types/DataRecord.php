@@ -43,7 +43,7 @@ class DataRecord implements ObjectInterface
         $this->id    = $id;
 
         if ($this->load() === false) {
-            $this->save();
+            \PerspectiveSimulator\Bootstrap::queueSave($this);
         }
 
     }//end __construct()

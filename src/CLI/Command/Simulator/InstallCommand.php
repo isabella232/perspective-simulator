@@ -61,6 +61,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
         if (is_dir($simulatorDir) === false) {
             $genAuth = true;
             Libs\FileSystem::mkdir($simulatorDir);
+            touch($simulatorDir.'/error_log');
         }
 
         $projectPath = Libs\FileSystem::getExportDir().'/projects/';

@@ -24,6 +24,13 @@ class Bootstrap
      *
      * @var boolean
      */
+    private static $saveQueue = [];
+
+    /**
+     * Read enabled flag.
+     *
+     * @var boolean
+     */
     private static $readEnabled = true;
 
     /**
@@ -50,6 +57,13 @@ class Bootstrap
      */
     public static function load(string $project)
     {
+        // Register the shutdown function to process any saves that we have queued.
+        register_shutdown_function(
+            function () {
+                \PerspectiveSimulator\Bootstrap::processSave();
+            }
+        );
+
         $GLOBALS['projectNamespace'] = $project;
         $GLOBALS['project']          = str_replace('\\', '/', $project);
         $projectDir                  = Libs\FileSystem::getProjectDir();
@@ -375,6 +389,54 @@ class Bootstrap
         }//end if
 
     }//end loadDependencies()
+
+
+    /**
+     * Queues a save for later.
+     *
+     * @param object $object Object to be added to the save queue
+     *
+     * @return void
+     */
+    public static function queueSave($object)
+    {
+        self::$saveQueue[] = $object;
+
+    }//end queueSave
+
+
+    /**
+     * Process the save queue.
+     *
+     * @return void
+     */
+    public static function processSave()
+    {
+        if (empty(self::$saveQueue) === true) {
+            return;
+        }
+
+        foreach (self::$saveQueue as $object) {
+            if (method_exists($object, 'save') === true) {
+                $object->save();
+            }
+        }
+
+        self::clearSaveQueue();
+
+    }//end processSave()
+
+
+    /**
+     * Clears the save queue
+     *
+     * @return void
+     */
+    public static function clearSaveQueue()
+    {
+        self::$saveQueue = [];
+
+    }//end clearSaveQueue()
 
 
 }//end class

@@ -89,7 +89,7 @@ class DataStore
             $this->records[$recordid]['depth']            += $this->records[$parent]['depth'];
         }
 
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
         return $record;
 
@@ -143,7 +143,7 @@ class DataStore
         $propertyCode = $project.'-'.$propertyCode;
 
         $this->uniqueMap[$propertyCode][$value] = $record;
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
     }//end setUniqueDataRecord()
 

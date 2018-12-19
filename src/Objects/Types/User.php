@@ -70,7 +70,7 @@ class User implements ObjectInterface
             $this->setFirstName($firstName);
             $this->setLastName($lastName);
 
-            $this->save();
+            \PerspectiveSimulator\Bootstrap::queueSave($this);
         }
 
     }//end __construct()
@@ -141,7 +141,7 @@ class User implements ObjectInterface
 
         $this->properties[$propertyCode] = $value;
 
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
     }//end setValue()
 

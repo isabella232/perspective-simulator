@@ -61,8 +61,27 @@ switch ($type) {
 
         $method = strtolower(($_SERVER['REQUEST_METHOD'] ?? ''));
 
-        $class = $GLOBALS['projectNamespace'].'\APIRouter';
-        $class::process($path, $method, $queryParams);
+        try {
+            ob_start();
+            $class   = $GLOBALS['projectNamespace'].'\APIRouter';
+            $response = $class::process($path, $method, $queryParams);
+
+            if ($response === null) {
+                $response = '';
+            }
+
+            \PerspectiveSimulator\Bootstrap::processSave();
+
+            ob_end_clean();
+        } catch (\Throwable $e) {
+            // Request failed so don't worry about saving.
+            \PerspectiveSimulator\Bootstrap::clearSaveQueue();
+            ob_end_clean();
+            header('HTTP/1.1 500 Internal Server Error');
+            throw $e;
+        }
+
+        echo $response;
     break;
 
     case 'cdn':

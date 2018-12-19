@@ -168,7 +168,7 @@ trait AspectedObjectTrait
 
         $this->properties[$propertyCode] = $value;
 
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
     }//end setValue()
 
@@ -185,7 +185,7 @@ trait AspectedObjectTrait
     {
         if (isset($this->properties[$propertyCode]) === true) {
             unset($this->properties[$propertyCode]);
-            $this->save();
+            \PerspectiveSimulator\Bootstrap::queueSave($this);
         }
 
     }//end deleteValue()

@@ -110,7 +110,7 @@ trait ReferenceObjectTrait
             }
         }
 
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
     }//end addReference()
 
@@ -162,7 +162,7 @@ trait ReferenceObjectTrait
             unset($this->references[$referenceid]);
         }
 
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
     }//end deleteReference()
 

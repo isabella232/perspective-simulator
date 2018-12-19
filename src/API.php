@@ -69,7 +69,7 @@ __ROUTES__
                 $output = call_user_func_array([$api, $handler], $vars);
 
                 header(\'Content-Type: application/json\');
-                echo json_encode($output);
+                return json_encode($output);
             break;
         }//end switch';
 

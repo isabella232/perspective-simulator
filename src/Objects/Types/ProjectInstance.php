@@ -41,7 +41,7 @@ class ProjectInstance implements ObjectInterface
         $this->id  = $projectid;
 
         if ($this->load() === false) {
-            $this->save();
+            Bootstrap::queueSave($this);
         }
 
     }//end __construct()

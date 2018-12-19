@@ -83,7 +83,7 @@ class UserStore
 
         $this->usernameMap[$username] = $record;
 
-        $this->save();
+        \PerspectiveSimulator\Bootstrap::queueSave($this);
 
         return $record;
 
