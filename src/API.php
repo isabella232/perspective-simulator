@@ -96,9 +96,9 @@ __ROUTES__
      */
     public static function getAPIPath(string $project)
     {
+        $project = str_replace('\\', '/', $project);
         if (strtolower($GLOBALS['project']) !== strtolower($project)) {
-            $project = str_replace('\\', '/', $project);
-            $dir     = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
+            $dir = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
 
             return $dir.'/vendor/'.$project.'/src/API';
         } else {

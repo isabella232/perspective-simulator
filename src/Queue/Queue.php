@@ -78,12 +78,13 @@ class Queue
     public static function getQueuePath(string $project=null)
     {
         if ($project === null) {
-            $project = $GLOBASL['projectNamespace'];
+            $project = $GLOBASL['project'];
         }
 
-        if (strtolower($GLOBALS['projectNamespace']) !== strtolower($project)) {
-            $project = str_replace('\\', '/', $project);
-            $dir     = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
+        $project = str_replace('\\', '/', $project);
+
+        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+            $dir = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
 
             return $dir.'/vendor/'.$project.'/src/Queues';
         } else {
