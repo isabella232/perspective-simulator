@@ -198,9 +198,10 @@ trait ObjectTrait
      */
     final public function property(string $propertyCode)
     {
-        $propertyType = \PerspectiveSimulator\Storage\StorageManager::getStoreType($this);
-        $functionName = 'get'.$propertyType.'Property';
-        $propertyCode = $this->getPrefixedPropertyCode($propertyCode);
+        $propertyType   = \PerspectiveSimulator\Storage\StorageManager::getStoreType($this);
+        $functionName   = 'get'.$propertyType.'Property';
+        $unprefixedCode = $propertyCode;
+        $propertyCode   = $this->getPrefixedPropertyCode($propertyCode);
         $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $propertyCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
@@ -215,7 +216,7 @@ trait ObjectTrait
         }
 
         try {
-            $propertyObject = new $className($this, $propertyCode, $propertyType);
+            $propertyObject = new $className($this, $unprefixedCode, $propertyType);
         } catch (\Throwable $e) {
             // Inside a try catch to ensure we set this flag back to false.
             throw $e;
