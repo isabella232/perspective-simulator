@@ -66,6 +66,7 @@ class Bootstrap
 
         $GLOBALS['projectNamespace'] = $project;
         $GLOBALS['project']          = str_replace('\\', '/', $project);
+        $GLOBALS['projectPath']      = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $project));
         $projectDir                  = Libs\FileSystem::getProjectDir();
 
         // Register an autoloader for the project.

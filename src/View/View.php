@@ -281,7 +281,7 @@ class View
             $project = str_replace('\\', '/', $project);
             $dir     = substr(FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
 
-            $routeFile =$dir.'/vendor/'.$project.'/src/web/routes/yaml';
+            $routeFile =$dir.'/vendor/'.strtolower($project).'/src/web/routes/yaml';
         } else {
             $routeFile = FileSystem::getProjectDir($project).'/web/routes.yaml';
         }
@@ -339,9 +339,10 @@ class View
         $code = str_replace('__CLASS_NAMESPACE__', str_replace('/', '\\', $project), $code);
         $code = str_replace('__ROUTES__', $routeCode, $code);
 
-        $prefix = Bootstrap::generatePrefix($project);
-        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
-            $routerFile = FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-viewrouter.php';
+        $prefix  = Bootstrap::generatePrefix($project);
+        $project = strtolower($project);
+        if (strtolower($GLOBALS['project']) !== $project) {
+            $routerFile = FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-viewrouter.php';
         } else {
             $routerFile = FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-viewrouter.php';
         }
@@ -386,9 +387,10 @@ class View
 
         $code .= Util::printCode(0, '}//end class');
 
-        $prefix = Bootstrap::generatePrefix($project);
-        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
-            $handlerFile = FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-webhandler.php';
+        $prefix  = Bootstrap::generatePrefix($project);
+        $project = strtolower($project);
+        if (strtolower($GLOBALS['project']) !== $project) {
+            $handlerFile = FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-webhandler.php';
         } else {
             $handlerFile = FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-webhandler.php';
         }

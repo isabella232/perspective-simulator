@@ -38,7 +38,7 @@ class Queue
             return false;
         }
 
-        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/queue.json';
+        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/queue.json';
         if (file_exists($filePath) === false) {
             return false;
         }
@@ -60,7 +60,7 @@ class Queue
             return false;
         }
 
-        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/queue.json';
+        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/queue.json';
         file_put_contents($filePath, Libs\Util::jsonEncode(self::$queue));
 
         return true;
@@ -78,12 +78,12 @@ class Queue
     public static function getQueuePath(string $project=null)
     {
         if ($project === null) {
-            $project = $GLOBASL['project'];
+            $project = $GLOBALS['project'];
         }
 
-        $project = str_replace('\\', '/', $project);
+        $project = strtolower(str_replace('\\', '/', $project));
 
-        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
+        if (strtolower($GLOBALS['project']) !== $project) {
             $dir = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
 
             return $dir.'/vendor/'.$project.'/src/Queues';
@@ -315,9 +315,11 @@ class Queue
 
             $queueClass .= Libs\Util::printCode(0, '}');
 
-            $prefix = Bootstrap::generatePrefix($project);
-            if (strtolower($GLOBALS['project']) !== strtolower($project)) {
-                $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-jobqueue.php';
+            $prefix   = Bootstrap::generatePrefix($project);
+            $project  = strtolower($project);
+            $gProject = strtolower($GLOBALS['project']);
+            if ($gProject !== $project) {
+                $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$gProject.'/'.$prefix.'-jobqueue.php';
             } else {
                 $queueFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-jobqueue.php';
             }

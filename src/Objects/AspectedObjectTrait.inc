@@ -122,7 +122,7 @@ trait AspectedObjectTrait
             }
 
             $prefix = str_replace('/', '-', str_replace('\\', '-', $prefix));
-            return '/property/'.str_replace('\\', '/', $GLOBALS['project']).'/'.$typeName.'/'.strtolower($prefix).'-'.$prop['default'];
+            return '/property/'.$GLOBALS['projectPath'].'/'.$typeName.'/'.strtolower($prefix).'-'.$prop['default'];
         }
 
         return $prop['default'];

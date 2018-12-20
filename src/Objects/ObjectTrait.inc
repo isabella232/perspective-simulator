@@ -176,7 +176,7 @@ trait ObjectTrait
                 throw new \Exception('Failed to get the upload file.');
             }
 
-            return '/property/'.str_replace('\\', '/', $GLOBALS['project']).'/'.$propertyType.'/'.$propertyCode.'.'.$ext;
+            return '/property/'.$GLOBALS['projectPath'].'/'.$propertyType.'/'.$propertyCode.'.'.$ext;
         } else if (is_string($value) === true) {
             // Expecting the base64 string.
             if (preg_match('#^data:[a-z]+/([a-z]+);base64,[\w=+/]++#', $value) !== 1) {

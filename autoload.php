@@ -67,7 +67,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
 
             if ($path === false) {
                 $projectNs   = strtolower($GLOBALS['projectNamespace']);
-                $projectPath = str_replace('\\', $ds, $projectNs);
+                $projectPath = $GLOBALS['projectPath'];
                 $prefix      = strtolower(str_replace('\\', '-', $class));
 
                 if (strtolower($class) === $projectNs.'\\api') {

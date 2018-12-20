@@ -34,17 +34,13 @@ class Property
         $pathParts = explode('/', $filePath);
         $file      = array_pop($pathParts);
         $type      = array_pop($pathParts);
-
         $fileParts = explode('-', $file);
-        $prefix    = $fileParts[0].'/'.$fileParts[1];
-        if ($prefix === strtolower($GLOBALS['project'])) {
-            array_shift($fileParts);
-            array_shift($fileParts);
+        $project   = strtolower($fileParts[0].'/'.$fileParts[1]);
+        array_shift($fileParts);
+        array_shift($fileParts);
+        if ($project === strtolower($GLOBALS['project'])) {
             $defaultPath = Libs\FileSystem::getProjectDir().'/Properties/'.$type.'/'.implode('-', $fileParts);
         } else {
-            $project = $fileParts[0].'/'.$fileParts[1];
-            array_shift($fileParts);
-            array_shift($fileParts);
             $defaultPath = substr(Libs\FileSystem::getProjectDir(), 0, -4).'/vendor/'.$project.'/src/Properties/'.$type.'/'.implode('-', $fileParts);
         }
 

@@ -32,7 +32,7 @@ class Session
             return false;
         }
 
-        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/session.json';
+        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/session.json';
         if (file_exists($filePath) === true) {
             $_SESSION = Libs\Util::jsonDecode(file_get_contents($filePath));
         } else {
@@ -55,7 +55,7 @@ class Session
             return false;
         }
 
-        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/session.json';
+        $filePath = Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/session.json';
         file_put_contents($filePath, Libs\Util::jsonEncode($_SESSION));
 
         return true;

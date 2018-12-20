@@ -1157,7 +1157,7 @@ class FileSystem
             return null;
         }
 
-        return str_replace('\\', '/', self::getSimulatorDir().'/'.$project.'/storage');
+        return str_replace('\\', '/', self::getSimulatorDir().'/'.strtolower($project).'/storage');
 
     }//end getStorageDir()
 
@@ -1196,10 +1196,6 @@ class FileSystem
      */
     public static function getCDNDir(string $project=null)
     {
-        if ($project === null) {
-            $project = $GLOBALS['project'];
-        }
-
         return self::getProjectDir($project).'/CDN';
 
     }//end getCDNDir()

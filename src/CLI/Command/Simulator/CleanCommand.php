@@ -58,7 +58,7 @@ class CleanCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->inProject($input, $output);
 
         $simDir         = Libs\FileSystem::getSimulatorDir();
-        $this->storeDir = $simDir.'/'.$GLOBALS['project'].'/storage';
+        $this->storeDir = $simDir.'/'.$GLOBALS['projectPath'].'/storage';
 
     }//end interact()
 

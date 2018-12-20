@@ -150,7 +150,7 @@ class Authentication
         $simulatorDir = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir();
 
         // Check if the key exists in file and return that instead or generating a new one.
-        $authFile = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
+        $authFile = $simulatorDir.'/'.$GLOBALS['projectPath'].'/authentication.json';
         if (Bootstrap::isReadEnabled() === true && file_exists($authFile) === true) {
             $keys            = Libs\Util::jsonDecode(file_get_contents($authFile));
             self::$secretKey = $keys['secretKey'];
@@ -162,7 +162,7 @@ class Authentication
 
         if (Bootstrap::isWriteEnabled() === true) {
             file_put_contents(
-                $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json',
+                $simulatorDir.'/'.$GLOBALS['projectPath'].'/authentication.json',
                 Libs\Util::jsonEncode(['secretKey' => $projectKey])
             );
         }
@@ -184,7 +184,7 @@ class Authentication
         if (self::$secretKey === null) {
             if (Bootstrap::isReadEnabled() === true ) {
                 $simulatorDir = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir();
-                $authFile     = $simulatorDir.'/'.$GLOBALS['project'].'/authentication.json';
+                $authFile     = $simulatorDir.'/'.$GLOBALS['projectPath'].'/authentication.json';
                 if (file_exists($authFile) === true) {
                     $keys            = Libs\Util::jsonDecode(file_get_contents($authFile));
                     self::$secretKey = $keys['secretKey'];

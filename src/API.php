@@ -100,7 +100,7 @@ __ROUTES__
         if (strtolower($GLOBALS['project']) !== strtolower($project)) {
             $dir = substr(\PerspectiveSimulator\Libs\FileSystem::getProjectDir($GLOBALS['project']), 0, -4);
 
-            return $dir.'/vendor/'.$project.'/src/API';
+            return $dir.'/vendor/'.strtolower($project).'/src/API';
         } else {
             return \PerspectiveSimulator\Libs\FileSystem::getProjectDir($project).'/API';
         }
@@ -223,7 +223,7 @@ __ROUTES__
 
         $prefix            = Bootstrap::generatePrefix($project);
         $currentAPIs       = [];
-        $simulatorYamlFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-api.yaml';
+        $simulatorYamlFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-api.yaml';
         if (file_exists($simulatorYamlFile) === true) {
             $currentAPIs = self::parseYaml($simulatorYamlFile);
         }
@@ -415,9 +415,10 @@ __ROUTES__
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(0, '}//end class');
 
-        $prefix = Bootstrap::generatePrefix($project);
-        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
-            $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-apirouter.php';
+        $prefix  = Bootstrap::generatePrefix($project);
+        $project = strtolower($project);
+        if (strtolower($GLOBALS['project']) !== $project) {
+            $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-apirouter.php';
         } else {
             $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-apirouter.php';
         }
@@ -545,9 +546,10 @@ __ROUTES__
 
         $function .= Util::printCode(0, '}//end class');
 
-        $prefix = Bootstrap::generatePrefix($project);
-        if (strtolower($GLOBALS['project']) !== strtolower($project)) {
-            $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['project'].'/'.$prefix.'-api.php';
+        $prefix  = Bootstrap::generatePrefix($project);
+        $project = strtolower($project);
+        if (strtolower($GLOBALS['project']) !== $project) {
+            $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-api.php';
         } else {
             $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$project.'/'.$prefix.'-api.php';
         }
