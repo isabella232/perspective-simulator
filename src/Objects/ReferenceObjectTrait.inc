@@ -36,7 +36,7 @@ trait ReferenceObjectTrait
      */
     final public function getReference(string $referenceid)
     {
-        if (isset($this->references[$referenceid]) === false) {
+        if (isset($this->references[$referenceid]) === false || empty($this->references[$referenceid]) === true) {
             return null;
         }
 
