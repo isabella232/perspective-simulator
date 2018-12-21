@@ -1129,7 +1129,7 @@ class FileSystem
 
 
     /**
-     * Gets the storage directory.
+     * Gets the simulator directory.
      *
      * @return string
      */
@@ -1175,10 +1175,12 @@ class FileSystem
             $project = $GLOBALS['project'];
         }
 
-        $project  = strtolower(str_replace('\\', '/', $project));
-        $projects = Util::jsonDecode(file_get_contents(self::getSimulatorDir().'/projects.json'));
-        if (isset($projects[$project]) === true) {
-            return $projects[$project];
+        $project = str_replace('\\', '/', $project);
+        if (file_exists(self::getSimulatorDir().'/projects.json') === true) {
+            $projects = Util::jsonDecode(file_get_contents(self::getSimulatorDir().'/projects.json'));
+            if (isset($projects[strtolower($project)]) === true) {
+                return $projects[strtolower($project)];
+            }
         }
 
         // Something must have gone wrong or the projects file so lets try to work it out.

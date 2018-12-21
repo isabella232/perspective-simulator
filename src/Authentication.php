@@ -161,8 +161,13 @@ class Authentication
         $projectKey = substr($uid, 0, 32);
 
         if (Bootstrap::isWriteEnabled() === true) {
+            $projectDir = $simulatorDir.'/'.$GLOBALS['projectPath'];
+            if (is_dir($projectDir) === false) {
+                mkdir($projectDir);
+            }
+
             file_put_contents(
-                $simulatorDir.'/'.$GLOBALS['projectPath'].'/authentication.json',
+                $projectDir.'/authentication.json',
                 Libs\Util::jsonEncode(['secretKey' => $projectKey])
             );
         }

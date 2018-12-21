@@ -90,11 +90,11 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
             $projects[$vendorProject] = str_replace('composer.json', 'src', $path);
             file_put_contents($simulatorDir.'/projects.json', Libs\Util::jsonEncode($projects));
 
-            if (is_dir($simulatorDir.'/'.$vendorProject) === false) {
-                Libs\FileSystem::mkdir($simulatorDir.'/'.$vendorProject, true);
+            if (is_dir($simulatorDir.'/'.$GLOBALS['projectPath']) === false) {
+                Libs\FileSystem::mkdir($simulatorDir.'/'.$GLOBALS['projectPath'], true);
             }
 
-            $authFile = $simulatorDir.'/'.$vendorProject.'/authentication.json';
+            $authFile = $simulatorDir.'/'.$GLOBALS['projectPath'].'/authentication.json';
             if ($genAuth === true || file_exists($authFile) === false) {
                 $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
             }

@@ -83,7 +83,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         // Check php namspace.
-        $syntaxRes = Libs\Util::checkPHPSyntax('<?php'."\n".'namespace '.$namespace.'; ?>');
+        $syntaxRes = Libs\Util::checkPHPSyntax('<?php'."\n".'namespace '.$namespace.'; ?'.'>');
         if ($syntaxRes !== true) {
             throw new \Exception(sprintf('Invalid project namespace (%s).', $namespace));
         }
@@ -106,7 +106,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         foreach ($projectDirs as $project) {
             $path = $projectPath.$project;
             if (is_dir($path) === true && $project[0] !== '.' && file_exists($path.'/project.json') === true) {
-                $settings = Libs\Util::jsonDecod(file_get_contents($path.'/project.json'));
+                $settings = Libs\Util::jsonDecode(file_get_contents($path.'/project.json'));
                 foreach ($settings['url'] as $url) {
                     if ($url['type'] === 'author') {
                         $urlParts = explode('/', $url['url']);
@@ -227,7 +227,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
                 }
             }
 
-            $testDir = Libs\FileSystem::getExportDir().'/projects/'.str_replace('\\', '/', $namespace).'/tests';
+            $testDir = dirname($projectDir).'/tests';
             if (is_dir($testDir) === false) {
                 Libs\FileSystem::mkdir($testDir);
             }
