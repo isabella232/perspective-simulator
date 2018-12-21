@@ -101,7 +101,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                 throw new \Exception(sprintf('Project (%s) doesn\'t exist', $namespace));
             }
 
-            Libs\FileSystem::delete($projectDir);
+            Libs\Git::delete($projectDir);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

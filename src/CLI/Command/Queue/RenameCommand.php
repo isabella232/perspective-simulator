@@ -123,7 +123,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             }
 
             $this->validateQueueName($newName);
-            Libs\FileSystem::move(
+            Libs\Git::move(
                 $this->storeDir.$oldName.'.php',
                 $this->storeDir.$newName.'.php'
             );

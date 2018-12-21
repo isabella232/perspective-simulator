@@ -160,7 +160,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             $this->validateStoreName($newName);
             $oldDir = $this->storeDir.$oldName;
             $newDir = $this->storeDir.$newName;
-            Libs\FileSystem::move($oldDir, $newDir);
+            Libs\Git::move($oldDir, $newDir);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

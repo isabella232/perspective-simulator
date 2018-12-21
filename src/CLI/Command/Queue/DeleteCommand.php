@@ -100,7 +100,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
         try {
             $name = $input->getArgument('name');
 
-            Libs\FileSystem::delete($this->storeDir.$name.'.php');
+            Libs\Git::delete($this->storeDir.$name.'.php');
             $this->rebake();
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

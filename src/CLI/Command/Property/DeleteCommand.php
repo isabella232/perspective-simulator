@@ -138,7 +138,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                 );
             }
 
-            Libs\FileSystem::delete($propertyFile);
+            Libs\Git::delete($propertyFile);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

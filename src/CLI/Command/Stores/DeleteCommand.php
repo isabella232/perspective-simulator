@@ -136,7 +136,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                 );
             }
 
-            Libs\FileSystem::delete($dataStoreDir);
+            Libs\Git::delete($dataStoreDir);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

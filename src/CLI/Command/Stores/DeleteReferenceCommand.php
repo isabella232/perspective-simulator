@@ -161,7 +161,7 @@ class DeleteReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
                 );
             }
 
-            Libs\FileSystem::delete($ref);
+            Libs\Git::delete($ref);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
