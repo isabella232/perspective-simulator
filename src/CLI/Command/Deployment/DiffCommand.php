@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\CLI\Command\Simulator;
+namespace PerspectiveSimulator\CLI\Command\Deployment;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +27,7 @@ class DiffCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @var string
      */
-    protected static $defaultName = 'simulator:diff';
+    protected static $defaultName = 'deployment:diff';
 
     /**
      * Readable type for command object.
