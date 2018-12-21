@@ -253,7 +253,7 @@ class DiffCommand extends \PerspectiveSimulator\CLI\Command\Command
                     break;
                 }
 
-                $style->section('Following changes detected as bieing: '.$gitType);
+                $style->section('Following changes detected as: '.$gitType);
 
                 foreach ($change as $system => $paths) {
                     if ($system === 'Stores') {
