@@ -206,7 +206,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
                 'name'        => str_replace('\\', '/', $namespace),
                 'description' => 'Project for '.$namespace,
             ];
-            file_put_contents(str_replace('src', '', $projectDir).'composer.json', Libs\Util::jsonEncode($settings));
+            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($settings));
 
             $folders = [
                 'API',
