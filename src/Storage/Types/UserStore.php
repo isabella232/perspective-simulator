@@ -14,7 +14,7 @@ require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
-use \PerspectiveSimulator\ObjectType\User;
+use \Perspective\PHPClass\ObjectType\User;
 use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 
 /**

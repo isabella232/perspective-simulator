@@ -27,16 +27,16 @@ class StorageManager
     public static function getStoreType($object)
     {
         $class = get_class($object);
-        if (is_subclass_of($object, 'PerspectiveSimulator\\ObjectType\\DataRecord') === true
-            || $class === 'PerspectiveSimulator\\ObjectType\\DataRecord'
+        if (is_subclass_of($object, 'Perspective\\PHPClass\\ObjectType\\DataRecord') === true
+            || $class === 'Perspective\\PHPClass\\ObjectType\\DataRecord'
         ) {
             return 'DataRecord';
-        } else if (is_subclass_of($object, 'PerspectiveSimulator\\ObjectType\\User') === true
-            || $class === 'PerspectiveSimulator\\ObjectType\\User'
+        } else if (is_subclass_of($object, 'Perspective\\PHPClass\\ObjectType\\User') === true
+            || $class === 'Perspective\\PHPClass\\ObjectType\\User'
         ) {
             return 'User';
-        } else if (is_subclass_of($object, 'PerspectiveSimulator\\ObjectType\\ProjectInstance') === true
-            || $class === 'PerspectiveSimulator\\ObjectType\\ProjectInstance'
+        } else if (is_subclass_of($object, 'Perspective\\PHPClass\\ObjectType\\ProjectInstance') === true
+            || $class === 'Perspective\\PHPClass\\ObjectType\\ProjectInstance'
         ) {
             return 'Project';
         }

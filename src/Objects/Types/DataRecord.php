@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\ObjectType;
+namespace Perspective\PHPClass\ObjectType;
 
 require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';

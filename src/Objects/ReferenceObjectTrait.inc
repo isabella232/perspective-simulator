@@ -285,9 +285,9 @@ trait ReferenceObjectTrait
             throw new \Exception('Invalid referenced object: is not an object');
         }
 
-        if ($object instanceof \PerspectiveSimulator\ObjectType\User) {
+        if ($object instanceof \Perspective\PHPClass\ObjectType\User) {
             $storageClass = 'UserStore';
-        } else if ($object instanceof \PerspectiveSimulator\ObjectType\DataRecord) {
+        } else if ($object instanceof \Perspective\PHPClass\ObjectType\DataRecord) {
             $storageClass = 'DataStore';
         } else {
             throw new \Exception(

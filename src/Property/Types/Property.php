@@ -69,9 +69,9 @@ abstract class Property
             || $owner instanceof \PerspectiveSimulator\StorageType\DataStore
         ) {
             $this->object = null;
-        } else if ($owner instanceof \PerspectiveSimulator\ObjectType\User
-            || $owner instanceof \PerspectiveSimulator\ObjectType\DataRecord
-            || $owner instanceof \PerspectiveSimulator\ObjectType\Deployment
+        } else if ($owner instanceof \Perspective\PHPClass\ObjectType\User
+            || $owner instanceof \Perspective\PHPClass\ObjectType\DataRecord
+            || $owner instanceof \Perspective\PHPClass\ObjectType\ProjectInstance
         ) {
             $this->object = $owner;
         } else {

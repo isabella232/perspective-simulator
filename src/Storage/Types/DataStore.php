@@ -14,7 +14,7 @@ require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
-use \PerspectiveSimulator\ObjectType\DataRecord;
+use \Perspective\PHPClass\ObjectType\DataRecord;
 use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 
 /**
@@ -65,7 +65,7 @@ class DataStore
     final public function createDataRecord(string $type=null, string $parent=null)
     {
         if ($type === null) {
-            $type = 'PerspectiveSimulator\ObjectType\DataRecord';
+            $type = 'Perspective\PHPClass\ObjectType\DataRecord';
         } else {
             $type = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.$type;
         }

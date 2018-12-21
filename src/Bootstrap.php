@@ -75,7 +75,7 @@ class Bootstrap
 
         class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
         class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
-        class_alias('PerspectiveSimulator\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
+        class_alias('Perspective\PHPClass\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
         class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
 
         if (class_exists('\Authentication') === false) {
@@ -322,7 +322,7 @@ class Bootstrap
 
                 class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
                 class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
-                class_alias('PerspectiveSimulator\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
+                class_alias('Perspective\PHPClass\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
                 class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
 
                 // Add data stores.

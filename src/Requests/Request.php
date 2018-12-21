@@ -50,7 +50,7 @@ class Request
         }
 
         try {
-            self::$deployments[$project] = new \PerspectiveSimulator\ObjectType\ProjectInstance($project);
+            self::$deployments[$project] = new \Perspective\PHPClass\ObjectType\ProjectInstance($project);
         } catch (\Exception $e) {
             throw new \Exception('Unable to create new deployment object');
         }

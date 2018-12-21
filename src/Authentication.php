@@ -93,7 +93,7 @@ class Authentication
      *
      * @return void
      */
-    final public static function login(\PerspectiveSimulator\ObjectType\User $user)
+    final public static function login(\Perspective\PHPClass\ObjectType\User $user)
     {
         self::$user            = $user;
         self::$loggedIn        = true;
