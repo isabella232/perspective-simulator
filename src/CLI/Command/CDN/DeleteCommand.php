@@ -90,7 +90,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                 throw new \Exception('Invalid CDN file/directory.');
             }
 
-            Libs\FileSystem::delete($this->storeDir.$cpPath);
+            Libs\Git::delete($this->storeDir.$cpPath);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

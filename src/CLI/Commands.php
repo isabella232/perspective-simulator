@@ -31,6 +31,7 @@ if (isset($runner) === true && empty($runner) === false) {
         '\\PerspectiveSimulator\\CLI\\Command\\Simulator\\CleanCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Simulator\\InstallCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Simulator\\ServerCommand',
+        '\\PerspectiveSimulator\\CLI\\Command\\Simulator\\DiffCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Stores\\AddCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Stores\\AddReferenceCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Stores\\DeleteCommand',

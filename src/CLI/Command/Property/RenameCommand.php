@@ -159,7 +159,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             $this->validatedPropertyCode($newCode);
             $oldDir = $this->storeDir.$code.'.json';
             $newDir = $this->storeDir.$newCode.'.json';
-            Libs\FileSystem::move($oldDir, $newDir);
+            Libs\Git::move($oldDir, $newDir);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

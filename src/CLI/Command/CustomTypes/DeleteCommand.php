@@ -127,8 +127,8 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                 );
             }
 
-            Libs\FileSystem::delete($customTypeFile);
-            Libs\FileSystem::delete($this->storeDir.$code.'.php');
+            Libs\Git::delete($customTypeFile);
+            Libs\Git::delete($this->storeDir.$code.'.php');
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

@@ -98,7 +98,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                 }
             }//end if
 
-            Libs\FileSystem::delete($path);
+            Libs\Git::delete($path);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

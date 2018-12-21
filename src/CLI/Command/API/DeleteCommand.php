@@ -74,8 +74,8 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            Libs\FileSystem::delete($this->storeDir.'api.yaml');
-            Libs\FileSystem::delete($this->storeDir.'/Operations/');
+            Libs\Git::delete($this->storeDir.'api.yaml');
+            Libs\Git::delete($this->storeDir.'/Operations/');
             $simDir = Libs\FileSystem::getSimulatorDir();
             Libs\FileSystem::delete($simDir.$GLOBALS['projectPath'].'/API.php');
             Libs\FileSystem::delete($simDir.$GLOBALS['projectPath'].'/APIRouter.php');
