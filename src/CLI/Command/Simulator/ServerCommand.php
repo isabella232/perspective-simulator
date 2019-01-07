@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Simulator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -42,6 +43,21 @@ class ServerCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->setDescription('Starts the PHP webserver for the simulator.');
         $this->setHelp('Starts the PHP webserver for the simulator.');
         $this->addArgument('host', InputArgument::OPTIONAL, 'Optional IP and Port to listen on, default 0.0.0.0:8000.');
+        $this->addOption(
+            'latency',
+            'l',
+            InputOption::VALUE_NONE,
+            'Flag to introduce latency between 0 and 2 seconds on each request.',
+            null
+        );
+
+        $this->addOption(
+            'failure',
+            'f',
+            InputOption::VALUE_NONE,
+            'Flag to simulate failed requests, this is randomly done based on what the latency delay would be.',
+            null
+        );
 
     }//end configure()
 
@@ -75,14 +91,23 @@ class ServerCommand extends \PerspectiveSimulator\CLI\Command\Command
             return;
         }
 
-        $host = ($input->getArgument('host') ?? '0.0.0.0:8000');
-        $output->writeln([
-            'Perspecitve Simulator running.',
-            '================================================',
-            'listening on: http://'.$host,
-            'Press Ctrl-C to quit.',
-            '',
-        ]);
+        if (file_exists($proot.'/simulator/router-settings.json') === true) {
+            \PerspectiveSimulator\Libs\FileSystem::delete($proot.'/simulator/router-settings.json');
+        }
+
+        $latency = ($input->getOption('latency') ?? false);
+        $failure = ($input->getOption('failure') ?? false);
+        $host    = ($input->getArgument('host') ?? '0.0.0.0:8000');
+        $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
+        $style->title('Perspecitve Simulator running.');
+        $style->section('listening on: http://'.$host);
+        $style->block('Press Ctrl-C to quit.', null, 'fg=yellow', ' ! ');
+
+        $routerData = [
+            'latency' => $latency,
+            'failure' => $failure,
+        ];
+        file_put_contents($proot.'/simulator/router-settings.json', \PerspectiveSimulator\Libs\Util::jsonEncode($routerData));
 
         $router = $proot.'/vendor/perspective/simulator/src/Requests/Router.php';
         exec('php -S '.$host.' '.$router);

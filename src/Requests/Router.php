@@ -14,6 +14,11 @@ ini_set('error_log', dirname(__DIR__, 5).'/simulator/error_log');
 
 include dirname(__DIR__, 4).'/autoload.php';
 
+$settings = [];
+if (file_exists(dirname(__DIR__, 5).'/simulator/router-settings.json') === true) {
+    $settings = json_decode(file_get_contents(dirname(__DIR__, 5).'/simulator/router-settings.json'), true);
+}
+
 $path = $_SERVER['REQUEST_URI'];
 
 if ($path === '/favicon.ico') {
@@ -53,6 +58,16 @@ $path = implode('/', $pathParts);
 
 processCORSPreflight();
 sendCORSHeaders();
+
+$delay = rand(0, 2000);
+if (isset($settings['latency']) === true && $settings['latency'] === true) {
+    sleep(($delay / 1000));
+}
+
+if (isset($settings['failure']) === true && $settings['failure'] === true && $delay > 1500) {
+    // Simulate a failed request.
+    return;
+}
 
 switch ($type) {
     case 'api':
