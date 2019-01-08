@@ -282,50 +282,50 @@ __ROUTES__
             $deletedPaths[] = $deleteID;
         }
 
-        if (empty($renamedPaths) === false) {
-            if ($showPrompt === true) {
-                $renamedMessage = "The following API operations will be renamed:\n";
-                foreach ($renamedPaths as $id => $path) {
-                    $count = ($id + 1);
-                    if (strtolower($path['oldOperationid']) !== strtolower($path['newOperationid'])) {
-                        $renamedMessage .= $count.'. '.$path['oldOperationid'].' => '.$path['newOperationid'];
-                    }
-                }
+        // if (empty($renamedPaths) === false) {
+        //     if ($showPrompt === true) {
+        //         $renamedMessage = "The following API operations will be renamed:\n";
+        //         foreach ($renamedPaths as $id => $path) {
+        //             $count = ($id + 1);
+        //             if (strtolower($path['oldOperationid']) !== strtolower($path['newOperationid'])) {
+        //                 $renamedMessage .= $count.'. '.$path['oldOperationid'].' => '.$path['newOperationid'];
+        //             }
+        //         }
 
-                $confirm = \PerspectiveSimulator\CLI\Prompt::confirm($renamedMessage."\n");
-                if ($confirm === false) {
-                    exit();
-                }
-            }
+        //         $confirm = \PerspectiveSimulator\CLI\Prompt::confirm($renamedMessage."\n");
+        //         if ($confirm === false) {
+        //             exit();
+        //         }
+        //     }
 
-            foreach ($renamedPaths as $path) {
-                if ($path['oldOperationid'] !== $path['newOperationid']) {
-                    $source = self::getAPIPath($project).'/Operations/'.$path['oldOperationid'].'.php';
-                    $dest   = self::getAPIPath($project).'/Operations/'.$path['newOperationid'].'.php';
-                    \PerspectiveSimulator\Libs\FileSystem::move($source, $dest);
-                }
-            }
-        }
+        //     foreach ($renamedPaths as $path) {
+        //         if ($path['oldOperationid'] !== $path['newOperationid']) {
+        //             $source = self::getAPIPath($project).'/Operations/'.$path['oldOperationid'].'.php';
+        //             $dest   = self::getAPIPath($project).'/Operations/'.$path['newOperationid'].'.php';
+        //             \PerspectiveSimulator\Libs\FileSystem::move($source, $dest);
+        //         }
+        //     }
+        // }
 
-        if (empty($deletedPaths) === false) {
-            if ($showPrompt === true) {
-                $deleteMessage = "The following API operations will be deleted:\n";
-                foreach ($deletedPaths as $op) {
-                    $count = ($id + 1);
-                    $deleteMessage .= $count.'. '.$op;
-                }
+        // if (empty($deletedPaths) === false) {
+        //     if ($showPrompt === true) {
+        //         $deleteMessage = "The following API operations will be deleted:\n";
+        //         foreach ($deletedPaths as $op) {
+        //             $count = ($id + 1);
+        //             $deleteMessage .= $count.'. '.$op;
+        //         }
 
-                $confirm = \PerspectiveSimulator\CLI\Prompt::confirm($deleteMessage."\n");
-                if ($confirm === false) {
-                    exit();
-                }
-            }
+        //         $confirm = \PerspectiveSimulator\CLI\Prompt::confirm($deleteMessage."\n");
+        //         if ($confirm === false) {
+        //             exit();
+        //         }
+        //     }
 
-            foreach ($deletedPaths as $opId) {
-                $file = self::getAPIPath($project).'/Operations/'.$opId.'.php';
-                \PerspectiveSimulator\Libs\FileSystem::delete($file);
-            }
-        }
+        //     foreach ($deletedPaths as $opId) {
+        //         $file = self::getAPIPath($project).'/Operations/'.$opId.'.php';
+        //         \PerspectiveSimulator\Libs\FileSystem::delete($file);
+        //     }
+        // }
 
         // Bake the simulator router and API functions.
         self::bakeRouter($apis, $project);

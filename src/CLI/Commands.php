@@ -20,6 +20,7 @@ if (isset($runner) === true && empty($runner) === false) {
         '\\PerspectiveSimulator\\CLI\\Command\\CDN\\DeleteCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\CustomTypes\\AddCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\CustomTypes\\DeleteCommand',
+        '\\PerspectiveSimulator\\CLI\\Command\\Deployment\\DeployCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Deployment\\DiffCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Project\\AddCommand',
         '\\PerspectiveSimulator\\CLI\\Command\\Project\\DeleteCommand',

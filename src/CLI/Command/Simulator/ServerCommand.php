@@ -98,7 +98,7 @@ class ServerCommand extends \PerspectiveSimulator\CLI\Command\Command
         $latency = ($input->getOption('latency') ?? false);
         $failure = ($input->getOption('failure') ?? false);
         $host    = ($input->getArgument('host') ?? '0.0.0.0:8000');
-        $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
+        $style   = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
         $style->title('Perspecitve Simulator running.');
         $style->section('listening on: http://'.$host);
         $style->block('Press Ctrl-C to quit.', null, 'fg=yellow', ' ! ');

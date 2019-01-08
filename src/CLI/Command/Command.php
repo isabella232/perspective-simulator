@@ -71,10 +71,145 @@ class Command extends \Symfony\Component\Console\Command\Command
 
         $project = str_replace('/', '\\', $project);
         \PerspectiveSimulator\Bootstrap::load($project);
+        $input->setOption('project', $project);
 
         return true;
 
     }//end inProject();
+
+
+    /**
+     * Parses the diff array.
+     *
+     * @param InputInterface $input The console input object.
+     * @param array          $diff  Diff array.
+     *
+     * @return array
+     */
+    final public function parseDiff(InputInterface $input, array $diff)
+    {
+        $changes = [];
+
+        foreach ($diff as $change) {
+            $changeParts = preg_split('/\s{1}/', $change);
+            $type        = $changeParts[0];
+            $path        = $changeParts[1];
+            $project     = $this->getProject($path);
+            if ($project !== null) {
+                if (isset($changes[$project]) === false) {
+                    $changes[$project] = [];
+                }
+
+                if (isset($changes[$project][$type]) === false) {
+                    $changes[$project][$type] = [];
+                }
+
+                if (strpos($path, 'API') !== false) {
+                    if (isset($changes[$project][$type]['API']) === false) {
+                        $changes[$project][$type]['API'] = [];
+                    }
+
+                    $changes[$project][$type]['API'][] = $path;
+                } else if (strpos($path, 'App') !== false) {
+                    if (isset($changes[$project][$type]['App']) === false) {
+                        $changes[$project][$type]['App'] = [];
+                    }
+
+                    $changes[$project][$type]['App'][] = $path;
+                } else if (strpos($path, 'CDN') !== false) {
+                    if (isset($changes[$project][$type]['CDN']) === false) {
+                        $changes[$project][$type]['CDN'] = [];
+                    }
+
+                    $changes[$project][$type]['CDN'][] = $path;
+                } else if (strpos($path, 'CustomTypes') !== false) {
+                    if (isset($changes[$project][$type]['CustomTypes']) === false) {
+                        $changes[$project][$type]['CustomTypes'] = [];
+                    }
+
+                    $changes[$project][$type]['CustomTypes'][] = $path;
+                } else if (strpos($path, 'Properties') !== false) {
+                    if (isset($changes[$project][$type]['Properties']) === false) {
+                        $changes[$project][$type]['Properties'] = [];
+                    }
+
+                    $changes[$project][$type]['Properties'][] = $path;
+                } else if (strpos($path, 'Queues') !== false) {
+                    if (isset($changes[$project][$type]['Queues']) === false) {
+                        $changes[$project][$type]['Queues'] = [];
+                    }
+
+                    $changes[$project][$type]['Queues'][] = $path;
+                } else if (strpos($path, 'Stores') !== false) {
+                    if (isset($changes[$project][$type]['Stores']) === false) {
+                        $changes[$project][$type]['Stores'] = [];
+                    }
+
+                    if (strpos($path, 'Data') !== false) {
+                        if (isset($changes[$project][$type]['Stores']['Data']) === false) {
+                            $changes[$project][$type]['Stores']['Data'] = [];
+                        }
+
+                        $changes[$project][$type]['Stores']['Data'][] = $path;
+                    } else if (strpos($path, 'User') !== false) {
+                        if (isset($changes[$project][$type]['Stores']['User']) === false) {
+                            $changes[$project][$type]['Stores']['User'] = [];
+                        }
+
+                        $changes[$project][$type]['Stores']['User'][] = $path;
+                    }
+                } else {
+                    if (isset($changes[$project][$type]['other']) === false) {
+                        $changes[$project][$type]['other'] = [];
+                    }
+
+                    $changes[$project][$type]['other'][] = $path;
+                }//end if
+            }//end if
+        }//end foreach
+
+        $filterProject = ($input->getOption('project') ?? '');
+        $filterProject = ltrim($filterProject, '=');
+        $filterProject = str_replace('\\', '/', $filterProject);
+        if (empty($filterProject) === true) {
+            return $changes;
+        } else if (isset($changes[$filterProject]) === true) {
+            $changes = array_filter(
+                $changes,
+                function ($a) use ($filterProject) {
+                    return $filterProject === $a;
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+        }
+
+        return $changes;
+
+    }//end parseDiff()
+
+
+    /**
+     * Gets the project for the change from the path.
+     *
+     * @param string $path Path of the change.
+     *
+     * @return string
+     */
+    final public function getProject(string $path)
+    {
+        $found    = null;
+        $projects = Libs\Util::jsonDecode(file_get_contents(Libs\FileSystem::getSimulatorDir().'/projects.json'));
+        foreach ($projects as $project => $projectPath) {
+            $projectPath = ltrim(str_replace(Libs\FileSystem::getExportDir(), '', $projectPath), '/');
+            if (strpos($path, $projectPath) === 0) {
+                $found = $project;
+                break;
+            }
+        }
+
+        return $found;
+
+    }//end getProject()
 
 
 }//end class

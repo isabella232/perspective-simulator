@@ -84,7 +84,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        if ($customType === 'DataType') {
+        if (strtolower($customType) === 'datatype') {
             $this->storeDir     = $projectDir.'/CustomTypes/Data/';
             $this->type         = 'customdatatype';
             $this->readableType = 'Custom Data Type';
@@ -166,7 +166,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             }
 
             // Check parent exits.
-            if ($parent !== $this->extends && file_exists($this->storeDir.$parent.'.json') === false) {
+            if ($parent !== null && $parent !== $this->extends && file_exists($this->storeDir.$parent.'.json') === false) {
                 $eMsg = sprintf('%s\'s parent doesn\'t exist.', $this->readableType);
                 throw new \Exception($eMsg);
             }
