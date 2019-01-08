@@ -1,6 +1,6 @@
 <?php
 /**
- * DiffCommand class for Perspective Simulator CLI.
+ * DeployCommand class for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use \PerspectiveSimulator\Libs;
 
 /**
- * DiffCommand Class
+ * DeployCommand Class
  */
 class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
@@ -60,7 +60,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Deploys the project.');
         $this->setHelp('Deploys a given project.');
-        $this->addArgument('oldVersion', InputArgument::REQUIRED, 'The previous version number or commitid.');
+        $this->addArgument('oldVersion', InputArgument::REQUIRED, 'The previous version number or commit ID.');
         $this->addArgument('newVersion', InputArgument::REQUIRED, 'The new version number eg: 0.0.1');
 
     }//end configure()
@@ -93,6 +93,27 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
             $style->error('Invalid version number. Version number can only contain . or intergers.');
             exit(1);
+        }
+
+        // Run predepolyment check command.
+        // Run the diff command so the user will know what changes are about to be made.
+        $diffCommand = $this->getApplication()->find('deployment:diff');
+        $diffArgs    = [
+            'command' => 'deployment:diff',
+            'from'    => $input->getArgument('oldVersion'),
+        ];
+
+        $diffInput  = new \Symfony\Component\Console\Input\ArrayInput($diffArgs);
+        $returnCode = $diffCommand->run($diffInput, $output);
+
+        $helper  = $this->getHelper('question');
+        $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
+            'The above changes have been detected do you want to continue the deployment',
+            false
+        );
+
+        if ($helper->ask($input, $output, $confirm) === false) {
+            return;
         }
 
     }//end interact()
@@ -174,11 +195,15 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $tarFilename = tempnam('/tmp/', 'deploy_data_'.str_replace('/', '_', $project));
         $tarCommand  = 'tar -jcf ';
         $tarCommand .= escapeshellarg($tarFilename);
-        $tarCommand .= ' -C '.escapeshellarg($tarDir);
-        $tarCommand .= ' `ls -1 '.escapeshellarg($tarDir).'`';
+        $tarCommand .= ' -C '.escapeshellarg($tarDir.'/'.$project);
+        $tarCommand .= ' `ls -1 '.escapeshellarg($tarDir.'/'.$project).'`';
         $tarOutput   = [];
         $tarRC       = -1;
 
+        $projectSrcDir = Libs\FileSystem::getProjectDir();
+        $projectVenDir = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
+        exec('cp -r '.$projectSrcDir.' '.$tarDir.'/'.$project.'/src/');
+        exec('cp -r '.$projectVenDir.' '.$tarDir.'/'.$project.'/vendor/');
         exec($tarCommand, $tarOutput, $tarRC);
 
         if ($tarRC !== 0) {
@@ -188,12 +213,16 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $this->progressBar->advance();
-        Libs\FileSystem::move($tarFilename, $tarDir.'/'.str_replace('/', '_', $project).'.tar.bz2');
+        $versionFile = $tarDir.'/'.str_replace('/', '_', $project).'.tar.bz2';
+        Libs\FileSystem::move($tarFilename, $versionFile);
         $this->progressBar->advance();
 
         $this->progressBar->setMessage('<comment>Sending deployment</comment>', 'titleMessage');
         $this->progressBar->advance(0);
-        // Send data.
+        // send
+        // 'fileContent'     => base64_encode(file_get_contents($versionFile)),
+        // 'checksum'        => sha1_file($versionFile),
+        // 'versionFileName' => str_replace('/', '_', $project).'.tar.bz2',
         $this->progressBar->advance();
 
         $this->progressBar->setMessage('', 'titleMessage');
@@ -234,17 +263,17 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         } else if ($system === 'CDN') {
             $action  = 'cdnFile';
             $cdnPath = str_replace(Libs\FileSystem::getProjectDir().DIRECTORY_SEPARATOR.'CDN/', '', $path);
-            if (is_dir($this->dataDir.'/CDN/') === false) {
-                Libs\FileSystem::mkdir($this->dataDir.'/CDN/', true);
-            }
+            // if (is_dir($this->dataDir.'/CDN/') === false) {
+            //     Libs\FileSystem::mkdir($this->dataDir.'/CDN/', true);
+            // }
 
-            if (in_array($type, ['A', 'C', 'M', 'R']) === true) {
-                if (is_dir(dirname($this->dataDir.'/CDN/'.$cdnPath)) === false) {
-                    Libs\FileSystem::mkdir(dirname($this->dataDir.'/CDN/'.$cdnPath), true);
-                }
+            // if (in_array($type, ['A', 'C', 'M', 'R']) === true) {
+            //     if (is_dir(dirname($this->dataDir.'/CDN/'.$cdnPath)) === false) {
+            //         Libs\FileSystem::mkdir(dirname($this->dataDir.'/CDN/'.$cdnPath), true);
+            //     }
 
-                copy($path, $this->dataDir.'/CDN/'.$cdnPath);
-            }
+            //     copy($path, $this->dataDir.'/CDN/'.$cdnPath);
+            // }
 
             $data = ['path' => $cdnPath];
         } else if ($system === 'CustomTypes') {
@@ -265,15 +294,15 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             $action = 'property';
             $data   = Libs\Util::jsonDecode(file_get_contents($path));
-            if ($data['type'] === 'file' || $data['type'] === 'image') {
-                if (is_dir($this->dataDir.'/Properties/') === false) {
-                    Libs\FileSystem::mkdir($this->dataDir.'/Properties/', true);
-                }
+            // if ($data['type'] === 'file' || $data['type'] === 'image') {
+            //     if (is_dir($this->dataDir.'/Properties/') === false) {
+            //         Libs\FileSystem::mkdir($this->dataDir.'/Properties/', true);
+            //     }
 
-                if (in_array($type, ['A', 'C', 'M', 'R']) === true) {
-                    copy($path, $this->dataDir.'/Properties/'.basename($path));
-                }
-            }
+            //     if (in_array($type, ['A', 'C', 'M', 'R']) === true) {
+            //         copy($path, $this->dataDir.'/Properties/'.basename($path));
+            //     }
+            // }
         } else if ($system === 'Queues') {
             $action = 'queue';
             $data   = [

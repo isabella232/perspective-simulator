@@ -56,94 +56,31 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $projects     = [];
-        $genAuth      = false;
         $simulatorDir = Libs\FileSystem::getSimulatorDir();
-        if (is_dir($simulatorDir) === false) {
-            $genAuth = true;
-            Libs\FileSystem::mkdir($simulatorDir);
-            touch($simulatorDir.'/error_log');
+        if (is_dir($simulatorDir) === true) {
+            $helper  = $this->getHelper('question');
+            $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
+                'Simualator already installed. <comment>Re-installing it will delete all simualtor data.</> Do you want to continue?',
+                false
+            );
+
+            if ($helper->ask($input, $output, $confirm) === false) {
+                return;
+            }
         }
 
-        $projectPath = Libs\FileSystem::getExportDir().'/projects/';
-        $projectDirs = Libs\FileSystem::listDirectory($projectPath, ['.json'], true, true, '/(composer)/');
-        foreach ($projectDirs as $path) {
-            if (strpos($path, 'vendor') !== false) {
-                // Must be a dependancy so skip it as it will already have been loaded by the top level project.
-                continue;
-            }
+        Libs\FileSystem::delete($simulatorDir);
+        Libs\FileSystem::mkdir($simulatorDir);
+        touch($simulatorDir.'/error_log');
 
-            $section      = $output->section();
-            $composerInfo = Libs\Util::jsonDecode(file_get_contents($path));
-            if (isset($composerInfo['name']) === false) {
-                // Invalid project so lets continue and print message.
-                $section->writeln('<error>Unable to install project from path "'.$path.'" missing name key in composer.json</error>');
-                continue;
-            } else {
-                $section->writeln('Installing project from "'.$path.'"');
-            }
+        $updateCommand = $this->getApplication()->find('simulator:update');
+        $updateArgs    = [
+            'command' => 'simulator:update',
+        ];
 
-            $vendorProject               = $composerInfo['name'];
-            $GLOBALS['projectNamespace'] = str_replace('/', '\\', $vendorProject);
-            $GLOBALS['project']          = $vendorProject;
-            $GLOBALS['projectPath']      = strtolower($vendorProject);
+        $updateInput = new \Symfony\Component\Console\Input\ArrayInput($updateArgs);
+        $returnCode  = $updateCommand->run($updateInput, $output);
 
-            $projects[$vendorProject] = str_replace('composer.json', 'src', $path);
-            file_put_contents($simulatorDir.'/projects.json', Libs\Util::jsonEncode($projects));
-
-            if (is_dir($simulatorDir.'/'.$GLOBALS['projectPath']) === false) {
-                Libs\FileSystem::mkdir($simulatorDir.'/'.$GLOBALS['projectPath'], true);
-            }
-
-            $authFile = $simulatorDir.'/'.$GLOBALS['projectPath'].'/authentication.json';
-            if ($genAuth === true || file_exists($authFile) === false) {
-                $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
-            }
-
-            $storageDir = Libs\FileSystem::getStorageDir($vendorProject);
-            if (is_dir($storageDir) === false) {
-                Libs\FileSystem::mkdir($storageDir);
-            }
-
-            \PerspectiveSimulator\API::installAPI($vendorProject);
-            \PerspectiveSimulator\Queue\Queue::installQueues($vendorProject);
-            \PerspectiveSimulator\View\View::installViews($vendorProject);
-
-            // Combine theses so one loop for both.
-            $requirements = [];
-            if (isset($composerInfo['require']) === true) {
-                $requirements = array_merge($requirements, $composerInfo['require']);
-            }
-
-            if (isset($composerInfo['require-dev']) === true) {
-                $requirements = array_merge($requirements, $composerInfo['require-dev']);
-            }
-
-            foreach ($requirements as $requirement => $version) {
-                $proj = str_replace('/', '\\', $requirement);
-                \PerspectiveSimulator\API::installAPI($proj);
-                \PerspectiveSimulator\Queue\Queue::installQueues($proj);
-                \PerspectiveSimulator\View\View::installViews($proj);
-            }
-
-            $projectPath = str_replace('/composer.json', '', $path);
-            chdir($projectPath);
-            exec('composer install', $out, $ret);
-
-            if (is_dir('./vendor') === false) {
-                $section->overwrite('Installing project from "'.$path.'" <error>INCOMPLETE</error>');
-                $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-                $style->error(
-                    sprintf(
-                        "\ncomposer install failed, please manually run composer install in \n\"%s\"\n to be able to use the simulator for this project.\n",
-                        $projectPath
-                    ),
-                    null,
-                    'error'
-                );
-            } else {
-                $section->overwrite('Installing project from "'.$path.'" <info>DONE</info>');
-            }
-        }//end foreach
     }//end execute()
 
 
