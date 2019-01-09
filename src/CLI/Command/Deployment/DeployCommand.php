@@ -420,11 +420,11 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
     private function send(string $project, string $file)
     {
         $this->checksum = sha1_file($file);
-        $this->size    = filesize($file);
-        $success       = false;
-        $chunkByteSize = (1 * 1024 * 1024);
-        $handle        = fopen($file, 'rb');
-        $getChunk      = function () use ($handle, $chunkByteSize) {
+        $this->size     = filesize($file);
+        $success        = false;
+        $chunkByteSize  = (8 * 1024 * 1024);
+        $handle         = fopen($file, 'rb');
+        $getChunk       = function () use ($handle, $chunkByteSize) {
             $byteCount  = 0;
             $giantChunk = '';
             while (feof($handle) === false) {
