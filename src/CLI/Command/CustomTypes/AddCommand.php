@@ -158,7 +158,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         try {
             $type   = $input->getArgument('type');
             $code   = $input->getArgument('code');
-            $parent = ($input->getArgument('parent') ?? null);
+            $parent = ($input->getArgument('parent') ?? 'DataRecord');
 
             $this->validatedCustomTypeCode($code);
             if (is_dir($this->storeDir) === false) {
