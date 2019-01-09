@@ -466,7 +466,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $lastBytePos = ($this->progress + strlen($chunk) - 1);
         $headers     = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
-            'Content-length: '.strlen($chunk),
             'Content-type: application/x-www-form-urlencoded',
         ];
 
