@@ -10,6 +10,8 @@
 
 namespace PerspectiveSimulator\Storage;
 
+use \PerspectiveAPI\Storage\StorageFactory as PerspectiveAPIStorageFactory;
+
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\StorageType\DataStore;
 use \PerspectiveSimulator\StorageType\UserStore;
@@ -17,7 +19,7 @@ use \PerspectiveSimulator\StorageType\UserStore;
 /**
  * StorageFactory Class.
  */
-class StorageFactory
+class StorageFactory extends PerspectiveAPIStorageFactory
 {
 
     /**

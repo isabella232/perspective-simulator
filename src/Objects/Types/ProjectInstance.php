@@ -13,15 +13,16 @@ namespace Perspective\PHPClass\ObjectType;
 require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ObjectInterface.inc';
 
+use \PerspectiveAPI\Object\Types\ProjectInstance as PerspectiveAPIProjectInstance;
+
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
 use \PerspectiveSimulator\Objects\AspectedObjectTrait as AspectedObjectTrait;
-use \PerspectiveSimulator\Objects\ObjectInterface as ObjectInterface;
 
 /**
  * ProjectInstance Class
  */
-class ProjectInstance implements ObjectInterface
+class ProjectInstance extends PerspectiveAPIProjectInstance
 {
 
     use AspectedObjectTrait;

@@ -12,16 +12,16 @@ namespace Perspective\PHPClass\ObjectType;
 
 require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
-require_once dirname(__FILE__, 2).'/ObjectInterface.inc';
+
+use \PerspectiveAPI\Object\Types\DataRecord as PerspectiveAPIDataRecord;
 
 use \PerspectiveSimulator\Objects\AspectedObjectTrait as AspectedObjectTrait;
 use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
-use \PerspectiveSimulator\Objects\ObjectInterface as ObjectInterface;
 
 /**
  * DataRecord Class
  */
-class DataRecord implements ObjectInterface
+class DataRecord extends PerspectiveAPIDataRecord
 {
 
     use AspectedObjectTrait;

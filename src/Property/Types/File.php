@@ -10,15 +10,20 @@
 
 namespace PerspectiveSimulator\PropertyType;
 
+require_once dirname(__FILE__, 2).'/PropertyTrait.inc';
 require_once dirname(__FILE__, 2).'/FileTrait.inc';
 
+use \PerspectiveAPI\Property\Types\File as PerspectiveAPIFile;
+use \PerspectiveSimulator\Property\PropertyTrait as PropertyTrait;
 use \PerspectiveSimulator\Property\FileTrait as FileTrait;
 
 /**
  * File Class.
  */
-class File extends Property
+class File extends PerspectiveAPIFile
 {
+
+    use PropertyTrait;
     use FileTrait;
 
 }//end class

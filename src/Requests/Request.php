@@ -10,10 +10,12 @@
 
 namespace PerspectiveSimulator\Requests;
 
+use \PerspectiveAPI\RequestInterface;
+
 /**
  * Request Class
  */
-class Request
+class Request implements RequestInterface
 {
 
     /**

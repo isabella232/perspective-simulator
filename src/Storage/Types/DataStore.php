@@ -12,6 +12,7 @@ namespace PerspectiveSimulator\StorageType;
 
 require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
+use \PerspectiveAPI\Storage\Types\DataStore as PerspectiveAPIDataStore;
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
 use \Perspective\PHPClass\ObjectType\DataRecord;
@@ -20,7 +21,7 @@ use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 /**
  * DataStore class
  */
-class DataStore
+class DataStore extends PerspectiveAPIDataStore
 {
 
     use StoreTrait;

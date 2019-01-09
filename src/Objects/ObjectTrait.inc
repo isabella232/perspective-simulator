@@ -19,19 +19,6 @@ use \PerspectiveSimulator\Libs;
 trait ObjectTrait
 {
 
-    /**
-     * The record id.
-     *
-     * @var string
-     */
-    private $id = '';
-
-    /**
-     * The store the record belongs to.
-     *
-     * @var object
-     */
-    private $store = '';
 
     /**
      * Array of record properties attached to the record.
@@ -207,16 +194,21 @@ trait ObjectTrait
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
         }
 
-        $className    = 'PerspectiveSimulator\PropertyType\\'.ucfirst($prop['type']);
+        $className = 'PerspectiveSimulator\PropertyType\\'.ucfirst($prop['type']);
         if (class_exists($className) === false) {
             // Running an eval instead of creating a file for each property.
+            require_once dirname(__FILE__, 2).'/Property/PropertyTrait.inc';
+            require_once dirname(__FILE__, 2).'/Property/FileTrait.inc';
             eval('namespace PerspectiveSimulator\PropertyType;
-                class '.ucfirst($propertyType).' extends Property {}'
-            );
+                use \PerspectiveSimulator\Property\PropertyTrait as PropertyTrait;
+                class '.ucfirst($prop['type']).' extends \PerspectiveAPI\Property\Types\\'.ucfirst($prop['type']).' {
+                    use PropertyTrait;
+                }');
         }
 
         try {
-            $propertyObject = new $className($this, $unprefixedCode, $propertyType);
+            $propertyObject = new $className($this, $unprefixedCode);
+            $propertyObject->setSystemType($propertyType);
         } catch (\Throwable $e) {
             // Inside a try catch to ensure we set this flag back to false.
             throw $e;

@@ -10,6 +10,8 @@
 
 namespace PerspectiveSimulator;
 
+use \PerspectiveAPI\AuthenticationInterface;
+
 use PerspectiveSimulator\Requests\Session;
 use PerspectiveSimulator\Storage\StorageFactory;
 use PerspectiveSimulator\Libs;
@@ -17,7 +19,7 @@ use PerspectiveSimulator\Libs;
 /**
  * Authentication class.
  */
-class Authentication
+class Authentication implements AuthenticationInterface
 {
 
     /**
@@ -93,7 +95,7 @@ class Authentication
      *
      * @return void
      */
-    final public static function login(\Perspective\PHPClass\ObjectType\User $user)
+    final public static function login(\PerspectiveAPI\Object\Types\User $user)
     {
         self::$user            = $user;
         self::$loggedIn        = true;

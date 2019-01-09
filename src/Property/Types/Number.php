@@ -10,15 +10,20 @@
 
 namespace PerspectiveSimulator\PropertyType;
 
+require_once dirname(__FILE__, 2).'/PropertyTrait.inc';
 require_once dirname(__FILE__, 2).'/NumberTrait.inc';
 
+use \PerspectiveAPI\Property\Types\Number as PerspectiveAPINumber;
+use \PerspectiveSimulator\Property\PropertyTrait as PropertyTrait;
 use \PerspectiveSimulator\Property\NumberTrait as NumberTrait;
+
 /**
  * Integer Class.
  */
-class Number extends Property
+class Number extends PerspectiveAPINumber
 {
 
+    use PropertyTrait;
     use NumberTrait;
 
 }//end class

@@ -23,13 +23,6 @@ trait AspectedObjectTrait
 
     use ObjectTrait;
 
-    /**
-     * The aspect to query data record properties.
-     *
-     * @var array
-     */
-    private $aspect = null;
-
 
     /**
      * Set aspect to query properties with.

@@ -12,6 +12,7 @@ namespace PerspectiveSimulator\StorageType;
 
 require_once dirname(__FILE__, 2).'/StoreTrait.inc';
 
+use \PerspectiveAPI\Storage\Types\UserStore as PerspectiveAPIUserStore;
 use \PerspectiveSimulator\Bootstrap;
 use \PerspectiveSimulator\Libs;
 use \Perspective\PHPClass\ObjectType\User;
@@ -20,7 +21,7 @@ use \PerspectiveSimulator\Storage\StoreTrait as StoreTrait;
 /**
  * User Store Class.
  */
-class UserStore
+class UserStore extends PerspectiveAPIUserStore
 {
 
     use StoreTrait;
@@ -124,6 +125,13 @@ class UserStore
         return $this->records[$userid]['object'];
 
     }//end getUser()
+
+
+    final public function getGroup(string $groupid)
+    {
+        // TODO:
+
+    }//end getGroup()
 
 
     /**

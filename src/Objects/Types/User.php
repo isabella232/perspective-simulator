@@ -12,17 +12,17 @@ namespace Perspective\PHPClass\ObjectType;
 
 require_once dirname(__FILE__, 2).'/ObjectTrait.inc';
 require_once dirname(__FILE__, 2).'/ReferenceObjectTrait.inc';
-require_once dirname(__FILE__, 2).'/ObjectInterface.inc';
+
+use \PerspectiveAPI\Object\Types\User as PerspectiveAPIUser;
 
 use \PerspectiveSimulator\Storage;
 use \PerspectiveSimulator\Objects\ObjectTrait as ObjectTrait;
 use \PerspectiveSimulator\Objects\ReferenceObjectTrait as ReferenceObjectTrait;
-use \PerspectiveSimulator\Objects\ObjectInterface as ObjectInterface;
 
 /**
  * User class.
  */
-class User implements ObjectInterface
+class User extends PerspectiveAPIUser
 {
 
     use ObjectTrait;
