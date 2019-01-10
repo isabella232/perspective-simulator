@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Simulator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -42,6 +43,14 @@ class CleanCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->setDescription('Cleans the simulator directory for a project.');
         $this->setHelp('Cleans the simulator directory for a project.');
 
+        $this->addOption(
+            'all',
+            'a',
+            InputOption::VALUE_NONE,
+            'Flag to clean all projects data, this overides --project flag.',
+            null
+        );
+
     }//end configure()
 
 
@@ -55,10 +64,22 @@ class CleanCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $this->inProject($input, $output);
+        $all = ($input->getOption('all') ?? false);
+        if ($all === true) {
+            $simDir   = Libs\FileSystem::getSimulatorDir();
+            $projects = Libs\Util::jsonDecode(file_get_contents($simDir.'/projects.json'));
 
-        $simDir         = Libs\FileSystem::getSimulatorDir();
-        $this->storeDir = $simDir.'/'.$GLOBALS['projectPath'].'/storage';
+            $this->storeDir = [];
+            foreach ($projects as $project => $path) {
+                $this->storeDir[] = $simDir.'/'.$project.'/storage';
+            }
+
+        } else {
+            $this->inProject($input, $output);
+
+            $simDir         = Libs\FileSystem::getSimulatorDir();
+            $this->storeDir = $simDir.'/'.$GLOBALS['projectPath'].'/storage';
+        }
 
     }//end interact()
 
@@ -74,7 +95,14 @@ class CleanCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            if (is_dir($this->storeDir) === true) {
+            if (is_array($this->storeDir) === true) {
+                foreach ($this->storeDir as $dir) {
+                    if (is_dir($dir) === true) {
+                        Libs\FileSystem::delete($dir);
+                        Libs\FileSystem::mkdir($dir);
+                    }
+                }
+            } else if (is_dir($this->storeDir) === true) {
                 Libs\FileSystem::delete($this->storeDir);
                 Libs\FileSystem::mkdir($this->storeDir);
             }
