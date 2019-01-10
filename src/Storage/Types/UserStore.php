@@ -43,7 +43,7 @@ class UserStore extends PerspectiveAPIUserStore
      */
     public function __construct(string $code)
     {
-        $this->code = $code;
+        parent::__construct($code);
         $this->type = 'User';
 
         if (Bootstrap::isWriteEnabled() === true) {

@@ -39,8 +39,7 @@ class DataRecord extends PerspectiveAPIDataRecord
      */
     final public function __construct(\PerspectiveSimulator\StorageType\DataStore $store, string $id)
     {
-        $this->store = $store;
-        $this->id    = $id;
+        parent::__construct($store, $id);
 
         if ($this->load() === false) {
             \PerspectiveSimulator\Bootstrap::queueSave($this);

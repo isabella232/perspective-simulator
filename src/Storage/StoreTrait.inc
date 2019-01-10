@@ -27,13 +27,6 @@ trait StoreTrait
     private $type = '';
 
     /**
-     * The code of the record store.
-     *
-     * @var string
-     */
-    private $code = '';
-
-    /**
      * Array of all the records.
      *
      * @var array

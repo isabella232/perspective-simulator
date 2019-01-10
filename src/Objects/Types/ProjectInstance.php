@@ -11,7 +11,6 @@
 namespace Perspective\PHPClass\ObjectType;
 
 require_once dirname(__FILE__, 2).'/AspectedObjectTrait.inc';
-require_once dirname(__FILE__, 2).'/ObjectInterface.inc';
 
 use \PerspectiveAPI\Object\Types\ProjectInstance as PerspectiveAPIProjectInstance;
 
@@ -39,7 +38,7 @@ class ProjectInstance extends PerspectiveAPIProjectInstance
     {
         $projectid = str_replace('\\', '-', $projectid);
         $projectid = str_replace('/', '-', $projectid);
-        $this->id  = $projectid;
+        parent::__construct($projectid);
 
         if ($this->load() === false) {
             Bootstrap::queueSave($this);

@@ -34,7 +34,7 @@ class User extends PerspectiveAPIUser
      *
      * @var string
      */
-    private $username = '';
+    // private $username = '';
 
     /**
      * The groups of the user.
@@ -62,14 +62,9 @@ class User extends PerspectiveAPIUser
         string $firstName,
         string $lastName
     ) {
-        $this->store    = $store;
-        $this->id       = $id;
-        $this->username = $username;
+        parent::__construct($store, $id, $username, $firstName, $lastName);
 
         if ($this->load() === false) {
-            $this->setFirstName($firstName);
-            $this->setLastName($lastName);
-
             \PerspectiveSimulator\Bootstrap::queueSave($this);
         }
 
@@ -125,6 +120,7 @@ class User extends PerspectiveAPIUser
         $propertyCode   = $this->getPrefixedPropertyCode($propertyCode);
 
         $functionName = 'get'.$typeName.'Property';
+
         $prop = call_user_func(['\\PerspectiveSimulator\\Storage\\StorageFactory', $functionName], $unprefixedCode);
         if ($prop === null) {
             throw new \Exception('Property "'.$propertyCode.'" does not exist');
