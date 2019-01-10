@@ -277,6 +277,10 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             throw new \Exception('Unable to depoly project to gateway.');
         }
 
+        // Cleanup the deploy files as the depolyment was successful.
+        Libs\FileSystem::delete($versionFile);
+        Libs\FileSystem::delete($tarDir.'/'.$project);
+
         $this->progressBar->advance();
 
         $this->progressBar->setMessage('', 'titleMessage');
