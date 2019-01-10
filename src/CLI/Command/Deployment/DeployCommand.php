@@ -79,7 +79,21 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      * @var string
      */
     private $checksum = '';
+
+    /**
+     * The project we are trying to deploy.
+     *
+     * @var string
+     */
     private $project = '';
+
+    /**
+     * The deployment Id for when we are sending chunked data across.
+     *
+     * @var null
+     */
+    private $deploymentid = null;
+
 
     /**
      * Configures the init command.
@@ -463,15 +477,17 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             return true;
         }
 
-        $lastBytePos = ($this->progress + strlen($chunk) - 1);
-        $headers     = [
+        $lastBytePos    = ($this->progress + strlen($chunk) - 1);
+        $headers        = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
             'Content-type: application/x-www-form-urlencoded',
         ];
+        $this->progress = $lastBytePos + 1;
 
         $sendData = [
-            'data'     => $chunk,
-            'checksum' => $this->checksum,
+            'data'         => $chunk,
+            'checksum'     => $this->checksum,
+            'deploymentid' => $this->deploymentid,
         ];
 
         $url     = Libs\Util::getGateway().'/deployment/'.str_replace('\\', '-', $this->project).'/'.$this->version;
@@ -483,8 +499,9 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             ],
         ];
 
-        $context = stream_context_create($options);
-        $result  = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
+        $context            = stream_context_create($options);
+        $result             = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
+        $this->deploymentid = $result['deploymentid'];
         if ($result === false || $result['deploymentid'] === null) {
             return false;
         }
