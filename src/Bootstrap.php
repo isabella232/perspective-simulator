@@ -88,19 +88,6 @@ class Bootstrap
             class_alias('PerspectiveSimulator\Libs\Email', '\Email');
         }
 
-        // Add data stores.
-        $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
-        foreach ($dirs as $dir) {
-            $storeName = strtolower(basename($dir));
-            StorageFactory::createDataStore($storeName, $project);
-        }
-
-        // Add user stores.
-        $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
-        foreach ($dirs as $dir) {
-            $storeName = strtolower(basename($dir));
-            StorageFactory::createUserStore($storeName, $project);
-        }
 
         $prefix = self::generatePrefix($project);
 
@@ -155,6 +142,20 @@ class Bootstrap
         // Add default user properties.
         StorageFactory::createUserProperty($prefix.'-__first-name__', 'text');
         StorageFactory::createUserProperty($prefix.'-__last-name__', 'text');
+
+        // Add data stores.
+        $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
+        foreach ($dirs as $dir) {
+            $storeName = strtolower(basename($dir));
+            StorageFactory::createDataStore($storeName, $project);
+        }
+
+        // Add user stores.
+        $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
+        foreach ($dirs as $dir) {
+            $storeName = strtolower(basename($dir));
+            StorageFactory::createUserStore($storeName, $project);
+        }
 
         \PerspectiveSimulator\Requests\Session::load();
         \PerspectiveSimulator\Queue\Queue::load();
