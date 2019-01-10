@@ -506,7 +506,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $context            = stream_context_create($options);
         $result             = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
         $this->deploymentid = $result['deploymentid'];
-        if ($result === false || $result['deploymentid'] === null) {
+        if ($result === false || ($this->progress !== $this->size)) {
             return false;
         }
 
