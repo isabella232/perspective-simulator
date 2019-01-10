@@ -23,7 +23,7 @@ trait NumberTrait
      * @param mixed $offset The amount to increment by.
      * @return void.
      */
-    final public function increment($value=1)
+    final public function increment(int $value=1)
     {
         if ($value < 1) {
             throw new \Exception('Decrement value must be greater than 0');
