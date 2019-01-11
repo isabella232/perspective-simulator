@@ -64,6 +64,9 @@ class CleanCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
+        // Clean task doesn't need to write any data so just disable writes.
+        \PerspectiveSimulator\Bootstrap::disableWrite();
+
         $all = ($input->getOption('all') ?? false);
         if ($all === true) {
             $simDir   = Libs\FileSystem::getSimulatorDir();

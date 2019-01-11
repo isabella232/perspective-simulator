@@ -418,9 +418,12 @@ class Bootstrap
             return;
         }
 
-        foreach (self::$saveQueue as $object) {
-            if (method_exists($object, 'save') === true) {
-                $object->save();
+        // Only need to save when write is enabled.
+        if (self::$writeEnabled === true) {
+            foreach (self::$saveQueue as $object) {
+                if (method_exists($object, 'save') === true) {
+                    $object->save();
+                }
             }
         }
 
