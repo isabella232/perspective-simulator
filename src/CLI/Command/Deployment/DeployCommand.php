@@ -94,6 +94,13 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     private $deploymentid = null;
 
+    /**
+     * Cache of the gateway object.
+     *
+     * @var object
+     */
+    private $gateway = null;
+
 
     /**
      * Configures the init command.
@@ -481,10 +488,15 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             return true;
         }
 
+        if ($this->gateway === null) {
+            $this->gateway = new \PerspectiveSimulator\Gateway();
+        }
+
         $lastBytePos    = ($this->progress + strlen($chunk) - 1);
         $headers        = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
             'Content-type: application/x-www-form-urlencoded',
+            'Authentication: Basic '.$this->gateway->getGatewayKey(),
         ];
         $this->progress = $lastBytePos + 1;
 
@@ -494,7 +506,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             'deploymentid' => $this->deploymentid,
         ];
 
-        $url     = Libs\Util::getGateway().'/deployment/'.str_replace('\\', '-', $this->project).'/'.$this->version;
+        $url     = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '-', $this->project).'/'.$this->version;
         $options = [
             'http' => [
                 'header'  => $headers,

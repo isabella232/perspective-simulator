@@ -20,18 +20,6 @@ class Util
 
 
     /**
-     * Gets the gateway url.
-     *
-     * @return string
-     */
-    public static function getGateway()
-    {
-        return 'http://127.0.0.1:3456';
-
-    }//end getGateway()
-
-
-    /**
      * Prints data in JSON format.
      *
      * @param mixed   $value   The value we want in JSON format.
