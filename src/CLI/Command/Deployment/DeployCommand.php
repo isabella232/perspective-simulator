@@ -50,7 +50,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     private $progressBar = null;
 
-
     /**
      * The progress of the file being sent.
      *
@@ -64,7 +63,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      * @var integer
      */
     private $size = 0;
-
 
     /**
      * The version we are depolying.
@@ -100,6 +98,20 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      * @var object
      */
     private $gateway = null;
+
+    /**
+     * The gateway receipt for the deploymeny progress.
+     *
+     * @var integer
+     */
+    private $receipt = 0;
+
+    /**
+     * Number of seconds between checking the status.
+     *
+     * @var integer
+     */
+    private $checkDelay = 5;
 
 
     /**
@@ -185,6 +197,10 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($this->gateway === null) {
+            $this->gateway = new \PerspectiveSimulator\Gateway();
+        }
+
         $from    = $input->getArgument('oldVersion');
         $version = $input->getArgument('newVersion');
         $diff    = Libs\Git::getDiff($from);
@@ -288,7 +304,46 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         Libs\FileSystem::delete($versionFile);
         Libs\FileSystem::delete($tarDir.'/'.$project);
 
-        $this->progressBar->advance();
+        $maxSteps = ($maxSteps + 6);
+        $this->progressBar->setMaxSteps($maxSteps);
+        $this->progressBar->setMessage('<comment>Waiting</comment>', 'titleMessage');
+        $this->progressBar->advance(0);
+        $status  = null;
+        $headers = [
+            'Content-type: application/x-www-form-urlencoded',
+            'Authentication: Basic '.$this->gateway->getGatewayKey(),
+        ];
+        $url     = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
+        $options = [
+            'http' => [
+                'header'  => $headers,
+                'method'  => 'GET',
+                'content' => '',
+            ],
+        ];
+
+        $context    = stream_context_create($options);
+        $prevStatus = null;
+        while ($status !== 'Complete' && strpos($status, 'Error') !== 0) {
+            $result     = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
+            $prevStatus = $status;
+            $status     = ($result['status'] ?? 'Error: status not returned.');
+            if (strpos($status, 'Error') !== 0) {
+                $this->progressBar->setMessage('<comment>'.$status.'</comment>', 'titleMessage');
+                if ($prevStatus !== $status) {
+                    $this->progressBar->advance();
+                }
+                // Wait before each retry, this might want to be higher.
+                sleep($this->checkDelay);
+            } else {
+                // Throw error.
+                throw new \Exception($status);
+            }
+        }
+
+        if (strpos($status, 'Error') === 0) {
+            throw new \Exception($status);
+        }
 
         $this->progressBar->setMessage('', 'titleMessage');
         $this->progressBar->finish();
@@ -488,17 +543,13 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             return true;
         }
 
-        if ($this->gateway === null) {
-            $this->gateway = new \PerspectiveSimulator\Gateway();
-        }
-
         $lastBytePos    = ($this->progress + strlen($chunk) - 1);
         $headers        = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
             'Content-type: application/x-www-form-urlencoded',
             'Authentication: Basic '.$this->gateway->getGatewayKey(),
         ];
-        $this->progress = $lastBytePos + 1;
+        $this->progress = ($lastBytePos + 1);
 
         $sendData = [
             'data'         => $chunk,
@@ -518,13 +569,14 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $context            = stream_context_create($options);
         $result             = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
         $this->deploymentid = $result['deploymentid'];
+        $this->receipt      = $result['receipt'];
         if ($result === false || ($this->progress !== $this->size)) {
             return false;
         }
 
         return true;
 
-    }//end sendChuck()
+    }//end sendChunk()
 
 
 }//end class
