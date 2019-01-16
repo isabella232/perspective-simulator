@@ -111,7 +111,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @var integer
      */
-    private $checkDelay = 5;
+    private $checkDelay = 1;
 
 
     /**
@@ -333,8 +333,11 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
                 if ($prevStatus !== $status) {
                     $this->progressBar->advance();
                 }
-                // Wait before each retry, this might want to be higher.
-                sleep($this->checkDelay);
+
+                if ($status !== 'Complete') {
+                    // Wait before each retry, this might want to be higher.
+                    sleep($this->checkDelay);
+                }
             } else {
                 // Throw error.
                 throw new \Exception($status);
