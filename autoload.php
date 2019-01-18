@@ -65,7 +65,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 $path = self::$composerAutoloader->findFile($class);
             }
 
-            if ($path === false) {
+            if ($path === false && isset($GLOBALS['projectNamespace']) === true) {
                 $projectNs   = strtolower($GLOBALS['projectNamespace']);
                 $projectPath = $GLOBALS['projectPath'];
                 $prefix      = strtolower(str_replace('\\', '-', $class));
@@ -88,24 +88,6 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
 
                 if (strtolower($class) === $projectNs.'\\jobqueue') {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
-                }
-
-                if (substr($class, 0, 21) === 'PerspectiveSimulator\\') {
-                    $parts = explode('\\', $class);
-                    if ($parts[1] === 'StorageType') {
-                        $path = __DIR__.$ds.'src'.$ds.'Storage'.$ds.'Types'.$ds.$parts[2].'.php';
-                    } else  if ($parts[1] === 'PropertyType') {
-                        $path = __DIR__.$ds.'src'.$ds.'Property'.$ds.'Types'.$ds.$parts[2].'.php';
-                    }
-                }
-
-                if (substr($class, 0, 12) === 'Perspective\\') {
-                    $parts = explode('\\', $class);
-                    if ($parts[1] === 'PHPClass') {
-                        if ($parts[2] === 'ObjectType') {
-                            $path = __DIR__.$ds.'src'.$ds.'Objects'.$ds.'Types'.$ds.$parts[3].'.php';
-                        }
-                    }
                 }
             }
 

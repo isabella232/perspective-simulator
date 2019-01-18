@@ -10,31 +10,13 @@
 
 namespace PerspectiveSimulator;
 
-use \PerspectiveAPI\AuthenticationInterface;
-
-use PerspectiveSimulator\Requests\Session;
-use PerspectiveSimulator\Storage\StorageFactory;
 use PerspectiveSimulator\Libs;
 
 /**
  * Authentication class.
  */
-class Authentication implements AuthenticationInterface
+class Authentication
 {
-
-    /**
-     * The current user.
-     *
-     * @var object
-     */
-    private static $user = null;
-
-    /**
-     * Logged in flag.
-     *
-     * @var boolean
-     */
-    private static $loggedIn = false;
 
     /**
      * Secret Key.
@@ -42,104 +24,6 @@ class Authentication implements AuthenticationInterface
      * @var string
      */
     private static $secretKey = null;
-
-
-    /**
-     * Gets the current user object.
-     *
-     * @return object|null
-     */
-    final public static function getCurrentUser()
-    {
-        $user = self::getCurrentUserid();
-        if ($user === null) {
-            return null;
-        }
-
-        return self::$user;
-
-    }//end getCurrentUser()
-
-
-    /**
-     * Gets current userid.
-     *
-     * @return object|null
-     */
-    final public static function getCurrentUserid()
-    {
-        if (self::$user === null && isset($_SESSION['user']) === false) {
-            return null;
-        } else if (self::$user === null) {
-            if (isset($_SESSION['user']) === true) {
-                $store = StorageFactory::getUserStore($_SESSION['userStore']);
-                if ($store !== null) {
-                    self::$user = $store->getUser($_SESSION['user']);
-                }
-            }
-
-            if (self::$user === null) {
-                return null;
-            }
-        }
-
-        return self::$user->getId();
-
-    }//end getCurrentUserid()
-
-
-    /**
-     * Login.
-     *
-     * @param object $user The user we want to login.
-     *
-     * @return void
-     */
-    final public static function login(\PerspectiveAPI\Object\Types\User $user)
-    {
-        self::$user            = $user;
-        self::$loggedIn        = true;
-        Session::setValue('user', $user->getId());
-        Session::setValue('userStore', $user->getStorage()->getCode());
-
-    }//end login()
-
-
-    /**
-     * Checks if the user is logged in.
-     *
-     * @return boolean
-     */
-    final public static function isLoggedIn()
-    {
-        if (self::$loggedIn === false && isset($_SESSION['user']) === true) {
-            // User is loggedIn so we can reset the flag.
-            self::$loggedIn = true;
-        }
-
-        return self::$loggedIn;
-
-    }//end isLoggedIn()
-
-
-    /**
-     * Logout
-     *
-     * @return boolean
-     */
-    final public static function logout()
-    {
-        self::$user     = null;
-        self::$loggedIn = false;
-
-        unset($_SESSION['user']);
-        unset($_SESSION['userStore']);
-        unset($_SESSION['moderator']);
-        Session::save();
-
-        return true;
-
-    }//end logout()
 
 
     /**

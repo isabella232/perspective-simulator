@@ -10,7 +10,7 @@
 
 namespace PerspectiveSimulator;
 
-use \PerspectiveSimulator\Storage\StorageFactory;
+use \PerspectiveAPI\Storage\StorageFactory;
 use \PerspectiveSimulator\Libs;
 
 /**
@@ -60,7 +60,8 @@ class Bootstrap
         // Register the shutdown function to process any saves that we have queued.
         register_shutdown_function(
             function () {
-                \PerspectiveSimulator\Bootstrap::processSave();
+                $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+                $simulatorHandler->save();
             }
         );
 
@@ -73,94 +74,50 @@ class Bootstrap
         $loader = include dirname(__DIR__, 3).'/autoload.php';
         $loader->addPsr4($project.'\\', $projectDir);
 
-        class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
-        class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
-        class_alias('Perspective\PHPClass\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
+        // First, set the connector alias.
+        if (class_exists('\PerspectiveAPI\Connector') === false) {
+            \PerspectiveAPI\Init::setConnectorAlias('PerspectiveSimulator\SimulatorConnector');
+        }
+
         class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
+
+        // Set up Perspective API class aliases for simulator execution.
+        $perspectiveAPIClassAliases = [
+            'PerspectiveAPI\Authentication'               => '\Authentication',
+            'PerspectiveAPI\Email'                        => '\Email',
+            'PerspectiveAPI\Request'                      => '\Request',
+            'PerspectiveAPI\Queue'                        => '\Queue',
+            'PerspectiveAPI\Session'                      => '\Session',
+            'PerspectiveAPI\Storage\StorageFactory'       => '\StorageFactory',
+            'PerspectiveAPI\Object\Types\ProjectInstance' => '\ProjectInstance',
+        ];
+
+        // Always alias theses classes if they haven't been already as we might be loading another project.
+        $perspectiveAPIClassAliasesProject = [
+            'PerspectiveAPI\Object\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
+            'PerspectiveAPI\Object\Types\User'       => $project.'\CustomTypes\User\User',
+            'PerspectiveAPI\Object\Types\Group'      => $project.'\CustomTypes\User\Group',
+        ];
+
+        if (class_exists($project.'\CustomTypes\User\Group') === false) {
+            foreach ($perspectiveAPIClassAliasesProject as $orignalClass => $aliasClass) {
+                class_alias($orignalClass, $aliasClass);
+            }
+        }
 
         if (class_exists('\Authentication') === false) {
             class_alias('PerspectiveSimulator\View\ViewBase', '\View');
-            class_alias('PerspectiveSimulator\Authentication', '\Authentication');
-            class_alias('PerspectiveSimulator\Storage\StorageFactory', '\StorageFactory');
-            class_alias('PerspectiveSimulator\Requests\Request', '\Request');
-            class_alias('PerspectiveSimulator\Requests\Session', '\Session');
-            class_alias('PerspectiveSimulator\Queue\Queue', '\Queue');
-            class_alias('PerspectiveSimulator\Libs\Email', '\Email');
-        }
 
-
-        $prefix = self::generatePrefix($project);
-
-        // Add data record properties.
-        if (is_dir($projectDir.'/Properties/Data') === true) {
-            $files = scandir($projectDir.'/Properties/Data');
-            foreach ($files as $file) {
-                if ($file[0] === '.'
-                    || substr($file, -5) !== '.json'
-                ) {
-                    continue;
-                }
-
-                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
-                $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Data/'.$file));
-                StorageFactory::createDataRecordProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
+            foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
+                class_alias($orignalClass, $aliasClass);
             }
         }
 
-        // Add project properties.
-        if (is_dir($projectDir.'/Properties/Project') === true) {
-            $files = scandir($projectDir.'/Properties/Project');
-            foreach ($files as $file) {
-                if ($file[0] === '.'
-                    || substr($file, -5) !== '.json'
-                ) {
-                    continue;
-                }
-
-                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
-                $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
-                StorageFactory::createProjectProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
-            }
-        }
-
-        // Add user properties.
-        if (is_dir($projectDir.'/Properties/User') === true) {
-            $files = scandir($projectDir.'/Properties/User');
-            foreach ($files as $file) {
-                if ($file[0] === '.'
-                    || substr($file, -5) !== '.json'
-                ) {
-                    continue;
-                }
-
-                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
-                $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/User/'.$file));
-                StorageFactory::createUserProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
-            }
-        }
-
-        // Add default user properties.
-        StorageFactory::createUserProperty($prefix.'-__first-name__', 'text');
-        StorageFactory::createUserProperty($prefix.'-__last-name__', 'text');
-
-        // Add data stores.
-        $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
-        foreach ($dirs as $dir) {
-            $storeName = strtolower(basename($dir));
-            StorageFactory::createDataStore($storeName, $project);
-        }
-
-        // Add user stores.
-        $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
-        foreach ($dirs as $dir) {
-            $storeName = strtolower(basename($dir));
-            StorageFactory::createUserStore($storeName, $project);
-        }
+        $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+        $simulatorHandler->load();
 
         \PerspectiveSimulator\Requests\Session::load();
         \PerspectiveSimulator\Queue\Queue::load();
-
-        self::loadDependencies($project);
 
     }//end load()
 
@@ -290,110 +247,6 @@ class Bootstrap
 
 
     /**
-     * Loads a projects dependencies to the simulator.
-     *
-     * @param string $mainProject The project we are loading dependencies for.
-     *
-     * @return void
-     */
-    private static function loadDependencies(string $mainProject)
-    {
-        $path     = substr(Libs\FileSystem::getProjectDir(), 0, -4);
-        $composer = $path.'/composer.json';
-        if (file_exists($composer) === true) {
-            $requirements     = [];
-            $composerContents = Libs\Util::jsonDecode(file_get_contents($composer));
-            if (isset($composerContents['require']) === true) {
-                $requirements = array_merge($requirements, $composerContents['require']);
-            }
-
-            if (isset($composerContents['require-dev']) === true) {
-                $requirements = array_merge($requirements, $composerContents['require-dev']);
-            }
-
-            if (empty($requirements) === true) {
-                // No dependencies to load so just return.
-                return;
-            }
-
-            foreach ($requirements as $requirement => $version) {
-                $project    = str_replace('/', '\\', $requirement);
-                $projectDir = $path.'/vendor/'.str_replace('\\', '/', $requirement).'/src';
-                $prefix     = self::generatePrefix($project);
-
-                class_alias('PerspectiveSimulator\Storage\StorageFactory', $project.'\API\Operations\StorageFactory');
-                class_alias('PerspectiveSimulator\Requests\Request', $project.'\API\Operations\Request');
-                class_alias('Perspective\PHPClass\ObjectType\DataRecord', $project.'\CustomTypes\Data\DataRecord');
-                class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
-
-                // Add data stores.
-                $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
-                foreach ($dirs as $dir) {
-                    $storeName = strtolower(basename($dir));
-                    StorageFactory::createDataStore($storeName, $project);
-                }
-
-                // Add user stores.
-                $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
-                foreach ($dirs as $dir) {
-                    $storeName = strtolower(basename($dir));
-                    StorageFactory::createUserStore($storeName, $project);
-                }
-
-                // Add data record properties.
-                if (is_dir($projectDir.'/Properties/Data') === true) {
-                    $files = scandir($projectDir.'/Properties/Data');
-                    foreach ($files as $file) {
-                        if ($file[0] === '.'
-                            || substr($file, -5) !== '.json'
-                        ) {
-                            continue;
-                        }
-
-                        $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
-                        $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Data/'.$file));
-                        StorageFactory::createDataRecordProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
-                    }
-                }
-
-                // Add project properties.
-                if (is_dir($projectDir.'/Properties/Project') === true) {
-                    $files = scandir($projectDir.'/Properties/Project');
-                    foreach ($files as $file) {
-                        if ($file[0] === '.'
-                            || substr($file, -5) !== '.json'
-                        ) {
-                            continue;
-                        }
-
-                        $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
-                        $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
-                        StorageFactory::createProjectProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
-                    }
-                }
-
-                // Add user properties.
-                if (is_dir($projectDir.'/Properties/User') === true) {
-                    $files = scandir($projectDir.'/Properties/User');
-                    foreach ($files as $file) {
-                        if ($file[0] === '.'
-                            || substr($file, -5) !== '.json'
-                        ) {
-                            continue;
-                        }
-
-                        $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
-                        $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/User/'.$file));
-                        StorageFactory::createUserProperty($propName, $propInfo['type'], ($propInfo['default'] ?? null));
-                    }
-                }
-            }//end foreach
-        }//end if
-
-    }//end loadDependencies()
-
-
-    /**
      * Queues a save for later.
      *
      * @param object $object Object to be added to the save queue
@@ -442,6 +295,33 @@ class Bootstrap
         self::$saveQueue = [];
 
     }//end clearSaveQueue()
+
+
+    public static function getProjectPrefix()
+    {
+        $bt = debug_backtrace(false);
+
+        // Remove the call to this and the call to the function that needs the property code prefixed.
+        array_shift($bt);
+        array_shift($bt);
+
+        $key = 0;
+        foreach ($bt as $id => $call) {
+            if ($call['function'] === 'eval') {
+                $key = ($id + 1);
+                break;
+            }
+        }
+
+        $called = $bt[$key];
+        if (isset($called['class']) === true && strpos(strtolower($GLOBALS['project']), strtolower($called['class'])) !== false) {
+            $classParts   = explode('\\', $called['class']);
+            return Bootstrap::generatePrefix($classParts[0].'\\'.$classParts[1]);
+        } else {
+            return Bootstrap::generatePrefix($GLOBALS['project']);
+        }
+
+    }//end getProjectPrefix()
 
 
 }//end class

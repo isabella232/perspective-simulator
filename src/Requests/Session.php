@@ -70,7 +70,7 @@ class Session
      *
      * @return mixed
      */
-    public static function getvalue(string $key)
+    public static function getValue(string $key)
     {
         if (isset($_SESSION[$key]) === false) {
             return null;
@@ -89,7 +89,7 @@ class Session
      *
      * @return void
      */
-    public static function setvalue(string $key, $value)
+    public static function setValue(string $key, $value)
     {
         $_SESSION[$key] = $value;
         self::save();

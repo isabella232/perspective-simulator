@@ -60,7 +60,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
         if (is_dir($simulatorDir) === true) {
             $helper  = $this->getHelper('question');
             $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
-                'Simualator already installed. <comment>Re-installing it will delete all simualtor data.</> Do you want to continue? (y/N) ',
+                'Simulator already installed. <comment>Re-installing it will delete all simulator data.</> Do you want to continue? (y/N) ',
                 false
             );
 
