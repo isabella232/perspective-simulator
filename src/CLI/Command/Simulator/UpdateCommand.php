@@ -60,7 +60,7 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
         if (is_dir($simulatorDir) === false) {
             $helper  = $this->getHelper('question');
             $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
-                'Simualator isn\'t installed. Did you want to install it now instead?',
+                'Simulator isn\'t installed. Did you want to install it now instead?',
                 true
             );
 
