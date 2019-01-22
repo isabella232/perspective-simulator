@@ -108,7 +108,7 @@ class Command extends \Symfony\Component\Console\Command\Command
 
         foreach ($diff as $change) {
             $changeParts = preg_split('/\s{1}/', $change);
-            $type        = $changeParts[0];
+            $type        = $changeParts[0][0];
             $path        = $changeParts[1];
             $project     = $this->getProject($path);
             if ($project !== null) {
@@ -125,37 +125,61 @@ class Command extends \Symfony\Component\Console\Command\Command
                         $changes[$project][$type]['API'] = [];
                     }
 
-                    $changes[$project][$type]['API'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['API'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['API'][] = $path;
+                    }
                 } else if (strpos($path, 'App') !== false) {
                     if (isset($changes[$project][$type]['App']) === false) {
                         $changes[$project][$type]['App'] = [];
                     }
 
-                    $changes[$project][$type]['App'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['App'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['App'][] = $path;
+                    }
                 } else if (strpos($path, 'CDN') !== false) {
                     if (isset($changes[$project][$type]['CDN']) === false) {
                         $changes[$project][$type]['CDN'] = [];
                     }
 
-                    $changes[$project][$type]['CDN'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['CDN'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['CDN'][] = $path;
+                    }
                 } else if (strpos($path, 'CustomTypes') !== false) {
                     if (isset($changes[$project][$type]['CustomTypes']) === false) {
                         $changes[$project][$type]['CustomTypes'] = [];
                     }
 
-                    $changes[$project][$type]['CustomTypes'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['CustomTypes'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['CustomTypes'][] = $path;
+                    }
                 } else if (strpos($path, 'Properties') !== false) {
                     if (isset($changes[$project][$type]['Properties']) === false) {
                         $changes[$project][$type]['Properties'] = [];
                     }
 
-                    $changes[$project][$type]['Properties'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['Properties'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['Properties'][] = $path;
+                    }
                 } else if (strpos($path, 'Queues') !== false) {
                     if (isset($changes[$project][$type]['Queues']) === false) {
                         $changes[$project][$type]['Queues'] = [];
                     }
 
-                    $changes[$project][$type]['Queues'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['Queues'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['Queues'][] = $path;
+                    }
                 } else if (strpos($path, 'Stores') !== false) {
                     if (isset($changes[$project][$type]['Stores']) === false) {
                         $changes[$project][$type]['Stores'] = [];
@@ -166,20 +190,35 @@ class Command extends \Symfony\Component\Console\Command\Command
                             $changes[$project][$type]['Stores']['Data'] = [];
                         }
 
-                        $changes[$project][$type]['Stores']['Data'][] = $path;
+                        if ($type === 'R') {
+                            $changes[$project][$type]['Stores']['Data'][] = [
+                                'from' => $path,
+                                'to'   => $changeParts[2],
+                            ];
+                        } else {
+                            $changes[$project][$type]['Stores']['Data'][] = $path;
+                        }
                     } else if (strpos($path, 'User') !== false) {
                         if (isset($changes[$project][$type]['Stores']['User']) === false) {
                             $changes[$project][$type]['Stores']['User'] = [];
                         }
 
-                        $changes[$project][$type]['Stores']['User'][] = $path;
+                        if ($type === 'R') {
+                            $changes[$project][$type]['Stores']['User'][] = $changeParts[2];
+                        } else {
+                            $changes[$project][$type]['Stores']['User'][] = $path;
+                        }
                     }
                 } else {
                     if (isset($changes[$project][$type]['other']) === false) {
                         $changes[$project][$type]['other'] = [];
                     }
 
-                    $changes[$project][$type]['other'][] = $path;
+                    if ($type === 'R') {
+                        $changes[$project][$type]['other'][] = $changeParts[2];
+                    } else {
+                        $changes[$project][$type]['other'][] = $path;
+                    }
                 }//end if
             }//end if
         }//end foreach
