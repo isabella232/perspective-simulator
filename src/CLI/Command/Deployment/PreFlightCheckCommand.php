@@ -88,7 +88,7 @@ class PreFlightCheckCommand extends \PerspectiveSimulator\CLI\Command\Command
         foreach ($dirs as $dir) {
             $folder = strtolower(basename($dir));
             if (in_array($folder, $this->allowedDirs) === false) {
-                throw new \Exception(sprintf('Invaild folder name "%s" detected', $dir));
+                throw new \Exception(sprintf('Invaild folder "%s" detected', $dir));
             }
         }
 
