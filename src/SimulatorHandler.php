@@ -202,7 +202,7 @@ class SimulatorHandler
                     continue;
                 }
 
-                $propName = $prefix.'-'.strtolower(substr($file, 0, -5));
+                $propName = strtolower(substr($file, 0, -5));
                 $propInfo = Libs\Util::jsonDecode(file_get_contents($projectDir.'/Properties/Project/'.$file));
 
                 $this->properties['project'][$prefix][$propName] = [
