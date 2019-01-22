@@ -577,7 +577,11 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
             return null;
         }
 
-        $user              = self::getUser($storeCode, $userid);
+        $user = self::getUser($storeCode, $userid);
+        if ($user === null) {
+            return null;
+        }
+
         $user['storeCode'] = $storeCode;
         return $user;
 
