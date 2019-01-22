@@ -64,8 +64,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->key = ($input->getOption('key') ?? null);
         if ($this->key === null) {
-            $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-            $style->error('Gatewway key must be provided.');
+            $this->style->error('Gatewway key must be provided.');
             exit(1);
         }
 
@@ -84,9 +83,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $gateway = new \PerspectiveSimulator\Gateway();
         $gateway->setGatewayKey($this->key);
-        $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-        $style->success('Gateway successfully registered.');
-        $style->note('It is suggested that you DO NOT commit .apiKey to your repo.');
+        $this->style->success('Gateway successfully registered.');
+        $this->style->note('It is suggested that you DO NOT commit .apiKey to your repo.');
 
     }//end execute()
 

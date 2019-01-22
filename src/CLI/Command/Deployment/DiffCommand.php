@@ -73,8 +73,7 @@ class DiffCommand extends \PerspectiveSimulator\CLI\Command\Command
         $changes = $this->parseDiff($input, $diff);
 
         foreach ($changes as $project => $changeData) {
-            $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-            $style->title($project);
+            $this->style->title($project);
             foreach ($changeData as $type => $change) {
                 $gitType = '';
                 switch ($type) {
@@ -119,17 +118,17 @@ class DiffCommand extends \PerspectiveSimulator\CLI\Command\Command
                     break;
                 }//end switch
 
-                $style->section('Following changes detected as: '.$gitType);
+                $this->style->section('Following changes detected as: '.$gitType);
 
                 foreach ($change as $system => $paths) {
                     if ($system === 'Stores') {
                         foreach ($paths as $store => $storePaths) {
-                            $style->block($store.' Stores', null, 'fg=yellow', ' ! ');
-                            $style->listing($storePaths);
+                            $this->style->block($store.' Stores', null, 'fg=yellow', ' ! ');
+                            $this->style->listing($storePaths);
                         }
                     } else {
-                        $style->block($system, null, 'fg=yellow', ' ! ');
-                        $style->listing($paths);
+                        $this->style->block($system, null, 'fg=yellow', ' ! ');
+                        $this->style->listing($paths);
                     }
                 }
             }//end foreach

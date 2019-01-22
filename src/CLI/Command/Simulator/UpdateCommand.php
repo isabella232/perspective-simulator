@@ -144,8 +144,7 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             if (is_dir('./vendor') === false) {
                 $section->overwrite('Installing project from "'.$path.'" <error>INCOMPLETE</error>');
-                $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-                $style->error(
+                $this->style->error(
                     sprintf(
                         "\ncomposer install failed, please manually run composer install in \n\"%s\"\n to be able to use the simulator for this project.\n",
                         $projectPath

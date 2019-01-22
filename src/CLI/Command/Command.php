@@ -24,6 +24,22 @@ class Command extends \Symfony\Component\Console\Command\Command
 
 
     /**
+     * Initialize's some components for us to use.
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return void
+     */
+    public function initialize(InputInterface $input, OutputInterface $output)
+    {
+        ini_set('error_log', dirname(__DIR__, 6).'/simulator/error_log');
+        $this->style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
+
+    }//end initialize()
+
+
+    /**
      * Tests we have a project.
      *
      * @return boolean

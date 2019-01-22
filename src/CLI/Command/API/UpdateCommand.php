@@ -69,11 +69,7 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln([
-            'Update API',
-            '================================================',
-            '',
-        ]);
+        $this->style->title('Update API');
 
         try {
             if ($input->getArgument('path') !== null) {
@@ -89,11 +85,6 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
-
-        $output->writeln([
-            'Projects API updated.',
-            '',
-        ]);
 
     }//end execute()
 

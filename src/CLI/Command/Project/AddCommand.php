@@ -166,11 +166,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln([
-            'Creating new project',
-            '================================================',
-            '',
-        ]);
+        $this->style->title('Creating new project');
 
         try {
             $name      = $input->getArgument('name');

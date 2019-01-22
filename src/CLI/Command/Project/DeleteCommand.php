@@ -88,11 +88,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln([
-            'Deleting project',
-            '================================================',
-            '',
-        ]);
+        $this->style->title('Deleting project');
 
         try {
             $namespace = $input->getArgument('namespace');

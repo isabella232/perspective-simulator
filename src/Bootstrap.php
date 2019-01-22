@@ -79,8 +79,6 @@ class Bootstrap
             \PerspectiveAPI\Init::setConnectorAlias('PerspectiveSimulator\SimulatorConnector');
         }
 
-        class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
-
         // Set up Perspective API class aliases for simulator execution.
         $perspectiveAPIClassAliases = [
             'PerspectiveAPI\Authentication'               => '\Authentication',
@@ -103,6 +101,10 @@ class Bootstrap
             foreach ($perspectiveAPIClassAliasesProject as $orignalClass => $aliasClass) {
                 class_alias($orignalClass, $aliasClass);
             }
+        }
+
+        if (class_exists($project.'\Web\Views\View') === false) {
+            class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
         }
 
         if (class_exists('\Authentication') === false) {

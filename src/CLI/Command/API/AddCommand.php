@@ -75,11 +75,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln([
-            'Add API Specification',
-            '================================================',
-            '',
-        ]);
+        $this->style->title('Add API Specification');
 
         try {
             $path = $input->getArgument('path');
@@ -92,13 +88,6 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
-
-        $output->writeln([
-            '================================================',
-            '',
-            'New API specification added',
-            '',
-        ]);
 
     }//end execute()
 

@@ -155,12 +155,20 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $matches = [];
         preg_match($re, $input->getArgument('newVersion'), $matches);
         if (empty($matches) === true) {
-            $style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-            $style->error('Invalid version number. Version number can only contain . or intergers.');
+            $this->style->error('Invalid version number. Version number can only contain . or intergers.');
             exit(1);
         }
 
         // Run predepolyment check command.
+        $preFlightCommand = $this->getApplication()->find('deployment:preflightchecks');
+        $preFlightArgs    = [
+            'command'   => 'deployment:preflightchecks',
+            '--project' => ($input->getOption('project') ?? ''),
+        ];
+
+        $preFlightInput = new \Symfony\Component\Console\Input\ArrayInput($preFlightArgs);
+        $returnCode     = $preFlightCommand->run($preFlightInput, $output);
+
         // Run the diff command so the user will know what changes are about to be made.
         $diffCommand = $this->getApplication()->find('deployment:diff');
         $diffArgs    = [
