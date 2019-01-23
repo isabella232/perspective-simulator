@@ -568,7 +568,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             'deploymentid' => $this->deploymentid,
         ];
 
-        $url     = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '-', $this->project).'/'.$this->version;
+        $url     = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '/', $this->project).'/'.$this->version;
         $options = [
             'http' => [
                 'header'  => $headers,
