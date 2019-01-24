@@ -239,7 +239,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
                         $this->progressBar->setMaxSteps($maxSteps);
                         $this->progressBar->setMessage('Gathering '.$store.' '.$system, 'progressMessage');
                         $this->progressBar->advance(0);
-                        foreach ($paths as $path) {
+                        foreach ($storePaths as $path) {
                             $this->gatherData($type, $path, $store.'Store');
                             $this->progressBar->advance();
                         }
