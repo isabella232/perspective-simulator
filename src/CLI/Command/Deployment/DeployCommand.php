@@ -453,13 +453,12 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
                 $data['source_code'] = file_get_contents($path);
             }
         } else if ($system === 'DataStore' || $system === 'UserStore') {
+            $action = $system;
             if (substr($path, -8) === '.gitKeep') {
                 $code   = basename(str_replace('/.gitKeep', '', $path));
-                $action = $system;
                 $data   = ['storeCode' => $code];
             } else if (substr($path, -5) === '.json') {
                 $code   = basename(str_replace('.json', '', $path));
-                $action = $system;
                 $data   = ['referenceCode' => $code];
 
                 if ($type !== 'D') {
@@ -571,14 +570,22 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $url     = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '/', $this->project).'/'.$this->version;
         $options = [
             'http' => [
-                'header'  => $headers,
-                'method'  => 'POST',
-                'content' => http_build_query($sendData),
+                'header'        => $headers,
+                'method'        => 'POST',
+                'content'       => http_build_query($sendData),
+                'ignore_errors' => true,
             ],
         ];
 
-        $context            = stream_context_create($options);
-        $result             = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
+        $context    = stream_context_create($options);
+        $result     = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
+        $statusLine = $http_response_header[0];
+        preg_match('{HTTP\/\S*\s(\d{3})}', $statusLine, $match);
+        $status = $match[1];
+        if ($status !== '200') {
+            throw new \Exception($statusLine."\n".$result);
+        }
+
         $this->deploymentid = $result['deploymentid'];
         $this->receipt      = $result['receipt'];
         if ($result === false || ($this->progress !== $this->size)) {
