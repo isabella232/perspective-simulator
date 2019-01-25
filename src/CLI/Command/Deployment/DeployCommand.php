@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Deployment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -113,6 +114,13 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     private $checkDelay = 1;
 
+    /**
+     * Flag for initial export.
+     *
+     * @var boolean
+     */
+    private $initial = false;
+
 
     /**
      * Configures the init command.
@@ -123,8 +131,15 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Deploys the project.');
         $this->setHelp('Deploys a given project.');
-        $this->addArgument('oldVersion', InputArgument::REQUIRED, 'The previous version number or commit ID.');
-        $this->addArgument('newVersion', InputArgument::REQUIRED, 'The new version number eg: 0.0.1');
+        $this->addOption(
+            'initial',
+            'i',
+            InputOption::VALUE_NONE,
+            'Flag for when the deployment is the initial.',
+            null
+        );
+        $this->addArgument('oldVersion', InputArgument::OPTIONAL, 'The previous version number or commit ID.');
+        $this->addArgument('newVersion', InputArgument::OPTIONAL, 'The new version number eg: 0.0.1');
 
     }//end configure()
 
@@ -151,9 +166,31 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             Libs\FileSystem::mkdir($this->dataDir, true);
         }
 
+        $this->initial = $input->getOption('initial');
+
+        if ($this->initial === true) {
+            // Get the initial commit hash and use that for the oldVersion.
+            exec('git rev-list --max-parents=0 HEAD', $out, $retval);
+            if (empty($out) === true) {
+                throw new \Exception('Unable to determine the initial version.');
+            }
+
+            $input->setArgument('newVersion', $input->getArgument('oldVersion'));
+            $input->setArgument('oldVersion', $out[0]);
+        }
+
+        $newVersion = ($input->getArgument('newVersion') ?? null);
+        $helper     = $this->getHelper('question');
+
+        if ($newVersion === null) {
+            $question   = new \Symfony\Component\Console\Question\Question('Please enter a new version number: ');
+            $newVersion = $helper->ask($input, $output, $question);
+            $input->setArgument('newVersion', $newVersion);
+        }
+
         $re      = '/^\d+(\.\d+)*$/';
         $matches = [];
-        preg_match($re, $input->getArgument('newVersion'), $matches);
+        preg_match($re, $newVersion, $matches);
         if (empty($matches) === true) {
             $this->style->error('Invalid version number. Version number can only contain . or intergers.');
             exit(1);
@@ -263,6 +300,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
                 [
                     'project'    => $project,
                     'version'    => $version,
+                    'initial'    => $this->initial,
                     'passengers' => $this->data,
                 ]
             )
