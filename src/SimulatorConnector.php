@@ -666,4 +666,16 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     }//end setSessionValue()
 
 
+    /**
+     * As this is the simulator we will alsways return true here.
+     *
+     * @return boolean
+     */
+    public static function isSimulated()
+    {
+        return true;
+
+    }//end isSimulated()
+
+
 }//end class
