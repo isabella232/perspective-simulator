@@ -450,7 +450,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      *
      * @return string
      */
-    public static function createGroup(string $storeCode, string $groupName, string $type, array $groups=[])
+    public static function createGroup(string $storeCode, string $groupName, string $type=null, array $groups=[])
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
         $group            = $simulatorHandler->createGroup($storeCode, $groupName, $type, $groups);
