@@ -38,13 +38,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
     private $dataDir = '';
 
     /**
-     * The data to be sent to gateway.
-     *
-     * @var array
-     */
-    private $data = [];
-
-    /**
      * The progress bar object
      *
      * @var object
@@ -246,12 +239,8 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             $this->gateway = new \PerspectiveSimulator\Gateway();
         }
 
-        $from    = $input->getArgument('oldVersion');
         $version = $input->getArgument('newVersion');
-        $diff    = Libs\Git::getDiff($from);
         $project = str_replace('\\', '/', $input->getOption('project'));
-        $changes = $this->parseDiff($input, $diff);
-        $changes = $changes[$project];
 
         $this->version = $version;
         $this->project = $input->getOption('project');
@@ -268,43 +257,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->progressBar->setProgressCharacter('>');
         $this->progressBar->start();
 
-        foreach ($changes as $type => $changeData) {
-            foreach ($changeData as $system => $paths) {
-                if ($system === 'Stores') {
-                    foreach ($paths as $store => $storePaths) {
-                        $maxSteps = ($maxSteps + count($storePaths));
-                        $this->progressBar->setMaxSteps($maxSteps);
-                        $this->progressBar->setMessage('Gathering '.$store.' '.$system, 'progressMessage');
-                        $this->progressBar->advance(0);
-                        foreach ($storePaths as $path) {
-                            $this->gatherData($type, $path, $store.'Store');
-                            $this->progressBar->advance();
-                        }
-                    }
-                } else {
-                    $maxSteps = ($maxSteps + count($paths));
-                    $this->progressBar->setMaxSteps($maxSteps);
-                    $this->progressBar->setMessage('Gathering '.$system, 'progressMessage');
-                    $this->progressBar->advance(0);
-                    foreach ($paths as $path) {
-                        $this->gatherData($type, $path, $system);
-                        $this->progressBar->advance();
-                    }
-                }//end if
-            }//end foreach
-        }//end foreach
-
-        file_put_contents(
-            $this->dataDir.'/data.json',
-            Libs\Util::jsonEncode(
-                [
-                    'project'    => $project,
-                    'version'    => $version,
-                    'initial'    => $this->initial,
-                    'passengers' => $this->data,
-                ]
-            )
-        );
         $this->progressBar->setMessage('<comment>Preparing to send data</comment>', 'titleMessage');
         $this->progressBar->setMessage('', 'progressMessage');
         $maxSteps = ($maxSteps + 2);
@@ -398,143 +350,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->progressBar->finish();
 
     }//end execute()
-
-
-    /**
-     * Gets the data ready.
-     *
-     * @param string $type   The type of change.
-     * @param string $path   The path of the change.
-     * @param string $system The system of the change eg, App, CustomType etc.
-     *
-     * @return void
-     */
-    private function gatherData(string $type, string $path, string $system)
-    {
-        $path = Libs\FileSystem::getExportDir().DIRECTORY_SEPARATOR.$path;
-        $data = [];
-        if ($system === 'App') {
-            $action = 'app';
-            $data   = ['class_name' => str_replace('.php', '', basename($path))];
-
-            if ($type !== 'D') {
-                $data['source_code'] = file_get_contents($path);
-            }
-        } else if ($system === 'API') {
-            $data = [];
-            if (strpos($path, 'Operations') !== false) {
-                $action            = 'apiOperation';
-                $data['operation'] = str_replace('.php', '', basename($path));
-            } else {
-                $action = 'apiSpec';
-            }
-
-            if ($type !== 'D') {
-                $data['source_code'] = file_get_contents($path);
-            }
-        } else if ($system === 'CDN') {
-            $action  = 'cdnFile';
-            $cdnPath = str_replace(Libs\FileSystem::getProjectDir().DIRECTORY_SEPARATOR.'CDN/', '', $path);
-            /*
-                if (is_dir($this->dataDir.'/CDN/') === false) {
-                    Libs\FileSystem::mkdir($this->dataDir.'/CDN/', true);
-                }
-
-                if (in_array($type, ['A', 'C', 'M', 'R']) === true) {
-                    if (is_dir(dirname($this->dataDir.'/CDN/'.$cdnPath)) === false) {
-                        Libs\FileSystem::mkdir(dirname($this->dataDir.'/CDN/'.$cdnPath), true);
-                    }
-
-                    copy($path, $this->dataDir.'/CDN/'.$cdnPath);
-                }
-            */
-            $data = ['path' => $cdnPath];
-        } else if ($system === 'CustomTypes') {
-            if (substr($path, -5) === '.json') {
-                // We will get the custom type from the PHP class instead.
-                return;
-            }
-
-            $action = 'customType';
-            $data   = ['customTypeCode' => str_replace('.php', '', basename($path))];
-
-            if ($type !== 'D') {
-                $data['source_code'] = file_get_contents($path);
-            }
-        } else if ($system === 'Properties') {
-            if (substr($path, -5) !== '.json') {
-                return;
-            }
-
-            $action = 'property';
-            $data   = [];
-            if ($type !== 'D') {
-                $data = Libs\Util::jsonDecode(file_get_contents($path));
-            }
-
-            /*
-                if ($data['type'] === 'file' || $data['type'] === 'image') {
-                    if (is_dir($this->dataDir.'/Properties/') === false) {
-                        Libs\FileSystem::mkdir($this->dataDir.'/Properties/', true);
-                    }
-
-                    if (in_array($type, ['A', 'C', 'M', 'R']) === true) {
-                        copy($path, $this->dataDir.'/Properties/'.basename($path));
-                    }
-                }
-            */
-        } else if ($system === 'Queues') {
-            $action = 'queue';
-            $data   = ['queue_name' => str_replace('.php', '', basename($path))];
-
-            if ($type !== 'D') {
-                $data['source_code'] = file_get_contents($path);
-            }
-        } else if ($system === 'DataStore' || $system === 'UserStore') {
-            $action = $system;
-            if (substr($path, -8) === '.gitKeep') {
-                $code   = basename(str_replace('/.gitKeep', '', $path));
-                $data   = ['storeCode' => $code];
-            } else if (substr($path, -5) === '.json') {
-                $code   = basename(str_replace('.json', '', $path));
-                $data   = ['referenceCode' => $code];
-
-                if ($type !== 'D') {
-                    $data['referenceData'] = Libs\Util::jsonDecode(file_get_contents($path));
-                }
-            }
-        }//end if
-
-        switch ($type) {
-            case 'A':
-                $this->data[] = [
-                    'action' => $action.'Added',
-                    'data'   => $data,
-                ];
-            break;
-
-            case 'D':
-                $this->data[] = [
-                    'action' => $action.'Deleted',
-                    'data'   => $data,
-                ];
-            break;
-
-            case 'C':
-            case 'M':
-            case 'R':
-                $this->data[] = [
-                    'action' => $action.'Updated',
-                    'data'   => $data,
-                ];
-            break;
-
-            default:
-                // Invalid type so nothing to get.
-            break;
-        }//end switch
-
-    }//end gatherData()
 
 
     /**
