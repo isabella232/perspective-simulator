@@ -678,4 +678,135 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     }//end isSimulated()
 
 
+    /**
+     * Returns true if the request is in a read-only mode.
+     *
+     * @return boolean
+     */
+    public static function isReadOnly()
+    {
+        // TODO!
+
+    }//end isReadOnly()
+
+
+    /**
+     * Suppresses 404 response code
+     *
+     * @return void
+     */
+    public static function suppress404()
+    {
+        // TODO!
+
+    }//end suppress404()
+
+
+    /**
+     * Returns the next value of the specified sequence.
+     *
+     * @param string $sequenceid The name of the sequence. If the sequence name does not match any existing sequences,
+     *                           a new sequence will be created.
+     *
+     * @return string
+     */
+    public static function getSequenceNextval(string $sequenceid)
+    {
+        // TODO!
+
+    }//end getSequenceNextval()
+
+
+    /**
+     * Sends a notification to subscriptions.
+     *
+     * Returns a array of error messages for failed pushes.
+     *
+     * @param array $subscriptions Array of subscription content.
+     * @param string $payload      The payload of message to send.
+     * @param array $VAPID         Array of the VAPID settings.
+     *
+     * @return array
+     */
+    public static function sendWebPushNotification(array $subscriptions, string $payload='', array $VAPID)
+    {
+        // TODO!
+
+    }//end sendWebPushNotification()
+
+
+    /**
+     * Get a list of all perspectives that the current user has been placed into.
+     *
+     * Long Description
+     *
+     * @param array $limit A list of perspectives to limit the result to. If not specified, all active perspectives will
+     *                     be returned.
+     *
+     * @return array
+     */
+    public static function getActivePerspectives(array $limit=null)
+    {
+        // TODO!
+
+    }//end getActivePerspectives()
+
+
+    /**
+     * Checks if the current user is in a list of perspectives.
+     *
+     * @param array|string $perspectives A list of perspectives to check if the user has been placed into. If only one
+     *                                   perspective needs to be checked, a perspective string code can be passed.
+     *
+     * @return boolean
+     */
+    public static function isActivePerspective($perspectives)
+    {
+        // TODO!
+
+    }//end isActivePerspective()
+
+
+    /**
+     * Expands a list of perspective categories into a list of perspective codes.
+     *
+     * @param array|string $categories A list of category names to expand.
+     *
+     * @return array
+     */
+    public static function expandPerspectiveCategory($categories=null)
+    {
+        // TODO!
+
+    }//end expandPerspectiveCategory()
+
+
+    /**
+     * Returns the active language string.
+     *
+     * This function is intended to be used from inline PHP situation.
+     *
+     * @return string
+     */
+    public static function getActiveLanguage()
+    {
+        // TODO!
+
+    }//end getActiveLanguage()
+
+
+    /**
+     * Returns true the passed language is the current language.
+     *
+     * @param string $languageid Languageid to check.
+     *
+     * @return boolean
+     */
+    public static function isActiveLanguage($languageid)
+    {
+        // TODO!
+
+    }//end isActiveLanguage()
+
+
 }//end class
