@@ -864,8 +864,6 @@ class SimulatorHandler
             unset($this->stores[$objectType][$project][$propertyCode]);
         } else if (isset($this->stores[$objectType][$project][$storeCode]['records'][$id][$propertyCode]) === true) {
             unset($this->stores[$objectType][$project][$storeCode]['records'][$id][$propertyCode]);
-        } else {
-            throw new \Exception('Property: '.$propertyCode.' does not exist.');
         }
 
     }//end deletePropertyValue()
