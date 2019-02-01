@@ -807,6 +807,10 @@ class SimulatorHandler
      */
     public function setPropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode, $value)
     {
+        if ($value === null) {
+            throw new \Exception('Property value violates not-null constraint');
+        }
+
         $project  = Bootstrap::getProjectPrefix();
         if (isset($this->properties[$objectType][$project][$propertyCode]) === false) {
             throw new \Exception('Property '.$propertyCode.'does not exist');
