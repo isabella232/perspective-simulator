@@ -100,7 +100,9 @@ class Email
      */
     public static function getSentEmails()
     {
-        return self::$sentEmails;
+        $emails = self::$sentEmails;
+        self::$sentEmails = [];
+        return $emails;
 
     }//end getSentEmails()
 
