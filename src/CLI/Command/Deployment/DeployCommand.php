@@ -439,7 +439,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
             throw new \Exception($statusLine."\n".$result);
         }
 
-        $this->deploymentid = $result['deploymentid'];
+        $this->deploymentid = $result['versionid'];
         $this->receipt      = $result['receipt'];
         if ($result === false || ($this->progress !== $this->size)) {
             return false;
