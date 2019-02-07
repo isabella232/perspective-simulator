@@ -302,49 +302,52 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
         Libs\FileSystem::delete($versionFile);
         Libs\FileSystem::delete($tarDir.'/'.$project);
 
-        $maxSteps = ($maxSteps + 6);
-        $this->progressBar->setMaxSteps($maxSteps);
-        $this->progressBar->setMessage('<comment>Waiting</comment>', 'titleMessage');
-        $this->progressBar->advance(0);
-        $status  = null;
-        $headers = [
-            'Content-type: application/x-www-form-urlencoded',
-            'Authentication: Basic '.$this->gateway->getGatewayKey(),
-        ];
-        $url     = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
-        $options = [
-            'http' => [
-                'header'  => $headers,
-                'method'  => 'GET',
-                'content' => '',
-            ],
-        ];
+        // Only get the progress if receipt is received.
+        if ($this->receipt !== null) {
+            $maxSteps = ($maxSteps + 6);
+            $this->progressBar->setMaxSteps($maxSteps);
+            $this->progressBar->setMessage('<comment>Waiting</comment>', 'titleMessage');
+            $this->progressBar->advance(0);
+            $status  = null;
+            $headers = [
+                'Content-type: application/x-www-form-urlencoded',
+                'Authentication: Basic '.$this->gateway->getGatewayKey(),
+            ];
+            $url     = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
+            $options = [
+                'http' => [
+                    'header'  => $headers,
+                    'method'  => 'GET',
+                    'content' => '',
+                ],
+            ];
 
-        $context    = stream_context_create($options);
-        $prevStatus = null;
-        while ($status !== 'Complete' && strpos($status, 'Error') !== 0) {
-            $result     = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
-            $prevStatus = $status;
-            $status     = ($result['status'] ?? 'Error: status not returned.');
-            if (strpos($status, 'Error') !== 0) {
-                $this->progressBar->setMessage('<comment>'.$status.'</comment>', 'titleMessage');
-                if ($prevStatus !== $status) {
-                    $this->progressBar->advance();
-                }
+            $context    = stream_context_create($options);
+            $prevStatus = null;
+            while ($status !== 'Complete' && strpos($status, 'Error') !== 0) {
+                $result     = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
+                $prevStatus = $status;
+                $status     = ($result['status'] ?? 'Error: status not returned.');
+                if (strpos($status, 'Error') !== 0) {
+                    $this->progressBar->setMessage('<comment>'.$status.'</comment>', 'titleMessage');
+                    if ($prevStatus !== $status) {
+                        $this->progressBar->advance();
+                    }
 
-                if ($status !== 'Complete') {
-                    // Wait before each retry, this might want to be higher.
-                    sleep($this->checkDelay);
+                    if ($status !== 'Complete') {
+                        // Wait before each retry, this might want to be higher.
+                        sleep($this->checkDelay);
+                    }
+                } else {
+                    // Throw error.
+                    throw new \Exception($status);
                 }
-            } else {
-                // Throw error.
+            }
+
+            if (strpos($status, 'Error') === 0) {
                 throw new \Exception($status);
             }
-        }
-
-        if (strpos($status, 'Error') === 0) {
-            throw new \Exception($status);
-        }
+        }//end if
 
         $this->progressBar->setMessage('', 'titleMessage');
         $this->progressBar->finish();
