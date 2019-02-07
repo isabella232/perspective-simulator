@@ -152,8 +152,10 @@ class SimulatorHandler
                         'PerspectiveSimulator\View\ViewBase'     => $project.'\Web\Views\View',
                     ];
 
-                    foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                        class_alias($orignalClass, $aliasClass);
+                    if (class_exists($project.'\CustomTypes\Data\DataRecord') === false) {
+                        foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
+                            class_alias($orignalClass, $aliasClass);
+                        }
                     }
                 }//end foreach
             }
