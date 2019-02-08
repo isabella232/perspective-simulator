@@ -20,7 +20,7 @@ use \PerspectiveSimulator\Libs;
 /**
  * DeployCommand Class
  */
-class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
+class DeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 {
 
     /**
@@ -85,13 +85,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      * @var null
      */
     private $deploymentid = null;
-
-    /**
-     * Cache of the gateway object.
-     *
-     * @var object
-     */
-    private $gateway = null;
 
     /**
      * The gateway receipt for the deploymeny progress.
@@ -235,10 +228,6 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this->gateway === null) {
-            $this->gateway = new \PerspectiveSimulator\Gateway();
-        }
-
         $version = $input->getArgument('newVersion');
         $project = str_replace('\\', '/', $input->getOption('project'));
 
