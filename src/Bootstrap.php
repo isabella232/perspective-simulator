@@ -87,14 +87,14 @@ class Bootstrap
             'PerspectiveAPI\Queue'                       => '\Queue',
             'PerspectiveAPI\Session'                     => '\Session',
             'PerspectiveAPI\Storage\StorageFactory'      => '\StorageFactory',
-            'PerspectiveAPI\Class\Types\ProjectInstance' => '\ProjectInstance',
+            'PerspectiveAPI\Objects\Types\ProjectInstance' => '\ProjectInstance',
         ];
 
         // Always alias theses classes if they haven't been already as we might be loading another project.
         $perspectiveAPIClassAliasesProject = [
-            'PerspectiveAPI\Class\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-            'PerspectiveAPI\Class\Types\User'       => $project.'\CustomTypes\User\User',
-            'PerspectiveAPI\Class\Types\Group'      => $project.'\CustomTypes\User\Group',
+            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
+            'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
+            'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
         ];
 
         if (class_exists($project.'\CustomTypes\User\Group') === false) {

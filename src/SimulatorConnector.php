@@ -9,11 +9,11 @@
  */
 namespace PerspectiveSimulator;
 
-use \PerspectiveAPI\Class\AbstractObject as AbstractObject;
-use \PerspectiveAPI\Class\Types\User as User;
-use \PerspectiveAPI\Class\Types\Group as Group;
-use \PerspectiveAPI\Class\Types\DataRecord as DataRecord;
-use \PerspectiveAPI\Class\Types\ProjectInstance as ProjectInstance;
+use \PerspectiveAPI\Objects\AbstractObject as AbstractObject;
+use \PerspectiveAPI\Objects\Types\User as User;
+use \PerspectiveAPI\Objects\Types\Group as Group;
+use \PerspectiveAPI\Objects\Types\DataRecord as DataRecord;
+use \PerspectiveAPI\Objects\Types\ProjectInstance as ProjectInstance;
 use \PerspectiveAPI\Storage\StorageFactory as StorageFactory;
 
 use \PerspectiveSimulator\Libs;
