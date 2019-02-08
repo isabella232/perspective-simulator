@@ -146,10 +146,10 @@ class SimulatorHandler
                     $this->loadStores($prefix, $projectDir);
 
                     $perspectiveAPIClassAliases = [
-                        'PerspectiveAPI\Object\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-                        'PerspectiveAPI\Object\Types\User'       => $project.'\CustomTypes\User\User',
-                        'PerspectiveAPI\Object\Types\Group'      => $project.'\CustomTypes\User\Group',
-                        'PerspectiveSimulator\View\ViewBase'     => $project.'\Web\Views\View',
+                        'PerspectiveAPI\Class\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
+                        'PerspectiveAPI\Class\Types\User'       => $project.'\CustomTypes\User\User',
+                        'PerspectiveAPI\Class\Types\Group'      => $project.'\CustomTypes\User\Group',
+                        'PerspectiveSimulator\View\ViewBase'    => $project.'\Web\Views\View',
                     ];
 
                     foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
@@ -461,9 +461,9 @@ class SimulatorHandler
             // Categorise the given objects into source and target values depending on their side in relationship.
             foreach ($objects as $object) {
                 $type = $objectType;
-                if ($object instanceof \PerspectiveAPI\Object\Types\User) {
+                if ($object instanceof \PerspectiveAPI\Class\Types\User) {
                     $type = 'user';
-                } else if ( $object instanceof \PerspectiveAPI\Object\Types\DataRecord) {
+                } else if ( $object instanceof \PerspectiveAPI\Class\Types\DataRecord) {
                     $type = 'data';
                 }
 
@@ -1034,7 +1034,7 @@ class SimulatorHandler
         $project = Bootstrap::getProjectPrefix();
 
         if ($customType === null) {
-            $customType = '\PerspectiveAPI\Objects\Types\DataRecord';
+            $customType = '\PerspectiveAPI\Class\Types\DataRecord';
         } else {
             $customType = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.$customType;
         }

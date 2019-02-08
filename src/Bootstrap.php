@@ -81,20 +81,20 @@ class Bootstrap
 
         // Set up Perspective API class aliases for simulator execution.
         $perspectiveAPIClassAliases = [
-            'PerspectiveAPI\Authentication'               => '\Authentication',
-            'PerspectiveAPI\Email'                        => '\Email',
-            'PerspectiveAPI\Request'                      => '\Request',
-            'PerspectiveAPI\Queue'                        => '\Queue',
-            'PerspectiveAPI\Session'                      => '\Session',
-            'PerspectiveAPI\Storage\StorageFactory'       => '\StorageFactory',
-            'PerspectiveAPI\Object\Types\ProjectInstance' => '\ProjectInstance',
+            'PerspectiveAPI\Authentication'              => '\Authentication',
+            'PerspectiveAPI\Email'                       => '\Email',
+            'PerspectiveAPI\Request'                     => '\Request',
+            'PerspectiveAPI\Queue'                       => '\Queue',
+            'PerspectiveAPI\Session'                     => '\Session',
+            'PerspectiveAPI\Storage\StorageFactory'      => '\StorageFactory',
+            'PerspectiveAPI\Class\Types\ProjectInstance' => '\ProjectInstance',
         ];
 
         // Always alias theses classes if they haven't been already as we might be loading another project.
         $perspectiveAPIClassAliasesProject = [
-            'PerspectiveAPI\Object\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-            'PerspectiveAPI\Object\Types\User'       => $project.'\CustomTypes\User\User',
-            'PerspectiveAPI\Object\Types\Group'      => $project.'\CustomTypes\User\Group',
+            'PerspectiveAPI\Class\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
+            'PerspectiveAPI\Class\Types\User'       => $project.'\CustomTypes\User\User',
+            'PerspectiveAPI\Class\Types\Group'      => $project.'\CustomTypes\User\Group',
         ];
 
         if (class_exists($project.'\CustomTypes\User\Group') === false) {
