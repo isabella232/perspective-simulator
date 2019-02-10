@@ -88,7 +88,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             $this->storeDir     = $projectDir.'/CustomTypes/Data/';
             $this->type         = 'customdatatype';
             $this->readableType = 'Custom Data Type';
-            $this->namespace    = $GLOBALS['project'].'\\CustomTypes\\Data';
+            $this->namespace    = $GLOBALS['projectNamespace'].'\\CustomTypes\\Data';
             $this->extends      = 'DataRecord';
         }
 

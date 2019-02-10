@@ -106,6 +106,8 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
             Libs\FileSystem::mkdir($this->storeDir, true);
         }
 
+        $this->targetCode = $input->addArgument('storeName');
+
     }//end interact()
 
 
@@ -129,7 +131,7 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        $reference  = $this->storeDir.$this->args['targetCode'].'/'.$this->args['referneceName'].'.json';
+        $reference  = $this->storeDir.$this->targetCode.'/'.$name.'.json';
         if (file_exists($reference) === true) {
             throw new \Exception('Reference name is already in use');
         }
@@ -171,11 +173,11 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         if (is_dir($sourceStoreDir.$sourceCode) === false) {
-            throw new CLIException(sprintf('%s doesn\'t exist.', $sourceType));
+            throw new \Exception(sprintf('%s doesn\'t exist.', $sourceType));
         }
 
         try {
-            $this->validateReferenceName($referneceName);
+            $this->validateReferenceName($referenceName);
             $referneceDetails = [
                 'sourceType'  => $sourceType,
                 'sourceCode'  => $sourceCode,
@@ -184,7 +186,7 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
                 'cardinality' => $cardinatlity,
             ];
 
-            $path = $this->storeDir.$targetCode.'/'.$referneceName.'.json';
+            $path = $this->storeDir.$targetCode.'/'.$referenceName.'.json';
             file_put_contents($path, Libs\Util::jsonEncode($referneceDetails));
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

@@ -118,13 +118,13 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         if ($name === null) {
             $eMsg = sprintf('%s name is required.', $this->readableType);
-            throw new CLIException($eMsg);
+            throw new \Exception($eMsg);
         }
 
         $valid = Libs\Util::isValidStringid($name);
         if ($valid === false) {
             $eMsg = sprintf('Invalid %s name provided', $this->readableType);
-            throw new CLIException($eMsg);
+            throw new \Exception($eMsg);
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
@@ -134,7 +134,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             $storeName = strtolower(basename($dir));
             if (strtolower($name) === $storeName) {
                 $eMsg = sprintf('%s name is already in use', $this->readableType);
-                throw new CLIException($eMsg);
+                throw new \Exception($eMsg);
             }
         }
 

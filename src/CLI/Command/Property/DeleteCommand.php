@@ -130,7 +130,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
             $code = $input->getArgument('code');
             $propertyFile = $this->storeDir.$code.'.json';
             if (file_exists($propertyFile) === false) {
-                throw new CLIException(
+                throw new \Exception(
                     sprintf(
                         '%s property doesn\'t exist.',
                         $code

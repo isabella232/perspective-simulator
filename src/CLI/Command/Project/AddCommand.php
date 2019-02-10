@@ -187,10 +187,10 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             file_put_contents($projectDir.'/project.json', Libs\Util::jsonEncode($settings));
 
             $composer = [
-                'name'        => str_replace('\\', '/', $namespace),
+                'name'        => strtolower(str_replace('\\', '/', $namespace)),
                 'description' => 'Project for '.$namespace,
             ];
-            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($settings));
+            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($composer));
 
             $folders = [
                 'API',
@@ -219,7 +219,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             // Install project for the simulator.
             $this->getApplication()->find('simulator:install')->run($input, $output);
         } catch (\Exception $e) {
-            throw new CLIException($e->getMessage());
+            throw new \Exception($e->getMessage());
         }//end try
 
         $output->writeln('New project created: '.$name);
