@@ -263,9 +263,14 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 
         $projectSrcDir = Libs\FileSystem::getProjectDir();
         $projectVenDir = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
-        copy(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json', $tarDir.'/'.$project.'/instructions.json');
+
+        if (file_exists(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json') === true) {
+            copy(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json', $tarDir.'/'.$project.'/instructions.json');
+        }
+
         exec('cp -r '.$projectSrcDir.' '.$tarDir.'/'.$project.'/src/');
         exec('cp -r '.$projectVenDir.' '.$tarDir.'/'.$project.'/vendor/');
+
         exec($tarCommand, $tarOutput, $tarRC);
 
         if ($tarRC !== 0) {
