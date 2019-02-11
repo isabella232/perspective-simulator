@@ -128,6 +128,15 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
                 $this->storeDir.$newName.'.php'
             );
             $this->rebake();
+
+            $this->logChange(
+                'rename',
+                'Queue',
+                [
+                    'from' => $oldName,
+                    'to'   => $newName,
+                ]
+            );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

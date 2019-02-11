@@ -1,6 +1,6 @@
 <?php
 /**
- * AddCommand class for Perspective Simulator CLI.
+ * RenameCommand class for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -18,12 +18,12 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * AddCommand Class
+ * RenameCommand Class
  */
-class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
+class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'customtype:add';
+    protected static $defaultName = 'customtype:rename';
 
     /**
      * The direcrtory where the export stores the data.
@@ -58,8 +58,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             null
         );
 
-        $this->addArgument('code', InputArgument::REQUIRED, 'Custom Type Code for Custom type being created.');
-        $this->addArgument('parent', InputArgument::OPTIONAL, 'Optional parent of the Custom Type.');
+        $this->addArgument('code', InputArgument::REQUIRED, 'Custom Type Code for Custom type being renamed.');
+        $this->addArgument('newCode', InputArgument::REQUIRED, 'The new Custom Type Code.');
 
     }//end configure()
 
@@ -164,39 +164,32 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $type   = $input->getOption('type');
-            $code   = $input->getArgument('code');
-            $parent = ($input->getArgument('parent') ?? 'DataRecord');
+            $type    = $input->getOption('type');
+            $code    = $input->getArgument('code');
+            $newCode = $input->getArgument('newCode');
 
-            $this->validatedCustomTypeCode($code);
-            if (is_dir($this->storeDir) === false) {
-                Libs\FileSystem::mkdir($this->storeDir, true);
-            }
-
-            // Check parent exits.
-            if ($parent !== null && $parent !== $this->extends && file_exists($this->storeDir.$parent.'.json') === false) {
-                $eMsg = sprintf('%s\'s parent doesn\'t exist.', $this->readableType);
-                throw new \Exception($eMsg);
-            }
+            $this->validatedCustomTypeCode($newCode);
 
             // PHP file.
-            $defaultContent = Libs\Util::getDefaultPHPClass();
-            $phpClass       = str_replace(
-                'CLASS_NAME',
-                $code,
-                str_replace(
-                    'CLASS_EXTENDS',
-                    'extends '.$parent,
-                    str_replace(
-                        'NAMESPACE',
-                        $this->namespace,
-                        $defaultContent
-                    )
-                )
+            $phpFile      = $this->storeDir.$code.'.php';
+            $classContent = file_get_contents($phpFile);
+            $phpClass     = str_replace(
+                'class '.$code,
+                'class '.$newCode,
+                $classContent
             );
-
-            $phpFile = $this->storeDir.$code.'.php';
             file_put_contents($phpFile, $phpClass);
+
+            Libs\Git::move($phpFile, $this->storeDir.$newCode.'.php');
+
+            $this->logChange(
+                'rename',
+                str_replace(' ', '', $this->readableType),
+                [
+                    'from' => $code,
+                    'to'   => $newCode,
+                ]
+            );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

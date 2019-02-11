@@ -1,6 +1,6 @@
 <?php
 /**
- * DeleteCommand class for Perspective Simulator CLI.
+ * RenameCommand class for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -18,12 +18,12 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * DeleteCommand Class
+ * RenameCommand Class
  */
-class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
+class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-    protected static $defaultName = 'app:delete';
+    protected static $defaultName = 'app:rename';
 
     /**
      * The direcrtory where the export stores the data.
@@ -49,6 +49,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
             null
         );
         $this->addArgument('name', InputArgument::REQUIRED, 'The path to the file or directory (this is realative to the APP folder).');
+        $this->addArgument('newName', InputArgument::REQUIRED, 'The new path to the file or directory (this is realative to the APP folder).');
 
     }//end configure()
 
@@ -63,14 +64,10 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $this->inProject($input, $output);
-        $helper  = $this->getHelper('question');
-        $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
-            'This will delete App '.$input->getArgument('type').' "'.$input->getArgument('name').'"',
-            false
-        );
-        if ($helper->ask($input, $output, $confirm) === false) {
-            return;
-        }
+
+        $projectDir          = Libs\FileSystem::getProjectDir();
+        $this->storeDir      = $projectDir.'/App/';
+        $this->baseNamespace = $GLOBALS['projectNamespace'].'\\App';
 
     }//end interact()
 
@@ -86,12 +83,19 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $name = $input->getArgument('name');
-            $type = $input->getOption('type');
+            $name    = $input->getArgument('name');
+            $newName = $input->getArgument('newName');
+            $type    = $input->getOption('type');
             if ($type === 'directory') {
                 $path = $this->storeDir.$name;
                 if (is_dir($path) === false) {
                     $eMsg = sprintf('The directory "%s" doesn\'t exist.', $path);
+                    throw new \Exception($eMsg);
+                }
+
+                $newPath = $this->storeDir.$newName;
+                if (is_dir($newPath) === false) {
+                    $eMsg = sprintf('The directory "%s" doesn\'t exist.', $newPath);
                     throw new \Exception($eMsg);
                 }
             } else {
@@ -103,9 +107,36 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
                     $eMsg = sprintf('App class "%s" doesn\'t exist.', $path);
                     throw new \Exception($eMsg);
                 }
+
+                $newPath = str_replace('.php', '', $this->storeDir.$newName);
+                $newPath = $newPath.'.php';
+                if (file_exists($path) === false) {
+                    $eMsg = sprintf('App class "%s" doesn\'t exist.', $newPath);
+                    throw new \Exception($eMsg);
+                }
+
+                // PHP file.
+                $classContent = file_get_contents($path);
+                $phpClass     = str_replace(
+                    'class '.$name,
+                    'class '.$newName,
+                    $classContent
+                );
+                file_put_contents($path, $phpClass);
             }//end if
 
-            Libs\Git::delete($path);
+
+
+            Libs\Git::move($path, $newPath);
+
+            $this->logChange(
+                'rename',
+                'App',
+                [
+                    'from' => $name,
+                    'to'   => $newName,
+                ]
+            );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

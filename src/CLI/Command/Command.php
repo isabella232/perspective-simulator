@@ -267,4 +267,32 @@ class Command extends \Symfony\Component\Console\Command\Command
     }//end getProject()
 
 
+    /**
+     * Logs upgrade instructionsfor when the cli adds/deletes/renames files.
+     *
+     * @param string $action The action performed.
+     * @param string $type   The type being changed, eg, CustomDataRecord, Property etc.
+     * @param array  $data   Array of data.
+     *
+     * @return void
+     */
+    final public function logChange(string $action, string $type, array $data)
+    {
+        $changeLog = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $GLOBALS['project']).'-instructions.json';
+        $tasks     = ['tasks' => []];
+        if (file_exists($changeLog) === true) {
+            $tasks = Libs\Util::jsonDecode(file_get_contents($changeLog));
+        }
+
+        $tasks['tasks'][] = [
+            'action' => $action,
+            'type'   => $type,
+            'data'   => $data,
+        ];
+
+        file_put_contents($changeLog, Libs\Util::jsonEncode($tasks));
+
+    }//end logChange()
+
+
 }//end class

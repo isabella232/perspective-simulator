@@ -167,6 +167,15 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             $oldDir = $this->storeDir.$code.'.json';
             $newDir = $this->storeDir.$newCode.'.json';
             Libs\Git::move($oldDir, $newDir);
+
+            $this->logChange(
+                'rename',
+                $propType.'Property',
+                [
+                    'from' => $code,
+                    'to'   => $newCode,
+                ]
+            );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
