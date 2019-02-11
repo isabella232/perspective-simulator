@@ -43,7 +43,6 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
         $this->setDescription('Registers the instance to a Gateway.');
         $this->setHelp('Registers the instance to a Gateway.');
         $this->addArgument('name', InputArgument::REQUIRED);
-        $this->addArgument('projectNamespace', InputArgument::REQUIRED);
 
     }//end configure()
 
@@ -65,43 +64,20 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
             $input->setArgument('name', $name);
         }
 
-        $namespace = ($input->getArgument('projectNamespace') ?? null);
-        if (empty($input->getArgument('projectNamespace')) === true) {
-            $question   = new \Symfony\Component\Console\Question\Question('Please enter a Project namespace: ');
-            $namespace  = $helper->ask($input, $output, $question);
-            $input->setArgument('projectNamespace', $namespace);
+        $project = ($input->getOption('project') ?? null);
+        if (empty($project) === true) {
+            $question   = new \Symfony\Component\Console\Question\Question('Please enter the project: ');
+            $instanceid = $helper->ask($input, $output, $question);
+            $input->setOption('project', $project);
         }
 
-        $question = sprintf('This will create a new instance "%s" in the project "%s": ', $name, $namespace);
+        $question = sprintf('This will create a new instance "%s" in the project "%s": ', $name, $project);
         $confirm  = new \Symfony\Component\Console\Question\ConfirmationQuestion($question, false);
         if ($helper->ask($input, $output, $confirm) === false) {
             exit(1);
         }
 
     }//end interact()
-
-
-    /**
-     * Validates the namespace of a project.
-     *
-     * @param string $namespace The namespace string.
-     *
-     * @return void
-     * @throws Exception When namespace is invalid.
-     */
-    private function validateProjectNamespace(string $namespace)
-    {
-        if (is_dir($this->storeDir.$namespace) === true) {
-            throw new \Exception(sprintf('Duplicate project namespace (%s).', $namespace));
-        }
-
-        // Check php namspace.
-        $syntaxRes = Libs\Util::checkPHPSyntax('<?php'."\n".'namespace '.$namespace.'; ?'.'>');
-        if ($syntaxRes !== true) {
-            throw new \Exception(sprintf('Invalid project namespace (%s).', $namespace));
-        }
-
-    }//end validateProjectNamespace()
 
 
     /**
@@ -117,7 +93,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
         $this->style->title('Creating new instance');
         $response = $this->sendAPIRequest(
             'post',
-            '/instance/'.$input->getArgument('projectNamespace'),
+            '/instance/'.$input->getOption('project'),
             ['name' => $input->getArgument('name')]
         );
 
