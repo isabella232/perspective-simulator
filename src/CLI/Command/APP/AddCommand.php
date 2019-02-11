@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\APP;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -42,7 +43,13 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new API specification file.');
         $this->setHelp('Copies a new API specification file to the project.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'The type we are adding or deleting, eg: class or directory.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'The type we are adding, eg: class or directory.',
+            null
+        );
         $this->addArgument('name', InputArgument::REQUIRED, 'The path to the file or directory (this is realative to the APP folder).');
 
     }//end configure()
@@ -67,7 +74,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             Libs\FileSystem::mkdir($this->storeDir, true);
         }
 
-        $this->type = $input->getArgument('type');
+        $this->type = $input->getOptions('type');
 
     }//end interact()
 
@@ -128,9 +135,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         try {
             $name = $input->getArgument('name');
-            $type = $input->getArgument('type');
             $this->validateName($name);
-            if ($type === 'directory') {
+            if ($this->type === 'directory') {
                 Libs\FileSystem::mkdir($this->storeDir.$name, true);
             } else {
                 $nameParts = explode(DIRECTORY_SEPARATOR, $name);

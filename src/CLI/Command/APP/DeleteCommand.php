@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\APP;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -40,7 +41,13 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Deletes an App class or directory.');
         $this->setHelp('Deletes an App class or directory.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'The type we are adding or deleting, eg: class or direcrtory.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'The type we are deleting, eg: class or directory.',
+            null
+        );
         $this->addArgument('name', InputArgument::REQUIRED, 'The path to the file or directory (this is realative to the APP folder).');
 
     }//end configure()
@@ -80,7 +87,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         try {
             $name = $input->getArgument('name');
-            $type = $input->getArgument('type');
+            $type = $input->getOption('type');
             if ($type === 'directory') {
                 $path = $this->storeDir.$name;
                 if (is_dir($path) === false) {

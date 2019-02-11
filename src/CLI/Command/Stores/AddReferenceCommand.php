@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Stores;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -55,10 +56,23 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new refernece between stores.');
         $this->setHelp('Adds a new refernece between stores.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'The type of store, eg, data or user.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'The type of store, eg, data or user.',
+            null
+        );
+        $this->addOption(
+            'sourceType',
+            'st',
+            InputOption::VALUE_OPTIONAL,
+            'The type of store, eg, data or user.',
+            null
+        );
+
         $this->addArgument('storeName', InputArgument::REQUIRED, 'The name of the target store.');
         $this->addArgument('referenceName', InputArgument::REQUIRED, 'The name of the reference.');
-        $this->addArgument('sourceType', InputArgument::REQUIRED, 'The type of store, eg, data or user.');
         $this->addArgument('sourceStore', InputArgument::REQUIRED, 'The type of store, eg, data or user.');
         $this->addArgument('cardinality', InputArgument::OPTIONAL, 'The cardinality of the reference, eg. 1:1, 1:M or M:M');
 
@@ -78,8 +92,8 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->inProject($input, $output);
 
         $helper    = $this->getHelper('question');
-        $storeType = $input->getArgument('type');
-        if (empty($input->getArgument('type')) === true) {
+        $storeType = $input->getOption('type');
+        if (empty($input->getOption('type')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which store type you are wanting to create.',
                 ['data', 'user'],
@@ -87,8 +101,13 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
             );
 
             $storeType = $helper->ask($input, $output, $question);
-            $input->setArgument('type', $storeType);
+            $input->setOption('type', $storeType);
             $output->writeln('You have just selected: '.$storeType);
+        }
+
+        $sourceType = $input->getOption('sourceType');
+        if ($sourceType === null){
+            $input->setOption('sourceType', $storeType);
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
@@ -151,12 +170,12 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $type          = $input->addArgument('type');
-        $targetCode    = $input->addArgument('storeName');
-        $referenceName = $input->addArgument('referenceName');
-        $sourceType    = $input->addArgument('sourceType');
-        $sourceStore   = $input->addArgument('sourceStore');
-        $cardinality   = ($input->addArgument('cardinality') ?? 'M:M');
+        $type          = $input->getOption('type');
+        $sourceType    = $input->getOption('sourceType');
+        $targetCode    = $input->getArgument('storeName');
+        $referenceName = $input->getArgument('referenceName');
+        $sourceStore   = $input->getArgument('sourceStore');
+        $cardinality   = ($input->getArgument('cardinality') ?? 'M:M');
 
         if (is_dir($this->storeDir.$targetCode) === false) {
             throw new \Exception(sprintf('%s doesn\'t exist.', $this->readableType));
