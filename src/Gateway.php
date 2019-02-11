@@ -44,9 +44,28 @@ class Gateway
      */
     public function getGatewayURL()
     {
+        $file = Libs\FileSystem::getExportDir().'/.gatewayURL';
+        if (file_exists($file) === true) {
+            return file_get_contents($file);
+        }
+
         return self::$url;
 
     }//end getGateway()
+
+
+    /**
+     * Sets the Gateway key.
+     *
+     * @param string $key The Gateway API's key.
+     *
+     */
+    public function setGatewayURL(string $url)
+    {
+        $file = Libs\FileSystem::getExportDir().'/.gatewayURL';
+        file_put_contents($file, $url);
+
+    }//end setGatewayKey()
 
 
     /**

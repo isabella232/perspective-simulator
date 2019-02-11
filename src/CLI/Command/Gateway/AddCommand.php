@@ -49,6 +49,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             'The key for the gateway.',
             null
         );
+        $this->addArgument('gatewayURL', InputArgument::OPTIONAL, 'Optional URL of the gateway network.');
 
     }//end configure()
 
@@ -83,6 +84,12 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $gateway = new \PerspectiveSimulator\Gateway();
         $gateway->setGatewayKey($this->key);
+
+        $gatewayURL = ($input->getArgument('gatewayURL') ?? null);
+        if ($gatewayURL !== null) {
+            $gateway->setGatewayURL($gatewayURL);
+        }
+
         $this->style->success('Gateway successfully registered.');
         $this->style->note('It is suggested that you DO NOT commit .apiKey to your repo.');
 
