@@ -41,9 +41,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new Project to the export.');
         $this->setHelp('Creates a new Project.');
-        $this->addArgument('name', InputArgument::REQUIRED);
         $this->addArgument('namespace', InputArgument::REQUIRED);
-        $this->addArgument('path', InputArgument::OPTIONAL);
 
     }//end configure()
 
@@ -140,15 +138,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $helper = $this->getHelper('question');
 
-        $name = ($input->getArgument('name') ?? null);
-        if (empty($input->getArgument('name')) === true) {
-            $question = new \Symfony\Component\Console\Question\Question('Please enter a Project name: ');
-            $name     = $helper->ask($input, $output, $question);
-            $input->setArgument('name', $name);
-        }
-
         if (empty($input->getArgument('namespace')) === true) {
-            $question   = new \Symfony\Component\Console\Question\Question('Please enter a Project namespace: ', $this->generateNamespace($name));
+            $question   = new \Symfony\Component\Console\Question\Question('Please enter a Project namespace: ');
             $namespace  = $helper->ask($input, $output, $question);
             $input->setArgument('namespace', $namespace);
         }
@@ -169,11 +160,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->style->title('Creating new project');
 
         try {
-            $name      = $input->getArgument('name');
-            $namespace = $input->getArgument('namespace');
-            $path      = ($input->getArgument('path') ?? str_replace('\\', '-', $namespace));
+            $namespace = strtolower($input->getArgument('namespace'));
             $this->validateProjectNamespace($namespace);
-            $this->validateProjectPath($path);
 
             $settingsFile   = Libs\FileSystem::getExportDir().'/system_info.json';
             $systemSettings = ['systemURL' => ''];
@@ -184,12 +172,12 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             }
 
             $settings = [
-                'name' => $name,
+                'name' => $namespace,
                 'type' => 'api',
                 'urls' => [
                     [
-                        'url'  => $systemSettings['systemURL'].'/'.$path,
-                        'type' => 'author',
+                        'url'  => '',
+                        'type' => '',
                     ],
                 ],
             ];
@@ -199,10 +187,10 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             file_put_contents($projectDir.'/project.json', Libs\Util::jsonEncode($settings));
 
             $composer = [
-                'name'        => str_replace('\\', '/', $namespace),
+                'name'        => strtolower(str_replace('\\', '/', $namespace)),
                 'description' => 'Project for '.$namespace,
             ];
-            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($settings));
+            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($composer));
 
             $folders = [
                 'API',
@@ -230,26 +218,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             // Install project for the simulator.
             $this->getApplication()->find('simulator:install')->run($input, $output);
-
-            // $simulatorDir       = Libs\FileSystem::getSimulatorDir();
-            //
-            // $GLOBALS['project'] = str_replace('\\', '/', $namespace);
-
-            // if (is_dir($simulatorDir.'/'.$project) === false) {
-            //     Libs\FileSystem::mkdir($simulatorDir.'/'.$project, true);
-            // }
-
-            // $projectKey = \PerspectiveSimulator\Authentication::generateSecretKey();
-
-            // $storageDir = Libs\FileSystem::getStorageDir($project);
-            // if (is_dir($storageDir) === false) {
-            //     Libs\FileSystem::mkdir($storageDir);
-            // }
-            // \PerspectiveSimulator\API::installAPI($project);
-            // \PerspectiveSimulator\Queue\Queue::installQueues($project);
-            // \PerspectiveSimulator\View\View::installViews($project);
         } catch (\Exception $e) {
-            throw new CLIException($e->getMessage());
+            throw new \Exception($e->getMessage());
         }//end try
 
         $output->writeln('New project created: '.$name);

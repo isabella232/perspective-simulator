@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\CustomTypes;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -49,7 +50,13 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Deletes a Custom Type from the project.');
         $this->setHelp('Deletes a Custom Type from the project.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'Type of Custom type to be deleted.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'Type of Custom type to deleted.',
+            null
+        );
         $this->addArgument('code', InputArgument::REQUIRED, 'Custom Type Code for Custom type being deleted.');
 
     }//end configure()
@@ -67,8 +74,8 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->inProject($input, $output);
 
         $helper     = $this->getHelper('question');
-        $customType = $input->getArgument('type');
-        if (empty($input->getArgument('type')) === true) {
+        $customType = $input->getOption('type');
+        if (empty($input->getOption('type')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which custom type you are wanting to create.',
                 ['DataType'],
@@ -76,7 +83,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
             );
 
             $customType = $helper->ask($input, $output, $question);
-            $input->setArgument('type', $customType);
+            $input->setOption('type', $customType);
             $output->writeln('You have just selected: '.$customType);
         }
 
@@ -89,7 +96,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        if ($customType === 'DataType') {
+        if (strtolower($customType) === 'datatype') {
             $this->storeDir     = $projectDir.'/CustomTypes/Data/';
             $this->type         = 'customdatatype';
             $this->readableType = 'Custom Data Type';

@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\CustomTypes;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -49,7 +50,14 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new Custom Type.');
         $this->setHelp('Adds a new Custom Type.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'Type of Custom type to create.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'Type of Custom type to create.',
+            null
+        );
+
         $this->addArgument('code', InputArgument::REQUIRED, 'Custom Type Code for Custom type being created.');
         $this->addArgument('parent', InputArgument::OPTIONAL, 'Optional parent of the Custom Type.');
 
@@ -70,8 +78,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $helper = $this->getHelper('question');
 
-        $customType = $input->getArgument('type');
-        if (empty($input->getArgument('type')) === true) {
+        $customType = $input->getOption('type');
+        if (empty($input->getOption('type')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which custom type you are wanting to create.',
                 ['DataType'],
@@ -88,7 +96,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             $this->storeDir     = $projectDir.'/CustomTypes/Data/';
             $this->type         = 'customdatatype';
             $this->readableType = 'Custom Data Type';
-            $this->namespace    = $GLOBALS['project'].'\\CustomTypes\\Data';
+            $this->namespace    = $GLOBALS['projectNamespace'].'\\CustomTypes\\Data';
             $this->extends      = 'DataRecord';
         }
 
@@ -156,7 +164,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $type   = $input->getArgument('type');
+            $type   = $input->getOption('type');
             $code   = $input->getArgument('code');
             $parent = ($input->getArgument('parent') ?? 'DataRecord');
 

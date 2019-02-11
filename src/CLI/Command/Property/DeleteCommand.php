@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Property;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -55,7 +56,14 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Deletes a Property.');
         $this->setHelp('Deletes a Property.');
-        $this->addArgument('propType', InputArgument::REQUIRED, 'Type of property eg, DataRecord, Project or User.');
+        $this->addOption(
+            'proptype',
+            'pt',
+            InputOption::VALUE_REQUIRED,
+            'Type of property eg, DataRecord, Project or User.',
+            null
+        );
+
         $this->addArgument('code', InputArgument::REQUIRED, 'Property code for the property being created.');
 
     }//end configure()
@@ -73,8 +81,8 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->inProject($input, $output);
 
         $helper   = $this->getHelper('question');
-        $propType = $input->getArgument('propType');
-        if (empty($input->getArgument('propType')) === true) {
+        $propType = $input->getOption('proptype');
+        if (empty($input->getOption('proptype')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which custom type you are wanting to create.',
                 ['DataRecord', 'Project', 'User',],
@@ -82,7 +90,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
             );
 
             $propType = $helper->ask($input, $output, $question);
-            $input->setArgument('propType', $propType);
+            $input->setOption('proptype', $propType);
             $output->writeln('You have just selected: '.$propType);
         }
 
@@ -130,7 +138,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
             $code = $input->getArgument('code');
             $propertyFile = $this->storeDir.$code.'.json';
             if (file_exists($propertyFile) === false) {
-                throw new CLIException(
+                throw new \Exception(
                     sprintf(
                         '%s property doesn\'t exist.',
                         $code

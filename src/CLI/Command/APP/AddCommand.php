@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\APP;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -42,7 +43,13 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new API specification file.');
         $this->setHelp('Copies a new API specification file to the project.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'The type we are adding or deleting, eg: class or direcrtory.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'The type we are adding, eg: class or directory.',
+            null
+        );
         $this->addArgument('name', InputArgument::REQUIRED, 'The path to the file or directory (this is realative to the APP folder).');
 
     }//end configure()
@@ -61,11 +68,13 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $projectDir          = Libs\FileSystem::getProjectDir();
         $this->storeDir      = $projectDir.'/App/';
-        $this->baseNamespace = $GLOBALS['project'].'\\App';
+        $this->baseNamespace = $GLOBALS['projectNamespace'].'\\App';
 
         if (is_dir($this->storeDir) === false) {
             Libs\FileSystem::mkdir($this->storeDir, true);
         }
+
+        $this->type = $input->getOptions('type');
 
     }//end interact()
 
@@ -81,15 +90,15 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     private function validateName(string $name)
     {
         if ($name === null) {
-            $eMsg = sprintf('%s is required.', $this->args['type']);
+            $eMsg = sprintf('%s is required.', $this->type);
             throw new \Exception($eMsg);
         }
 
         $nameParts = explode(DIRECTORY_SEPARATOR, $name);
-        if ($this->args['type'] === 'directory') {
+        if ($this->type === 'directory') {
             $valid = Libs\Util::isValidStringid(end($nameParts));
             if ($valid === false) {
-                $eMsg = sprintf('Invalid %s name provided.', $this->args['type']);
+                $eMsg = sprintf('Invalid %s name provided.', $this->type);
                 throw new \Exception($eMsg);
             }
 
@@ -100,7 +109,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             $className = str_replace('.php', '', end($nameParts));
             $valid     = Libs\Util::isPHPClassString($className);
             if ($valid === false) {
-                $eMsg = sprintf('Invalid %s name provided.', $this->args['type']);
+                $eMsg = sprintf('Invalid %s name provided.', $this->type);
                 throw new \Exception($eMsg);
             }
 
@@ -126,9 +135,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         try {
             $name = $input->getArgument('name');
-            $type = $input->getArgument('type');
             $this->validateName($name);
-            if ($type === 'directory') {
+            if ($this->type === 'directory') {
                 Libs\FileSystem::mkdir($this->storeDir.$name, true);
             } else {
                 $nameParts = explode(DIRECTORY_SEPARATOR, $name);

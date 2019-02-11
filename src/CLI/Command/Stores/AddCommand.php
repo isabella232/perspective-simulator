@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Stores;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
@@ -55,7 +56,13 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new store to a project.');
         $this->setHelp('Adds a new store to a project.');
-        $this->addArgument('type', InputArgument::REQUIRED, 'The type of the new store, eg, data or user.');
+        $this->addOption(
+            'type',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'The type of the new store, eg, data or user',
+            null
+        );
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the new store.');
 
     }//end configure()
@@ -74,8 +81,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->inProject($input, $output);
 
         $helper    = $this->getHelper('question');
-        $storeType = $input->getArgument('type');
-        if (empty($input->getArgument('type')) === true) {
+        $storeType = $input->getOption('type');
+        if (empty($input->getOption('type')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which store type you are wanting to create.',
                 ['data', 'user'],
@@ -83,7 +90,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             );
 
             $storeType = $helper->ask($input, $output, $question);
-            $input->setArgument('type', $storeType);
+            $input->setOption('type', $storeType);
             $output->writeln('You have just selected: '.$storeType);
         }
 

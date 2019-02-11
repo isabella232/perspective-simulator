@@ -91,7 +91,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->style->title('Deleting project');
 
         try {
-            $namespace = $input->getArgument('namespace');
+            $namespace = strtolower($input->getArgument('namespace'));
             $projectDir = Libs\FileSystem::getExportDir().'/projects/'.$namespace;
             if (is_dir($projectDir) === false) {
                 throw new \Exception(sprintf('Project (%s) doesn\'t exist', $namespace));

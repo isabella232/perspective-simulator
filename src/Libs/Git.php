@@ -83,7 +83,7 @@ class Git
      */
     public static function getDiff(string $from, string $to=null)
     {
-        $cmd = 'git diff --name-status '.$from;
+        $cmd = 'git diff --no-renames --name-status '.$from;
         if ($to !== null) {
             $cmd .= '...'.$to;
         }
