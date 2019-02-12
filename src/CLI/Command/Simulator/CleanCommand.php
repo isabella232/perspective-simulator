@@ -98,6 +98,11 @@ class CleanCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            // Clean the sessions.
+            $sessionDir = Libs\FileSystem::getSimulatorDir().'/sessions';
+            Libs\FileSystem::delete($dir);
+            Libs\FileSystem::mkdir($dir);
+
             if (is_array($this->storeDir) === true) {
                 foreach ($this->storeDir as $dir) {
                     if (is_dir($dir) === true) {

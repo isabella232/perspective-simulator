@@ -81,12 +81,11 @@ class Bootstrap
 
         // Set up Perspective API class aliases for simulator execution.
         $perspectiveAPIClassAliases = [
-            'PerspectiveAPI\Authentication'              => '\Authentication',
-            'PerspectiveAPI\Email'                       => '\Email',
-            'PerspectiveAPI\Request'                     => '\Request',
-            'PerspectiveAPI\Queue'                       => '\Queue',
-            'PerspectiveAPI\Session'                     => '\Session',
-            'PerspectiveAPI\Storage\StorageFactory'      => '\StorageFactory',
+            'PerspectiveAPI\Authentication'                => '\Authentication',
+            'PerspectiveAPI\Email'                         => '\Email',
+            'PerspectiveAPI\Request'                       => '\Request',
+            'PerspectiveAPI\Queue'                         => '\Queue',
+            'PerspectiveAPI\Storage\StorageFactory'        => '\StorageFactory',
             'PerspectiveAPI\Objects\Types\ProjectInstance' => '\ProjectInstance',
         ];
 
@@ -118,7 +117,6 @@ class Bootstrap
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
         $simulatorHandler->load();
 
-        \PerspectiveSimulator\Requests\Session::load();
         \PerspectiveSimulator\Queue\Queue::load();
 
     }//end load()

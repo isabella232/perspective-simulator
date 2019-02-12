@@ -149,7 +149,7 @@ class SimulatorHandler
                         'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
                         'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
                         'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
-                        'PerspectiveSimulator\View\ViewBase'    => $project.'\Web\Views\View',
+                        'PerspectiveSimulator\View\ViewBase'      => $project.'\Web\Views\View',
                     ];
 
                     if (class_exists($project.'\CustomTypes\Data\DataRecord') === false) {

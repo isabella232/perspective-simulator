@@ -11,8 +11,48 @@
 namespace PerspectiveSimulator\Requests;
 
 ini_set('error_log', dirname(__DIR__, 5).'/simulator/error_log');
+ini_set('session.save_path', dirname(__DIR__, 5).'/simulator/sessions');
+ini_set('session.save_handler', 'files');
+ini_set('session.use_strict_mode', 1);
+ini_set('session.use_cookies', 1);
+ini_set('session.use_only_cookies', 1);
+ini_set('session.name', 'PERS_SIM_SESSID');
+ini_set('session.auto_start', 0);
+ini_set('session.cookie_lifetime', 0);
+ini_set('session.cookie_path', '/');
+ini_set('session.cookie_domain', '');
+ini_set('session.cookie_httponly', true);
+ini_set('session.serialize_handler', 'php');
+ini_set('session.gc_probability', 25);
+ini_set('session.gc_divisor', 100);
+ini_set('session.gc_maxlifetime', 86400);
+ini_set('session.lazy_write', 1);
+ini_set('session.referer_check', '');
+ini_set('session.cache_limiter', 'nocache');
+ini_set('session.cache_expire', 180);
+ini_set('session.use_trans_sid', 0);
+ini_set('session.sid_length', 64);
+ini_set('session.sid_bits_per_character', 5);
 
 include dirname(__DIR__, 4).'/autoload.php';
+
+session_start();
+
+register_shutdown_function(
+    function () {
+        error_log('$_SESSION BEFORE: '.var_export($_SESSION,1));
+        $usersSession                = $_SESSION;
+        $_SESSION                    = $GLOBALS['SIM_SESSION'];
+        $_SESSION['SANDBOX_SESSION'] = $usersSession;
+        error_log('$_SESSION AFTER: '.var_export($_SESSION,1));
+    }
+);
+
+// Remove our own session from $_SESSION will be readded on shutdown.
+$usersSession = ($_SESSION['SANDBOX_SESSION'] ?? []);
+unset($_SESSION['SANDBOX_SESSION']);
+$GLOBALS['SIM_SESSION'] = $_SESSION;
+$_SESSION               = $usersSession;
 
 $settings = [];
 if (file_exists(dirname(__DIR__, 5).'/simulator/router-settings.json') === true) {
@@ -78,7 +118,7 @@ switch ($type) {
 
         try {
             ob_start();
-            $class   = $GLOBALS['projectNamespace'].'\APIRouter';
+            $class    = $GLOBALS['projectNamespace'].'\APIRouter';
             $response = $class::process($path, $method, $queryParams);
 
             if ($response === null) {
@@ -100,7 +140,7 @@ switch ($type) {
     break;
 
     case 'cdn':
-       \PerspectiveSimulator\Requests\CDN::serveFile($path);
+        \PerspectiveSimulator\Requests\CDN::serveFile($path);
     break;
 
     case 'web':
@@ -133,13 +173,12 @@ switch ($type) {
     break;
 
     case 'property':
-       \PerspectiveSimulator\Requests\Property::serveFile($path);
+        \PerspectiveSimulator\Requests\Property::serveFile($path);
     break;
 
     default:
-        return;
-    break;
-}
+    return;
+}//end switch
 
 
 function processCORSPreflight()

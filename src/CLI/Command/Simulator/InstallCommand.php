@@ -71,6 +71,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         Libs\FileSystem::delete($simulatorDir);
         Libs\FileSystem::mkdir($simulatorDir);
+        Libs\FileSystem::mkdir($simulatorDir.'/sessions');
         touch($simulatorDir.'/error_log');
 
         $updateCommand = $this->getApplication()->find('simulator:update');

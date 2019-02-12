@@ -29,6 +29,11 @@ abstract class SimulatorTest extends \PHPUnit\Framework\TestCase
         $calledClass = get_called_class();
         $classParts  = explode('\\', $calledClass);
 
+        if (empty($_SESSION) === true) {
+            // "Start" the session for phpunit tests.
+            $_SESSION = [];
+        }
+
         Bootstrap::disableRead();
         Bootstrap::disableWrite();
         Bootstrap::disableNotifications();

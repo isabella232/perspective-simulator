@@ -527,8 +527,8 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function login(string $id, string $storeCode)
     {
-        \Session::setValue('user', $id);
-        \Session::setValue('userStore', $storeCode);
+        $GLOBALS['SIM_SESSION']['user']      = $id;
+        $GLOBALS['SIM_SESSION']['userStore'] = $storeCode;
         return true;
 
     }//end login()
@@ -541,11 +541,8 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function logout()
     {
-        unset($_SESSION['user']);
-        unset($_SESSION['userStore']);
-        unset($_SESSION['moderator']);
-        \PerspectiveSimulator\Requests\Session::save();
-
+        unset($GLOBALS['SIM_SESSION']['user']);
+        unset($GLOBALS['SIM_SESSION']['userStore']);
         return true;
 
     }//end logout()
@@ -570,8 +567,8 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getLoggedInUser()
     {
-        $userid    = \Session::getValue('user');
-        $storeCode = \Session::getValue('userStore');
+        $userid    = $GLOBALS['SIM_SESSION']['user'];
+        $storeCode = $GLOBALS['SIM_SESSION']['userStore'];
 
         if ($userid === null) {
             return null;
@@ -635,35 +632,6 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
         \PerspectiveSimulator\Queue\Queue::addJob($queueNames, $data, $successCallback, $failedCallback);
 
     }//end addQueueJob()
-
-
-    /**
-     * Gets Session value.
-     *
-     * @param string $key The session index.
-     *
-     * @return mixed
-     */
-    public static function getSessionValue(string $key)
-    {
-        return \PerspectiveSimulator\Requests\Session::getValue($key);
-
-    }//end getSessionValue()
-
-
-    /**
-     * Sets Session value.
-     *
-     * @param string $key   The session index.
-     * @param mixed  $value The value to set.
-     *
-     * @return mixed
-     */
-    public static function setSessionValue(string $key, $value)
-    {
-        \PerspectiveSimulator\Requests\Session::setValue($key, $value);
-
-    }//end setSessionValue()
 
 
     /**
