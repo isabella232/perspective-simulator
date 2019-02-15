@@ -1,6 +1,6 @@
 <?php
 /**
- * DiffCommand class for Perspective Simulator CLI.
+ * DeployDiffCommand class for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\CLI\Command\Deployment;
+namespace PerspectiveSimulator\CLI\Command\Gateway;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,9 +17,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use \PerspectiveSimulator\Libs;
 
 /**
- * DiffCommand Class
+ * DeployDiffCommand Class
  */
-class DiffCommand extends \PerspectiveSimulator\CLI\Command\Command
+class DeployDiffCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
     /**
@@ -27,7 +27,7 @@ class DiffCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @var string
      */
-    protected static $defaultName = 'deployment:diff';
+    protected static $defaultName = 'gateway:deploy:diff';
 
     /**
      * Readable type for command object.

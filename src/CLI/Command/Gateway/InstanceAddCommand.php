@@ -1,6 +1,6 @@
 <?php
 /**
- * Project class for Perspective Simulator CLI.
+ * InstanceAddCommand for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\CLI\Command\Instance;
+namespace PerspectiveSimulator\CLI\Command\Gateway;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,12 +18,12 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * AddCommand Class
+ * InstanceAddCommand Class
  */
-class AddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
+class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 {
 
-    protected static $defaultName = 'instance:add';
+    protected static $defaultName = 'gateway:instance:add';
 
     /**
      * The direcrtory where the export stores the data.
