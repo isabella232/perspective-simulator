@@ -1,6 +1,6 @@
 <?php
 /**
- * DeployCommand class for Perspective Simulator CLI.
+ * ProjectDeployCommand class for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\CLI\Command\Deployment;
+namespace PerspectiveSimulator\CLI\Command\Gateway;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,9 +18,9 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * DeployCommand Class
+ * ProjectDeployCommand Class
  */
-class DeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
+class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 {
 
     /**
@@ -28,7 +28,7 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
      *
      * @var string
      */
-    protected static $defaultName = 'deployment:deploy';
+    protected static $defaultName = 'gateway:project:deploy';
 
     /**
      * The directory where the data to be deployed will be prepared in.
@@ -183,9 +183,9 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
         }
 
         // Run predepolyment check command.
-        $preFlightCommand = $this->getApplication()->find('deployment:preflightchecks');
+        $preFlightCommand = $this->getApplication()->find('gateway:deploy:preflightchecks');
         $preFlightArgs    = [
-            'command'   => 'deployment:preflightchecks',
+            'command'   => 'gateway:deploy:preflightchecks',
             '--project' => ($input->getOption('project') ?? ''),
         ];
 
@@ -193,9 +193,9 @@ class DeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
         $returnCode     = $preFlightCommand->run($preFlightInput, $output);
 
         // Run the diff command so the user will know what changes are about to be made.
-        $diffCommand = $this->getApplication()->find('deployment:diff');
+        $diffCommand = $this->getApplication()->find('gateway:deploy:diff');
         $diffArgs    = [
-            'command'   => 'deployment:diff',
+            'command'   => 'gateway:deploy:diff',
             '--project' => ($input->getOption('project') ?? ''),
             'from'      => $input->getArgument('oldVersion'),
         ];

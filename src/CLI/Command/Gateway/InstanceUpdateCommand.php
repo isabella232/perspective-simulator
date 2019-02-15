@@ -1,6 +1,6 @@
 <?php
 /**
- * Project class for Perspective Simulator CLI.
+ * InstanceUpdateCommand for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\CLI\Command\Instance;
+namespace PerspectiveSimulator\CLI\Command\Gateway;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,12 +18,12 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * UpdateCommand Class
+ * InstanceUpdateCommand Class
  */
-class UpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
+class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 {
 
-    protected static $defaultName = 'instance:update';
+    protected static $defaultName = 'gateway:instance:update';
 
 
     /**

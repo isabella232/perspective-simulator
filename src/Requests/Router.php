@@ -40,11 +40,9 @@ session_start();
 
 register_shutdown_function(
     function () {
-        error_log('$_SESSION BEFORE: '.var_export($_SESSION,1));
         $usersSession                = $_SESSION;
         $_SESSION                    = $GLOBALS['SIM_SESSION'];
         $_SESSION['SANDBOX_SESSION'] = $usersSession;
-        error_log('$_SESSION AFTER: '.var_export($_SESSION,1));
     }
 );
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * PreFlightCheckCommand class for Perspective Simulator CLI.
+ * DeployPreFlightCheckCommand class for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -8,7 +8,7 @@
  * @copyright  2018 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
-namespace PerspectiveSimulator\CLI\Command\Deployment;
+namespace PerspectiveSimulator\CLI\Command\Gateway;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,9 +17,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use \PerspectiveSimulator\Libs;
 
 /**
- * PreFlightCheckCommand Class
+ * DeployPreFlightCheckCommand Class
  */
-class PreFlightCheckCommand extends \PerspectiveSimulator\CLI\Command\Command
+class DeployPreFlightCheckCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
     /**
@@ -27,7 +27,7 @@ class PreFlightCheckCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @var string
      */
-    protected static $defaultName = 'deployment:preflightchecks';
+    protected static $defaultName = 'gateway:deploy:preflightchecks';
 
     /**
      * Array of allowed directory names directly under src.
