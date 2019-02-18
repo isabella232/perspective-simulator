@@ -65,7 +65,8 @@ class Bootstrap
             }
         );
 
-        $GLOBALS['projectNamespace'] = $project;
+        $projectParts                = explode('\\', $project);
+        $GLOBALS['projectNamespace'] = ucfirst($projectParts[0]).'\\'.ucfirst($projectParts[1]);
         $GLOBALS['project']          = str_replace('\\', '/', $project);
         $GLOBALS['projectPath']      = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $project));
         $projectDir                  = Libs\FileSystem::getProjectDir();
@@ -81,12 +82,12 @@ class Bootstrap
 
         // Set up Perspective API class aliases for simulator execution.
         $perspectiveAPIClassAliases = [
-            'PerspectiveAPI\Authentication'                => '\Authentication',
-            'PerspectiveAPI\Email'                         => '\Email',
-            'PerspectiveAPI\Request'                       => '\Request',
-            'PerspectiveAPI\Queue'                         => '\Queue',
-            'PerspectiveAPI\Storage\StorageFactory'        => '\StorageFactory',
-            'PerspectiveAPI\Objects\Types\ProjectInstance' => '\ProjectInstance',
+            'PerspectiveAPI\Authentication'                => 'Authentication',
+            'PerspectiveAPI\Email'                         => 'Email',
+            'PerspectiveAPI\Request'                       => 'Request',
+            'PerspectiveAPI\Queue'                         => 'Queue',
+            'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
+            'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
         ];
 
         // Always alias theses classes if they haven't been already as we might be loading another project.
@@ -106,11 +107,11 @@ class Bootstrap
             class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
         }
 
-        if (class_exists('\Authentication') === false) {
+        if (class_exists($project.'\Framework\Authentication') === false) {
             class_alias('PerspectiveSimulator\View\ViewBase', '\View');
 
             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                class_alias($orignalClass, $aliasClass);
+                eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
             }
         }
 
@@ -297,29 +298,10 @@ class Bootstrap
     }//end clearSaveQueue()
 
 
-    public static function getProjectPrefix()
+    public static function getProjectPrefix(string $code)
     {
-        $bt = debug_backtrace(false);
-
-        // Remove the call to this and the call to the function that needs the property code prefixed.
-        array_shift($bt);
-        array_shift($bt);
-
-        $key = 0;
-        foreach ($bt as $id => $call) {
-            if ($call['function'] === 'eval') {
-                $key = ($id + 1);
-                break;
-            }
-        }
-
-        $called = $bt[$key];
-        if (isset($called['class']) === true && strpos(strtolower($GLOBALS['project']), strtolower($called['class'])) !== false) {
-            $classParts   = explode('\\', $called['class']);
-            return Bootstrap::generatePrefix($classParts[0].'\\'.$classParts[1]);
-        } else {
-            return Bootstrap::generatePrefix($GLOBALS['project']);
-        }
+        $parts = explode('/', $storeCode);
+        return Bootstrap::generatePrefix($parts[0].'\\'.$parts[1]);
 
     }//end getProjectPrefix()
 

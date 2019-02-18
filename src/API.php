@@ -448,7 +448,7 @@ __ROUTES__
 
         foreach ($apis as $method => $paths) {
             foreach ($paths as $id => $api) {
-                $functionSignature = 'public function '.$api['operationid'].'(';
+                $functionSignature = 'public static function '.$api['operationid'].'(';
                 $arguments         = [];
                 $requiredArgs      = [];
                 $optionalArgs      = [];

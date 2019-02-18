@@ -33,7 +33,14 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function getPropertyTypeClass(string $objectType, string $propertyCode)
     {
         $objectType = ucfirst($objectType);
-        $prop       = Libs\FileSystem::getProjectDir().'/Properties/'.$objectType.'/'.$propertyCode.'.json';
+        if (strpos($propertyCode, $GLOBALS['project']) === 0) {
+            $prop = Libs\FileSystem::getProjectDir().'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
+        } else {
+            $codeParts   = explode('/', $propertyCode);
+            $requirement = $codeParts[0].'/'.$codeParts[1];
+            $prop = Libs\FileSystem::getRequirementDir($requirement).'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
+        }
+
         if (file_exists($prop) === false) {
             return null;
         }
@@ -317,7 +324,14 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getDataStoreExists(string $name)
     {
-        $storeDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.$name;
+        if (strpos($name, $GLOBALS['project']) === 0) {
+            $storeDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.basename($name);
+        } else {
+            $codeParts   = explode('/', $name);
+            $requirement = $codeParts[0].'/'.$codeParts[1];
+            $storeDir    = Libs\FileSystem::getRequirementDir($requirement).'/Stores/Data/'.basename($name);
+        }
+
         if (is_dir($storeDir) === true) {
             return true;
         }
@@ -336,7 +350,14 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getUserStoreExists(string $name)
     {
-        $storeDir = Libs\FileSystem::getProjectDir().'/Stores/User/'.$name;
+        if (strpos($name, $GLOBALS['project']) === 0) {
+            $storeDir = Libs\FileSystem::getProjectDir().'/Stores/User/'.basename($name);
+        } else {
+            $codeParts   = explode('/', $name);
+            $requirement = $codeParts[0].'/'.$codeParts[1];
+            $storeDir    = Libs\FileSystem::getRequirementDir($requirement).'/Stores/User/'.basename($name);
+        }
+
         if (is_dir($storeDir) === true) {
             return true;
         }
@@ -612,7 +633,12 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getCustomTypeClassByName(string $objectType, string $type)
     {
-        return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.$objectType.'\\'.$type;
+        if (strpos($type, $GLOBALS['project']) === 0) {
+            return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+        } else {
+            $requirement = rtrim(str_replace(basename($type), '', $type), '/');
+            return '\\'.str_replace('/', '\\', $requirement).'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+        }
 
     }//end getCustomTypeClassByName()
 

@@ -72,21 +72,31 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
 
                 if (strtolower($class) === $projectNs.'\\api') {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
+                } else if (file_exists(dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php') === true) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
                 }
 
                 if (strtolower($class) === $projectNs.'\\apirouter') {
+                    $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
+                } else if (file_exists(dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php') === true) {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
                 }
 
                 if (strtolower($class) === $projectNs.'\\webhandler') {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
+                } else if (file_exists(dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php') === true) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
                 }
 
                 if (strtolower($class) === $projectNs.'\\viewrouter') {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
+                } else if (file_exists(dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php') === true) {
+                    $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
                 }
 
                 if (strtolower($class) === $projectNs.'\\jobqueue') {
+                    $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
+                } else if (file_exists(dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php') === true) {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
                 }
             }

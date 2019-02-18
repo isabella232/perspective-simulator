@@ -1190,6 +1190,31 @@ class FileSystem
 
 
     /**
+     * Gets a requirement directory.
+     *
+     * @param string $requirement The name of the requirement.
+     *
+     * @return string
+     */
+    public static function getRequirementDir(string $requirement)
+    {
+        $project     = str_replace('\\', '/', $GLOBALS['project']);
+        $projectPath = str_replace('\\', '/', self::getExportDir().'/projects/'.$project.'/src');;
+
+        if (file_exists(self::getSimulatorDir().'/projects.json') === true) {
+            $projects = Util::jsonDecode(file_get_contents(self::getSimulatorDir().'/projects.json'));
+            if (isset($projects[strtolower($project)]) === true) {
+                $projectPath = $projects[strtolower($project)];
+            }
+        }
+
+        $projectPath = substr($projectPath, 0, -4);
+
+        return $projectPath.'/vendor/'.$requirement.'/src';
+
+    }//end getRequirementDir()
+
+    /**
      * Gets the project's CDN directory.
      *
      * @param string $project The project code we are getting the directory for.
