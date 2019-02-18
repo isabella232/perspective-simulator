@@ -41,7 +41,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Adds a new Project to the export.');
         $this->setHelp('Creates a new Project.');
-        $this->addArgument('namespace', InputArgument::REQUIRED);
+        $this->addArgument('namespace', InputArgument::REQUIRED, 'The namespace for the project');
 
     }//end configure()
 
@@ -157,39 +157,25 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->style->title('Creating new project');
+        $this->style->title('Adding new project to local environment');
 
         try {
-            $namespace = strtolower($input->getArgument('namespace'));
+            $namespace = $input->getArgument('namespace');
             $this->validateProjectNamespace($namespace);
+            $packageName = escapeshellarg(strtolower(str_replace('\\', '/', $namespace)));
 
-            $settingsFile   = Libs\FileSystem::getExportDir().'/system_info.json';
-            $systemSettings = ['systemURL' => ''];
-            if (file_exists($settingsFile) === true) {
-                $systemSettings = Libs\Util::jsonDecode(
-                    file_get_contents($settingsFile)
-                );
-            }
-
-            $settings = [
-                'name' => $namespace,
-                'type' => 'api',
-                'urls' => [
-                    [
-                        'url'  => '',
-                        'type' => '',
+            $composer = [
+                'name'        => $packageName,
+                'description' => 'Project for '.$namespace,
+                'autoload'    => [
+                    'psr-4' => [
+                        $namespace.'\\' => 'src/',
                     ],
                 ],
             ];
 
-            $projectDir = Libs\FileSystem::getProjectDir($namespace);
+            $projectDir = Libs\FileSystem::getProjectDir($packageName);
             Libs\FileSystem::mkdir($projectDir, true);
-            file_put_contents($projectDir.'/project.json', Libs\Util::jsonEncode($settings));
-
-            $composer = [
-                'name'        => strtolower(str_replace('\\', '/', $namespace)),
-                'description' => 'Project for '.$namespace,
-            ];
             file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($composer));
 
             $folders = [
@@ -217,12 +203,20 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
             }
 
             // Install project for the simulator.
-            $this->getApplication()->find('simulator:install')->run($input, $output);
+            $updateCommand = $this->getApplication()->find('simulator:update');
+            $updateArgs    = ['command' => 'simulator:update'];
+
+            $updateInput = new \Symfony\Component\Console\Input\ArrayInput($updateArgs);
+            $returnCode  = $updateCommand->run($updateInput, $output);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
 
-        $output->writeln('New project created: '.$name);
+        $this->style->section('New Project created');
+        $this->style->note('Namespace: '.$namespace);
+        $this->style->note('Pacakge Name: '.$packageName);
+        $this->style->note('Project direcrtory: '.$projectDir);
+
 
     }//end execute()
 
