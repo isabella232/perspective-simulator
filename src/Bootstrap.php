@@ -300,7 +300,7 @@ class Bootstrap
 
     public static function getProjectPrefix(string $code)
     {
-        $parts = explode('/', $storeCode);
+        $parts = explode('/', $code);
         return Bootstrap::generatePrefix($parts[0].'\\'.$parts[1]);
 
     }//end getProjectPrefix()

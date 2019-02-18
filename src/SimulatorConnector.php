@@ -636,8 +636,8 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
         if (strpos($type, $GLOBALS['project']) === 0) {
             return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         } else {
-            $requirement = rtrim(str_replace(basename($type), '', $type), '/');
-            return '\\'.str_replace('/', '\\', $requirement).'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+            $requirement = explode('/', str_replace(basename($type), '', $type));
+            return '\\'.ucfirst($requirement[0]).'\\'.ucfirst($requirement[1]).'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         }
 
     }//end getCustomTypeClassByName()
