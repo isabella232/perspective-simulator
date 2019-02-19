@@ -34,7 +34,8 @@ class Command extends \Symfony\Component\Console\Command\Command
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         ini_set('error_log', dirname(__DIR__, 6).'/simulator/error_log');
-        $this->style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
+        $this->style            = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
+        $this->simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
 
     }//end initialize()
 

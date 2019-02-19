@@ -248,62 +248,59 @@ class Bootstrap
 
 
     /**
-     * Queues a save for later.
+     * Gets the project prefix from a code/name
      *
-     * @param object $object Object to be added to the save queue
+     * @param string $code The name/code to get the project prefix of
      *
-     * @return void
+     * @return string
      */
-    public static function queueSave($object)
-    {
-        self::$saveQueue[] = $object;
-
-    }//end queueSave
-
-
-    /**
-     * Process the save queue.
-     *
-     * @return void
-     */
-    public static function processSave()
-    {
-        if (empty(self::$saveQueue) === true) {
-            return;
-        }
-
-        // Only need to save when write is enabled.
-        if (self::$writeEnabled === true) {
-            foreach (self::$saveQueue as $object) {
-                if (method_exists($object, 'save') === true) {
-                    $object->save();
-                }
-            }
-        }
-
-        self::clearSaveQueue();
-
-    }//end processSave()
-
-
-    /**
-     * Clears the save queue
-     *
-     * @return void
-     */
-    public static function clearSaveQueue()
-    {
-        self::$saveQueue = [];
-
-    }//end clearSaveQueue()
-
-
     public static function getProjectPrefix(string $code)
     {
         $parts = explode('/', $code);
         return Bootstrap::generatePrefix($parts[0].'\\'.$parts[1]);
 
     }//end getProjectPrefix()
+
+
+    /**
+     * Gets the property id and type from the code.
+     *
+     * @param string $propertyCode The property code we want the id and type from.
+     *
+     * @return array
+     */
+    public static function getPropertyInfo(string $propertyCode)
+    {
+        $allowedTypes = [
+            'unique',
+            'boolean',
+            'datetime',
+            'html',
+            'integer',
+            'number',
+            'pageid',
+            'recordset',
+            'selection',
+            'text',
+            'userid',
+            'image',
+            'file',
+        ];
+
+        $codeParts  = explode('.', $propertyCode);
+        $type       = array_pop($codeParts);
+        $propertyid = implode('.', $codeParts);
+
+        if (in_array($type, $allowedTypes) === false) {
+            throw new \Exception('Invalid property type');
+        }
+
+        return [
+            strtolower($propertyid),
+            strtolower($type),
+        ];
+
+    }//end getPropertyInfo()
 
 
 }//end class

@@ -32,22 +32,8 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getPropertyTypeClass(string $objectType, string $propertyCode)
     {
-        $objectType = ucfirst($objectType);
-        if (strpos($propertyCode, $GLOBALS['project']) === 0) {
-            $prop = Libs\FileSystem::getProjectDir().'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
-        } else {
-            $codeParts   = explode('/', $propertyCode);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $prop = Libs\FileSystem::getRequirementDir($requirement).'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
-        }
-
-        if (file_exists($prop) === false) {
-            return null;
-        }
-
-        $propData = Libs\Util::jsonDecode(file_get_contents($prop));
-
-        return '\PerspectiveAPI\Property\Types\\'.$propData['type'];
+        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyCode);
+        return '\PerspectiveAPI\Property\Types\\'.ucfirst($propType);
 
     }//end getPropertyTypeClass()
 

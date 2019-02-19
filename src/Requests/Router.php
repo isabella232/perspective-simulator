@@ -123,12 +123,10 @@ switch ($type) {
                 $response = '';
             }
 
-            \PerspectiveSimulator\Bootstrap::processSave();
-
             ob_end_clean();
         } catch (\Throwable $e) {
-            // Request failed so don't worry about saving.
-            \PerspectiveSimulator\Bootstrap::clearSaveQueue();
+            // Request failed so don't worry about saving, so disable the writes.
+            \PerspectiveSimulator\Bootstrap::disableWrite();
             ob_end_clean();
             header('HTTP/1.1 500 Internal Server Error');
             throw $e;

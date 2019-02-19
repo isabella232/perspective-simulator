@@ -60,11 +60,12 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             'proptype',
             'pt',
             InputOption::VALUE_REQUIRED,
-            'Type of property eg, DataRecord, Project or User.',
+            'Type of property eg, data, project or user.',
             null
         );
-        $this->addArgument('code', InputArgument::REQUIRED, 'Property code for the property being rename.');
-        $this->addArgument('newCode', InputArgument::REQUIRED, 'New property code for the property being renamed.');
+
+        $this->addArgument('code', InputArgument::REQUIRED, 'Property code with type for the property being rename.');
+        $this->addArgument('newCode', InputArgument::REQUIRED, 'New property code with type for the property being renamed.');
 
     }//end configure()
 
@@ -86,7 +87,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         if (empty($input->getOption('proptype')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which custom type you are wanting to create.',
-                ['DataRecord', 'Project', 'User',],
+                ['Data', 'Project', 'User',],
                 0
             );
 
@@ -96,22 +97,15 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        if (strtolower($propType) === 'datarecord') {
-            $this->storeDir     = $projectDir.'/Properties/Data/';
-            $this->type         = 'datarecord';
+        if (strtolower($propType) === 'data') {
+            $this->type         = 'data';
             $this->readableType = 'Data Record';
         } else if (strtolower($propType) === 'project') {
-            $this->storeDir     = $projectDir.'/Properties/Project/';
             $this->type         = 'project';
             $this->readableType = 'Project';
         } else if (strtolower($propType) === 'user') {
-            $this->storeDir     = $projectDir.'/Properties/User/';
             $this->type         = 'user';
             $this->readableType = 'User';
-        }
-
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
         }
 
     }//end interact()
@@ -138,8 +132,8 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             throw new \Exception($eMsg);
         }
 
-        $property = $this->storeDir.$code.'.json';
-        if (file_exists($property) === true) {
+        $properties = $this->simulatorHandler->getProperties($this->type);
+        if (array_key_exists($code, $properties) === true) {
             throw new \Exception('Property Code is already in use');
         }
 
@@ -159,14 +153,26 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $propType = $input->getOption('proptype');
-            $code     = $input->getArgument('code');
-            $newCode  = $input->getArgument('newCode');
+            $namespace = $input->getOption('project');
+            $propType  = $input->getOption('proptype');
+            $code      = $namespace.'/'.$input->getArgument('code');
+            $newCode   = $namespace.'/'.$input->getArgument('newCode');
 
-            $this->validatedPropertyCode($newCode);
-            $oldDir = $this->storeDir.$code.'.json';
-            $newDir = $this->storeDir.$newCode.'.json';
-            Libs\Git::move($oldDir, $newDir);
+            list($oldPropid, $oldPropType) = \PerspectiveSimulator\Bootstrap::getPropertyInfo($code);
+            list($propid, $propType)       = \PerspectiveSimulator\Bootstrap::getPropertyInfo($newCode);
+
+            if ($oldPropType !== $propType) {
+                throw new \Exception('Property types must match');
+            }
+
+            $this->validatedPropertyCode($propid);
+
+            $properties = $this->simulatorHandler->getProperties($this->type);
+            if (isset($properties[$oldPropid]) === true) {
+                // Sim has saved data and the old property has values set.
+                $properties[$propid] = $properties[$oldPropid];
+                unset($properties[$oldPropid]);
+            }
 
             $this->logChange(
                 'rename',
