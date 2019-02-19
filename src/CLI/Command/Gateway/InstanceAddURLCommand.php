@@ -82,24 +82,24 @@ class InstanceAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
         $this->style->title('Setting instance URLs');
 
         // Prepare the apiSettings array the input is in the format key:value key:value.
-        $URLs      = $input->getArgument('urls');
-        $typedURLs = [];
+        $URLs = $input->getArgument('urls');
         foreach ($URLs as $URL) {
             list($key, $value) = explode(':', $URL);
-            $typedURLs[$key]   = $value;
-        }
 
-        $response = $this->sendAPIRequest(
-            'post',
-            '/url/'.$input->getOption('project').'/instance/'.$input->getOption('instanceid'),
-            ['urls' => json_encode($typedURLs)]
-        );
+            $response = $this->sendAPIRequest(
+                'post',
+                '/url/'.$input->getOption('project').'/instance/'.$input->getOption('instanceid'),
+                [
+                    'urlType' => $key,
+                    'url'     => $value,
+                ]
+            );
 
-        if ($response['curlInfo']['http_code'] === 200) {
-            $this->style->success('Instance URLs set');
-            $this->style->table(array_keys($typedURLs), [$typedURLs]);
-        } else {
-            $this->style->error($response['result']);
+            if ($response['curlInfo']['http_code'] === 200) {
+                $this->style->success(sprintf('Instance URL set: %1$s - %2$s', $key, $value));
+            } else {
+                $this->style->error($response['result']);
+            }
         }
 
     }//end execute()
