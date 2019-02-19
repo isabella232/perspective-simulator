@@ -75,24 +75,23 @@ class ProjectAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $this->style->title('Setting project URLs');
 
         // Prepare the apiSettings array the input is in the format key:value key:value.
-        $URLs      = $input->getArgument('urls');
-        $typedURLs = [];
+        $URLs = $input->getArgument('urls');
         foreach ($URLs as $URL) {
             list($key, $value) = explode(':', $URL);
-            $typedURLs[$key]   = $value;
-        }
+            $response = $this->sendAPIRequest(
+                'post',
+                '/url/'.$input->getOption('project').'/project',
+                [
+                    'urlType' => $key,
+                    'url'     => $value,
+                ]
+            );
 
-        $response = $this->sendAPIRequest(
-            'post',
-            '/url/'.$input->getOption('project').'/project',
-            ['urls' => json_encode($typedURLs)]
-        );
-
-        if ($response['curlInfo']['http_code'] === 200) {
-            $this->style->success('Project URLs set');
-            $this->style->table(array_keys($typedURLs), [$typedURLs]);
-        } else {
-            $this->style->error($response['result']);
+            if ($response['curlInfo']['http_code'] === 200) {
+                $this->style->success(sprintf('Project URL set: %1$s - %2$s', $key, $value));
+            } else {
+                $this->style->error($response['result']);
+            }
         }
 
     }//end execute()
