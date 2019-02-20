@@ -162,7 +162,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         try {
             $namespace = $input->getArgument('namespace');
             $this->validateProjectNamespace($namespace);
-            $packageName = escapeshellarg(strtolower(str_replace('\\', '/', $namespace)));
+            $packageName = strtolower(str_replace('\\', '/', $namespace));
 
             $composer = [
                 'name'        => $packageName,
@@ -176,7 +176,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             $projectDir = Libs\FileSystem::getProjectDir($packageName);
             Libs\FileSystem::mkdir($projectDir, true);
-            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($composer));
+            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
             $folders = [
                 'API',
@@ -187,9 +187,6 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
                 'Properties',
                 'Stores',
                 'Queues',
-                'web',
-                'web/handlers',
-                'web/views'
             ];
             foreach ($folders as $folder) {
                 if (is_dir($projectDir.'/'.$folder) === false) {
