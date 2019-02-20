@@ -90,8 +90,8 @@ class InstanceAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
                 'post',
                 '/url/'.$input->getOption('project').'/instance/'.$input->getOption('instanceid'),
                 [
-                    'urlType' => $key,
-                    'url'     => $value,
+                    'type' => $key,
+                    'url'  => $value,
                 ]
             );
 
