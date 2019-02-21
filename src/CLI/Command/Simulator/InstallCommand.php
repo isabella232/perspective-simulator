@@ -83,7 +83,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
         Libs\FileSystem::mkdir($simulatorDir.'/certs');
         touch($simulatorDir.'/error_log');
 
-        $certs = $this->getOption('certs');
+        $certs = ($input->getOption('certs') ?? null);
         if ($certs !== null) {
             $added = false;
             if (is_file($certs) === true) {
