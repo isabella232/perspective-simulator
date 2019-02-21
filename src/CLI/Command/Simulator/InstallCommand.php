@@ -41,6 +41,13 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->setDescription('Installs the simulator directory for use.');
         $this->setHelp('Installs the simulator directory for use.');
+        $this->addOption(
+            'cert',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Optional path to a CA cert for self signed certificates.',
+            null
+        );
 
     }//end configure()
 
@@ -72,7 +79,31 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
         Libs\FileSystem::delete($simulatorDir);
         Libs\FileSystem::mkdir($simulatorDir);
         Libs\FileSystem::mkdir($simulatorDir.'/sessions');
+        Libs\FileSystem::mkdir($simulatorDir.'/certs');
         touch($simulatorDir.'/error_log');
+
+        $certs = $this->getOption('certs');
+        if ($certs !== null) {
+            $added = false;
+            if (is_file($certs) === true) {
+                copy($certs, $simulatorDir.'/certs/'.basename($certs));
+                $added = true;
+            } else if (is_dir($certs) === true) {
+                $added = true;
+                foreach (glob($certs.'/*.pem') as $cert) {
+                    copy($cert, $simulatorDir.'/certs/'.basename($cert));
+                }//end foreach
+            }//end if
+
+            if ($added === true) {
+                exec('which c_rehash 2>/dev/null', $output, $rc);
+                if ($rc === 0) {
+                    exec('c_rehash '.$simulatorDir.'/certs');
+                } else {
+                    throw new \Exception('Tried to installed a certificate but openssl is missing');
+                }//end if
+            }//end if
+        }//end if
 
         $updateCommand = $this->getApplication()->find('simulator:update');
         $updateArgs    = [

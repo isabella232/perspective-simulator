@@ -12,6 +12,9 @@
         "symfony/yaml": "^4.2",
         "ext-curl": "*"
     },
+    "suggest": {
+        "openssl": "*"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
