@@ -13,6 +13,7 @@ namespace PerspectiveSimulator\CLI\Command\Simulator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
 
