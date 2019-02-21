@@ -42,6 +42,7 @@ class InstanceListCommand extends \PerspectiveSimulator\CLI\Command\GatewayComma
     {
         $this->setDescription('Lists all the instances for a project.');
         $this->setHelp('Lists all the instances for a project.');
+        $this->addArgument('filter', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'Optional list of instance ids to filter the list by seperated by spaces, eg. 1.1 10.1');
 
     }//end configure()
 
@@ -75,6 +76,22 @@ class InstanceListCommand extends \PerspectiveSimulator\CLI\Command\GatewayComma
 
         if ($response['curlInfo']['http_code'] === 200) {
             $response['result'] = json_decode($response['result'], true);
+
+            $filter = ($input->getArgument('filter') ?? []);
+            if (empty($filter) === false) {
+                // Filter to instaces down.
+                $response['result'] = array_filter(
+                    $response['result'],
+                    function ($a) use ($filter) {
+                        if (in_array($a['instanceid'], $filter) === true) {
+                            return true;
+                        }
+
+                        return false;
+                    }
+                );
+            }
+
             if (empty($response['result']) === false){
                 $this->style->table(array_keys($response['result'][0]), $response['result']);
             } else {

@@ -306,7 +306,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             $status  = null;
             $headers = [
                 'Content-type: application/x-www-form-urlencoded',
-                'Authentication: Basic '.$this->gateway->getGatewayKey(),
+                'X-Sim-Key: '.$this->gateway->getGatewayKey(),
             ];
             $url     = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
             $options = [
@@ -408,7 +408,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $headers        = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
             'Content-type: application/x-www-form-urlencoded',
-            'Authentication: Basic '.$this->gateway->getGatewayKey(),
+            'X-Sim-Key: '.$this->gateway->getGatewayKey(),
         ];
         $this->progress = ($lastBytePos + 1);
 
