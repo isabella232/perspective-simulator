@@ -324,7 +324,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getDataStoreExists(string $name)
     {
-        if (strpos($name, $GLOBALS['project']) === 0) {
+        if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
             $storeDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.basename($name);
         } else {
             $codeParts   = explode('/', $name);
@@ -350,7 +350,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getUserStoreExists(string $name)
     {
-        if (strpos($name, $GLOBALS['project']) === 0) {
+        if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
             $storeDir = Libs\FileSystem::getProjectDir().'/Stores/User/'.basename($name);
         } else {
             $codeParts   = explode('/', $name);
