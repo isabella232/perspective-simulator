@@ -83,26 +83,24 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
         Libs\FileSystem::mkdir($simulatorDir.'/certs');
         touch($simulatorDir.'/error_log');
 
-        $certs = ($input->getOption('certs') ?? null);
+        $certs = ($input->getOption('cert') ?? null);
         if ($certs !== null) {
-            $added = false;
             if (is_file($certs) === true) {
                 copy($certs, $simulatorDir.'/certs/'.basename($certs));
-                $added = true;
             } else if (is_dir($certs) === true) {
-                $added = true;
                 foreach (glob($certs.'/*.pem') as $cert) {
                     copy($cert, $simulatorDir.'/certs/'.basename($cert));
                 }//end foreach
             }//end if
+        }//end if
 
-            if ($added === true) {
-                exec('which c_rehash 2>/dev/null', $output, $rc);
-                if ($rc === 0) {
-                    exec('c_rehash '.$simulatorDir.'/certs');
-                } else {
-                    throw new \Exception('Tried to installed a certificate but openssl is missing');
-                }//end if
+        exec('find '.$simulatorDir.'/certs/ -mindepth 1', $lines);
+        if (empty($lines) === false) {
+            exec('which c_rehash 2>/dev/null', $execOutput, $rc);
+            if ($rc === 0) {
+                exec('find '.$simulatorDir.'/certs -type l -delete; c_rehash '.$simulatorDir.'/certs');
+            } else {
+                throw new \Exception('Tried to installed a certificate but openssl is missing');
             }//end if
         }//end if
 
