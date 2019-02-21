@@ -33,7 +33,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function getPropertyTypeClass(string $objectType, string $propertyCode)
     {
         $objectType = ucfirst($objectType);
-        if (strpos($propertyCode, $GLOBALS['project']) === 0) {
+        if (strpos($propertyCode, strtolower($GLOBALS['project'])) === 0) {
             $prop = Libs\FileSystem::getProjectDir().'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
         } else {
             $codeParts   = explode('/', $propertyCode);
@@ -633,7 +633,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getCustomTypeClassByName(string $objectType, string $type)
     {
-        if (strpos($type, $GLOBALS['project']) === 0) {
+        if (strpos($type, strtolower($GLOBALS['project'])) === 0) {
             return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         } else {
             $requirement = explode('/', str_replace(basename($type), '', $type));

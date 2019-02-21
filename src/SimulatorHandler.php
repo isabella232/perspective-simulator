@@ -396,7 +396,7 @@ class SimulatorHandler
             return;
         }
 
-        if (strpos($storeCode, $GLOBALS['project']) === 0) {
+        if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
             $storageDir = Libs\FileSystem::getProjectDir();
         } else {
             $codeParts   = explode('/', $storeCode);
@@ -514,7 +514,7 @@ class SimulatorHandler
     private function validateReference(string $objectType, string $storageCode, string $id, string $referenceid, array $objects=[])
     {
         $valid = false;
-        if (strpos($storageCode, $GLOBALS['project']) === 0) {
+        if (strpos($storageCode, strtolower($GLOBALS['project'])) === 0) {
             $storageDir = Libs\FileSystem::getProjectDir();
         } else {
             $codeParts   = explode('/', $storageCode);
@@ -1108,7 +1108,7 @@ class SimulatorHandler
         if ($customType === null) {
             $customType = '\PerspectiveAPI\Objects\Types\DataRecord';
         } else {
-            if (strpos($storeCode, $GLOBALS['project']) === 0) {
+            if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
                 $customType = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.basename($customType);
             } else {
                 $parts      = explode('/', $storeCode);
