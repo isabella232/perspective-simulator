@@ -278,7 +278,7 @@ class Command extends \Symfony\Component\Console\Command\Command
      */
     final public function logChange(string $action, string $type, array $data)
     {
-        $changeLog = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $GLOBALS['project']).'-instructions.json';
+        $changeLog = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $GLOBALS['project']).'-update.json';
         $tasks     = ['tasks' => []];
         if (file_exists($changeLog) === true) {
             $tasks = Libs\Util::jsonDecode(file_get_contents($changeLog));

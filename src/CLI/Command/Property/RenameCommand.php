@@ -58,7 +58,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->setHelp('Renames a Property.');
         $this->addOption(
             'proptype',
-            'pt',
+            't',
             InputOption::VALUE_REQUIRED,
             'Type of property eg, DataRecord, Project or User.',
             null
