@@ -50,7 +50,7 @@ class Command extends \Symfony\Component\Console\Command\Command
         $project = ltrim($project, '=');
         if (empty($project) === true) {
             // Workout the current project and if the simulator is installed so we can run our actions.
-            $simPath = '/vendor/Perspective/Simulator';
+            $simPath = '/vendor/perspective/simulator';
             $cwd     = getcwd();
             $proot   = $cwd;
             while (is_dir($proot.$simPath) === false) {
