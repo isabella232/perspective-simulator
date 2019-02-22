@@ -416,6 +416,15 @@ class SimulatorHandler
                             }
                         }
                     }
+                } else {
+                    if (strpos($sourceCode, strtolower($GLOBALS['project'])) !== 0) {
+                        $sourceCode = strtolower($GLOBALS['project']).'/'.$sourceCode;
+                    }
+
+                    $referenceObjectType = 'data';
+                    if ($reference['sourceType'] === 'UserStore') {
+                        $referenceObjectType = 'user';
+                    }
                 }
 
                 if (count($ids) === 1) {
