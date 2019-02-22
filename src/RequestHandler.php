@@ -149,7 +149,7 @@ class RequestHandler
         }//end switch
 
         if (empty($this->_headers) === false) {
-            curl_setopt($this->_ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($this->_ch, CURLOPT_HTTPHEADER, $this->_headers);
         }//end if
 
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, 1);

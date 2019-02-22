@@ -10,12 +10,13 @@
 
 namespace PerspectiveSimulator\CLI\Command\Gateway;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
+use \Symfony\Component\Console\Input\InputInterface;
+use \Symfony\Component\Console\Output\OutputInterface;
+use \Symfony\Component\Console\Input\InputArgument;
 use \Symfony\Component\Console\Input\InputOption;
 
 use \PerspectiveSimulator\Libs;
+use \PerspectiveSimulator\RequestHandler;
 
 /**
  * ProjectDeployCommand Class
@@ -303,26 +304,28 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             $this->progressBar->setMaxSteps($maxSteps);
             $this->progressBar->setMessage('<comment>Waiting</comment>', 'titleMessage');
             $this->progressBar->advance(0);
-            $status  = null;
-            $headers = [
+            $status     = null;
+            $headers    = [
                 'Content-type: application/x-www-form-urlencoded',
                 'X-Sim-Key: '.$this->gateway->getGatewayKey(),
             ];
-            $url     = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
-            $options = [
-                'http' => [
-                    'header'  => $headers,
-                    'method'  => 'GET',
-                    'content' => '',
-                ],
-            ];
-
-            $context    = stream_context_create($options);
+            $url        = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
             $prevStatus = null;
             while ($status !== 'Complete' && strpos($status, 'Error') !== 0) {
-                $result     = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
-                $prevStatus = $status;
-                $status     = ($result['status'] ?? 'Error: status not returned.');
+                $request    = new RequestHandler();
+                $response   = $request->setMethod('get')
+                    ->setURL($url)
+                    ->setHeaders($headers)
+                    ->execute()
+                    ->getResult();
+                if ($response['result'] === false) {
+                    $status = 'Error: '.$response['error'];
+                } else {
+                    $result = Libs\Util::jsonDecode($response['result']);
+                    $prevStatus = $status;
+                    $status     = ($result['status'] ?? 'Error: status not returned.');
+                }//end if
+
                 if (strpos($status, 'Error') !== 0) {
                     $this->progressBar->setMessage('<comment>'.$status.'</comment>', 'titleMessage');
                     if ($prevStatus !== $status) {
@@ -407,35 +410,31 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $lastBytePos    = ($this->progress + strlen($chunk) - 1);
         $headers        = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
-            'Content-type: application/x-www-form-urlencoded',
             'X-Sim-Key: '.$this->gateway->getGatewayKey(),
         ];
         $this->progress = ($lastBytePos + 1);
 
-        $sendData = [
+        $sendData  = [
             'data'         => $chunk,
             'checksum'     => $this->checksum,
             'deploymentid' => $this->deploymentid,
         ];
-
-        $url     = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '/', $this->project).'/'.$this->version;
-        $options = [
-            'http' => [
-                'header'        => $headers,
-                'method'        => 'POST',
-                'content'       => http_build_query($sendData),
-                'ignore_errors' => true,
-            ],
-        ];
-
-        $context    = stream_context_create($options);
-        $result     = Libs\Util::jsonDecode(file_get_contents($url, false, $context));
-        $statusLine = $http_response_header[0];
-        preg_match('{HTTP\/\S*\s(\d{3})}', $statusLine, $match);
-        $status = $match[1];
-        if ($status !== '200') {
-            throw new \Exception($statusLine."\n".$result);
-        }
+        $url      = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '/', $this->project).'/'.$this->version;
+        $request  = new RequestHandler();
+        $response = $request->setMethod('post')
+            ->setURL($url)
+            ->setHeaders($headers)
+            ->setData($sendData)
+            ->execute()
+            ->getResult();
+        if ($response['result'] === false) {
+            throw new \Exception('Error: '.$response['error']);
+        } else {
+            $result = Libs\Util::jsonDecode($response['result']);
+            if ($response['curlInfo']['http_code'] !== 200) {
+                throw new \Exception($response['curlInfo']['http_code']."\n".$result['result']);
+            }
+        }//end if
 
         $this->deploymentid = $result['versionid'];
         $this->receipt      = $result['receipt'];
