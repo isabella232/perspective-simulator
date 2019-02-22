@@ -65,7 +65,7 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
         );
         $this->addOption(
             'sourceType',
-            'st',
+            's',
             InputOption::VALUE_OPTIONAL,
             'The type of store, eg, data or user.',
             null
@@ -125,7 +125,7 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
             Libs\FileSystem::mkdir($this->storeDir, true);
         }
 
-        $this->targetCode = $input->addArgument('storeName');
+        $this->targetCode = $input->getArgument('storeName');
 
     }//end interact()
 

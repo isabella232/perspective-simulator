@@ -33,18 +33,21 @@ class SimulatorHandler
 
     /**
      * Sequence of data record ids.
+     *
      * @var integer
      */
     private $dataRecordSequence = 0;
 
     /**
      * Sequence of user ids.
+     *
      * @var integer
      */
     private $userSequence = 0;
 
     /**
      * Sequence of user group ids.
+     *
      * @var integer
      */
     private $userGroupSequence = 0;
@@ -70,6 +73,13 @@ class SimulatorHandler
         'user'    => [],
         'project' => [],
     ];
+
+    /**
+     * Local cache of the loaded references.
+     *
+     * @var array
+     */
+    private $referneces = [];
 
 
     /**
@@ -169,10 +179,10 @@ class SimulatorHandler
                     $this->loadStores($prefix, $projectDir);
 
                     $perspectiveAPIClassAliases = [
-                        'PerspectiveAPI\Objects\Types\DataRecord'      => $project.'\CustomTypes\Data\DataRecord',
-                        'PerspectiveAPI\Objects\Types\User'            => $project.'\CustomTypes\User\User',
-                        'PerspectiveAPI\Objects\Types\Group'           => $project.'\CustomTypes\User\Group',
-                        'PerspectiveSimulator\View\ViewBase'           => $project.'\Web\Views\View',
+                        'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
+                        'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
+                        'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
+                        'PerspectiveSimulator\View\ViewBase'      => $project.'\Web\Views\View',
                     ];
 
                     if (class_exists($project.'\CustomTypes\Data\DataRecord') === false) {
@@ -195,9 +205,8 @@ class SimulatorHandler
                             eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
                         }
                     }
-
                 }//end foreach
-            }
+            }//end if
         }//end if
 
     }//end load()
@@ -303,7 +312,16 @@ class SimulatorHandler
                 ];
             }
 
-        }
+            // Loads the stores references.
+            $refs = glob($dir.'/*.json');
+            foreach ($refs as $ref) {
+                $refContent    = Libs\Util::jsonDecode(file_get_contents($ref));
+                $referenceCode = $namespace.'/'.str_replace('.json', '', basename($ref));
+                if (isset($this->references[$referenceCode]) === false) {
+                    $this->references[$referenceCode] = $refContent;
+                }
+            }
+        }//end foreach
 
         // Add user stores.
         $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
@@ -320,6 +338,16 @@ class SimulatorHandler
                     'usernameMap' => [],
                     'groups'      => [],
                 ];
+            }
+
+            // Loads the stores references.
+            $refs = glob($dir.'/*.json');
+            foreach ($refs as $ref) {
+                $refContent    = Libs\Util::jsonDecode(file_get_contents($ref));
+                $referenceCode = $namespace.'/'.str_replace('.json', '', basename($ref));
+                if (isset($this->references[$referenceCode]) === false) {
+                    $this->references[$referenceCode] = $refContent;
+                }
             }
         }
 
@@ -342,6 +370,7 @@ class SimulatorHandler
             ];
             file_put_contents($this->saveFile, Libs\Util::jsonEncode($saveData));
         }
+
     }//end save()
 
 
@@ -360,14 +389,85 @@ class SimulatorHandler
         $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores[$objectType][$project][$storeCode]['records'][$id]['references']) === true) {
             if (isset($this->stores[$objectType][$project][$storeCode]['records'][$id]['references'][$referenceCode]) === true) {
-                $ids = array_keys($this->stores[$objectType][$project][$storeCode]['records'][$id]['references'][$referenceCode]);
-                if (count($ids) === 1) {
-                    return $ids[0];
-                } else {
-                    return $ids;
+                $ids       = array_keys($this->stores[$objectType][$project][$storeCode]['records'][$id]['references'][$referenceCode]);
+                $reference = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
+
+                if (empty($reference) === true) {
+                    return null;
                 }
-            }
-        }
+
+                $sourceCode = $reference['sourceCode'];
+                if ($sourceCode === null) {
+                    foreach ($this->stores['user'][$project] as $storeid => $store) {
+                        if (isset($store['records'][$ids[0]]) === true) {
+                            $sourceCode          = $storeid;
+                            $referenceObjectType = 'user';
+                            break;
+                        }
+                    }
+
+                    if ($sourceCode === null) {
+                        // Must not be a user
+                        foreach ($this->stores['data'][$project] as $storeid => $store) {
+                            if (isset($store['records'][$ids[0]]) === true) {
+                                $sourceCode          = $storeid;
+                                $referenceObjectType = 'data';
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (count($ids) === 1) {
+                    if ($referenceObjectType === 'user') {
+                        $user = $this->getUser($sourceCode, $ids[0]);
+                        return [
+                            'objectType' => $referenceObjectType,
+                            'storeCode'  => $sourceCode,
+                            'id'         => $ids[0],
+                            'typeClass'  => $user['typeClass'],
+                            'username'   => $user['username'],
+                            'firstName'  => $user['firstName'],
+                            'lastName'   => $user['lastName'],
+                        ];
+                    } else {
+                        $dataRecord = $this->getDataRecord($sourceCode, $ids[0]);
+                        return [
+                            'objectType' => $referenceObjectType,
+                            'storeCode'  => $sourceCode,
+                            'id'         => $ids[0],
+                            'typeClass'  => $dataRecord['typeClass'],
+                        ];
+                    }
+                } else {
+                    $references = [];
+                    foreach ($ids as $id) {
+                        if ($referenceObjectType === 'user') {
+                            $user         = $this->getUser($sourceCode, $id);
+                            $references[] = [
+                                'objectType' => $referenceObjectType,
+                                'storeCode'  => $sourceCode,
+                                'id'         => $id,
+                                'typeClass'  => $user['typeClass'],
+                                'username'   => $user['username'],
+                                'firstName'  => $user['firstName'],
+                                'lastName'   => $user['lastName'],
+                            ];
+                        } else {
+                            $dataRecord   = $this->getDataRecord($sourceCode, $id);
+                            $references[] = [
+                                'objectType' => $referenceObjectType,
+                                'storeCode'  => $sourceCode,
+                                'id'         => $id,
+                                'typeClass'  => $dataRecord['typeClass'],
+                            ];
+                        }
+                    }//end foreach
+
+                    return $references;
+                }//end if
+            }//end if
+        }//end if
 
         return null;
 
@@ -396,17 +496,8 @@ class SimulatorHandler
             return;
         }
 
-        if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
-            $storageDir = Libs\FileSystem::getProjectDir();
-        } else {
-            $codeParts   = explode('/', $storeCode);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storageDir  = Libs\FileSystem::getRequirementDir($requirement);
-        }
-
-        $filePath  = $storageDir.'/Stores/'.ucfirst($objectType).'/'.basename($storeCode).'/'.basename($referenceCode).'.json';
-        if (file_exists($filePath) === true) {
-            $reference     = Libs\Util::jsonDecode(file_get_contents($filePath));
+        $reference = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
+        if (empty($reference) === false) {
             $sourceValue   = [];
             $targetValue   = [];
             $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
@@ -446,12 +537,10 @@ class SimulatorHandler
 
                 $object->addReference(
                     basename($referenceCode),
-                    [
-                        new $this->stores[$objectType][$project][$storeCode]['records'][$id]['typeClass']($store, $id)
-                    ]
+                    [new $this->stores[$objectType][$project][$storeCode]['records'][$id]['typeClass']($store, $id)]
                 );
             }
-        }
+        }//end foreach
 
     }//end addReference()
 
@@ -488,14 +577,42 @@ class SimulatorHandler
             if ($object->getReference(basename($referenceCode)) === null) {
                 $object->deleteReference(
                     basename($referenceCode),
-                    [
-                        new $this->stores[$objectType][$project][$storeCode]['records'][$id]['typeClass']($store, $id)
-                    ]
+                    [new $this->stores[$objectType][$project][$storeCode]['records'][$id]['typeClass']($store, $id)]
                 );
             }
         }
 
     }//end deleteReference()
+
+
+    /**
+     * Gets the reference definition.
+     *
+     * @param string $objectType  The object type we are using to reference.
+     * @param string $storeCode   The code of the store.
+     * @param string $referenceid The id of the reference we getting.
+     *
+     * @return array
+     */
+    private function getReferenceDefinition(string $objectType, string $storeCode, string $referenceid)
+    {
+        $reference = [];
+        if (isset($this->references[$referenceid]) === true) {
+            $reference = $this->references[$referenceid];
+            if ($reference['cardinality'] === 'M:1') {
+                $reference['cardinality'] = '1:M';
+                $sourceTypeArg            = $reference['sourceType'];
+                $sourceCodeArg            = $reference['sourceCode'];
+                $reference['sourceType']  = $reference['targetType'];
+                $reference['sourceCode']  = $reference['targetCode'];
+                $reference['targetType']  = $sourceTypeArg;
+                $reference['targetCode']  = $sourceCodeArg;
+            }
+        }
+
+        return $reference;
+
+    }//end getReferenceDefinition()
 
 
     /**
@@ -513,18 +630,9 @@ class SimulatorHandler
      */
     private function validateReference(string $objectType, string $storageCode, string $id, string $referenceid, array $objects=[])
     {
-        $valid = false;
-        if (strpos($storageCode, strtolower($GLOBALS['project'])) === 0) {
-            $storageDir = Libs\FileSystem::getProjectDir();
-        } else {
-            $codeParts   = explode('/', $storageCode);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storageDir  = Libs\FileSystem::getRequirementDir($requirement);
-        }
-
-        $filePath   = $storageDir.'/Stores/'.ucfirst($objectType).'/'.basename($storageCode).'/'.basename($referenceid).'.json';
-        if (file_exists($filePath) === true) {
-            $reference   = \PerspectiveSimulator\Libs\Util::jsonDecode(file_get_contents($filePath));
+        $valid     = false;
+        $reference = $this->getReferenceDefinition($objectType, $storageCode, $referenceid);
+        if (empty($reference) === false) {
             $sourceValue = [];
             $targetValue = [];
 
@@ -533,7 +641,7 @@ class SimulatorHandler
                 $type = $objectType;
                 if ($object instanceof \PerspectiveAPI\Objects\Types\User) {
                     $type = 'user';
-                } else if ( $object instanceof \PerspectiveAPI\Objects\Types\DataRecord) {
+                } else if ($object instanceof \PerspectiveAPI\Objects\Types\DataRecord) {
                     $type = 'data';
                 }
 
@@ -611,7 +719,6 @@ class SimulatorHandler
      */
     private function getReferenceSide(array $reference, string $objectType, string $storageCode)
     {
-
         if (ucfirst($objectType) === 'User') {
             $storageClass = 'UserStore';
         } else if (ucfirst($objectType) === 'Data') {
@@ -623,15 +730,22 @@ class SimulatorHandler
             );
         }
 
-        $parts                   = explode('/', $storageCode);
-        $reference['sourceCode'] = $parts[0].'/'.$parts[1].'/'.$reference['sourceCode'];
-        $reference['targetCode'] = $parts[0].'/'.$parts[1].'/'.$reference['targetCode'];
-        if ($reference['sourceType'] === $storageClass && $reference['sourceCode'] === $storageCode) {
+        $parts = explode('/', $storageCode);
+
+        if ($reference['sourceCode'] !== null) {
+            $reference['sourceCode'] = $parts[0].'/'.$parts[1].'/'.$reference['sourceCode'];
+        }
+
+        if ($reference['targetCode'] !== null) {
+            $reference['targetCode'] = $parts[0].'/'.$parts[1].'/'.$reference['targetCode'];
+        }
+
+        if ($reference['sourceType'] === $storageClass && ($reference['sourceCode'] === $storageCode || $reference['sourceCode'] === null)) {
             return 'source';
-        } else if ($reference['targetType'] === $storageClass && $reference['targetCode'] === $storageCode) {
+        } else if ($reference['targetType'] === $storageClass && ($reference['targetCode'] === $storageCode || $reference['targetCode'] === null)) {
             return 'target';
         } else {
-            throw new \Exception(sprintf('Invalid referenced object: %s'), $objectType);
+            throw new \Exception(sprintf('Invalid referenced object: %s', $objectType));
         }
 
     }//end getReferenceSide()
@@ -723,7 +837,7 @@ class SimulatorHandler
      *
      * @param string $storeCode The store the user belongs to.
      * @param string $id        The id of the user.
-     * @param string $lastName The last name of the user.
+     * @param string $lastName  The last name of the user.
      *
      * @return void
      */
@@ -762,7 +876,7 @@ class SimulatorHandler
      *
      * @param string $storeCode The store the user belongs to.
      * @param string $id        The id of the user.
-     * @param mixed $groupid    Parent user groups to assign the user to.
+     * @param mixed  $groupid   Parent user groups to assign the user to.
      *
      * @return void
      */
@@ -807,7 +921,7 @@ class SimulatorHandler
      * @param string $id           The id of the data record.
      * @param string $propertyCode The property we want the value of.
      *
-     *  @return mixed
+     * @return mixed
      */
     public function getPropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode)
     {
@@ -815,7 +929,6 @@ class SimulatorHandler
         if (isset($this->properties[$objectType][$project][$propertyCode]) === false) {
             throw new \Exception('Property '.$propertyCode.' does not exist');
         }
-
 
         if ($objectType === 'project'
             && isset($this->stores[$objectType][$project][$propertyCode]) === true
@@ -860,7 +973,7 @@ class SimulatorHandler
 
             $prefix = str_replace('/', '-', str_replace('\\', '-', $prefix));
             return '/property/'.$GLOBALS['projectPath'].'/'.ucfirst($objectType).'/'.strtolower($prefix).'-'.$property['default'];
-        }
+        }//end if
 
         return $property['default'];
 
@@ -876,7 +989,7 @@ class SimulatorHandler
      * @param string $propertyCode The property we are setting.
      * @param mixed  $value        The value of the property.
      *
-     *  @return void
+     * @return void
      */
     public function setPropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode, $value)
     {
@@ -902,7 +1015,6 @@ class SimulatorHandler
             } else {
                 $this->stores[$objectType][$project][$storeCode]['uniqueMap'][$propertyCode][$value] = $id;
             }
-
         } else if ($property['type'] === 'image' || $property['type'] === 'file') {
             $value = $this->prepareFileImagePropertyValue($value, ucfirst($objectType), $propertyCode);
         }
@@ -924,7 +1036,7 @@ class SimulatorHandler
      * @param string $id           The id of the data record.
      * @param string $propertyCode The property we are setting.
      *
-     *  @return void
+     * @return void
      */
     public function deletePropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode)
     {
@@ -1011,16 +1123,16 @@ class SimulatorHandler
     /**
      * Gets the children for an object.
      *
-     * @param string $objectType The object type.
-     * @param string $storeCode  The store the object belongs to.
-     * @param string $id         The id of the record.
-     * @param int    $depth      The depth to get.
+     * @param string  $objectType The object type.
+     * @param string  $storeCode  The store the object belongs to.
+     * @param string  $id         The id of the record.
+     * @param integer $depth      The depth to get.
      *
      * @return array
      */
     public function getChildren(string $objectType, string $storeCode, string $id, int $depth=null)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
+        $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores[$objectType][$project][$storeCode]['records'][$id]) === false) {
             return [];
         }
@@ -1053,16 +1165,16 @@ class SimulatorHandler
     /**
      * Gets the parents for an object.
      *
-     * @param string $objectType The object type.
-     * @param string $storeCode  The store the object belongs to.
-     * @param string $id         The id of the record.
-     * @param int    $depth      The depth to get.
+     * @param string  $objectType The object type.
+     * @param string  $storeCode  The store the object belongs to.
+     * @param string  $id         The id of the record.
+     * @param integer $depth      The depth to get.
      *
      * @return array
      */
     public function getParents(string $objectType, string $storeCode, string $id, int $depth=null)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
+        $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores[$objectType][$project][$storeCode]['records'][$id]['parent']) === false) {
             return [];
         }
@@ -1100,7 +1212,7 @@ class SimulatorHandler
      * @param string $customType The type of the data record.
      * @param string $parent     The parent of the data record.
      *
-     *  @return mixed
+     * @return mixed
      */
     public function createDataRecord(string $storeCode, string $customType, string $parent=null)
     {
@@ -1151,7 +1263,7 @@ class SimulatorHandler
      */
     public function getDataRecord(string $storeCode, string $id)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
+        $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores['data'][$project][$storeCode]['records'][$id]) === true) {
             return $this->stores['data'][$project][$storeCode]['records'][$id];
         }
@@ -1172,8 +1284,8 @@ class SimulatorHandler
      */
     public function getDataRecordByValue(string $storeCode, string $propertyid, string $value)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
-        $id        = ($this->stores['data'][$project][$storeCode]['uniqueMap'][$propertyid][$value] ?? null);
+        $project = Bootstrap::getProjectPrefix($storeCode);
+        $id      = ($this->stores['data'][$project][$storeCode]['uniqueMap'][$propertyid][$value] ?? null);
         if ($id === null) {
             return null;
         }
@@ -1190,7 +1302,7 @@ class SimulatorHandler
      * @param string $customType The type of the data record.
      * @param string $parent     The parent of the data record.
      *
-     *  @return mixed
+     * @return mixed
      */
     public function createUser(string $storeCode, string $username, string $firstName, string $lastName, string $type=null, array $groups=[])
     {
@@ -1230,8 +1342,8 @@ class SimulatorHandler
     {
         $this->userGroupSequence++;
 
-        $project   = Bootstrap::getProjectPrefix($storeCode);
-        $recordid  = $this->userGroupSequence.'.1';
+        $project  = Bootstrap::getProjectPrefix($storeCode);
+        $recordid = $this->userGroupSequence.'.1';
 
         $this->stores['user'][$project][$storeCode]['groups'][$recordid] = [
             'groupid'   => $recordid,
@@ -1255,7 +1367,7 @@ class SimulatorHandler
      */
     public function getGroup(string $storeCode, string $groupid)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
+        $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores['user'][$project][$storeCode]['groups'][$groupid]) === false) {
             return null;
         }
@@ -1271,11 +1383,11 @@ class SimulatorHandler
      * @param string $storeCode The store the user belongs to.
      * @param string $username  The username to search for.
      *
-     *  @return mixed
+     * @return mixed
      */
     public function getUserByUsername(string $storeCode, string $username)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
+        $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores['user'][$project][$storeCode]['usernameMap'][$username]) === false) {
             return null;
         }
@@ -1291,11 +1403,11 @@ class SimulatorHandler
      * @param string $storeCode The store the user belongs to.
      * @param string $userid    The userid to search for.
      *
-     *  @return mixed
+     * @return mixed
      */
     public function getUser(string $storeCode, string $userid)
     {
-        $project   = Bootstrap::getProjectPrefix($storeCode);
+        $project = Bootstrap::getProjectPrefix($storeCode);
         if (isset($this->stores['user'][$project][$storeCode]['records'][$userid]) === false) {
             return null;
         }

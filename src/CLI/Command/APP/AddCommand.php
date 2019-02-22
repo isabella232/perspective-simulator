@@ -41,8 +41,8 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function configure()
     {
-        $this->setDescription('Adds a new API specification file.');
-        $this->setHelp('Copies a new API specification file to the project.');
+        $this->setDescription('Adds a new App class or directory.');
+        $this->setHelp('Adds a new App class or directory.');
         $this->addOption(
             'type',
             't',

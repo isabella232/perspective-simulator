@@ -39,13 +39,13 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function configure()
     {
-        $this->setDescription('Deletes an App class or directory.');
-        $this->setHelp('Deletes an App class or directory.');
+        $this->setDescription('Renames an App class or directory.');
+        $this->setHelp('Renames an App class or directory.');
         $this->addOption(
             'type',
             't',
             InputOption::VALUE_REQUIRED,
-            'The type we are deleting, eg: class or directory.',
+            'The type we are renaming, eg: class or directory.',
             null
         );
         $this->addArgument('name', InputArgument::REQUIRED, 'The path to the file or directory (this is realative to the APP folder).');
