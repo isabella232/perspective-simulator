@@ -1229,6 +1229,28 @@ class FileSystem
 
 
     /**
+     * Return true, if a directory is empty (or not existing).
+     *
+     * @param string $path The path to check.
+     *
+     * @return boolean
+     */
+    public static function isDirEmpty(string $path)
+    {
+        $isEmpty = true;
+        if (is_dir($path) === true) {
+            exec('find '.$path.' -mindepth 1 2>/dev/null', $output, $rc);
+            if ($rc === 0 && empty($output) === false) {
+                $isEmpty = false;
+            }//end if
+        }//end if
+
+        return $isEmpty;
+
+    }//end isDirEmpty()
+
+
+    /**
      * Lists the contents of a directory.
      *
      * @param string  $path          The path of the directory to list.

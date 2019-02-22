@@ -72,7 +72,6 @@ class URLListCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
     {
         $this->style->title(sprintf('URLs for project: %s', $input->getOption('project')));
         $response = $this->sendAPIRequest('get', '/url/'.$input->getOption('project'), []);
-
         if ($response['curlInfo']['http_code'] === 200) {
             $response['result'] = json_decode($response['result'], true);
 
@@ -97,6 +96,8 @@ class URLListCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
             } else {
                 $this->style->note('No instance URLs set.');
             }
+        } else if ($response['curlInfo']['http_code'] === 403) {
+            $this->style->error('Forbidden');
         } else {
             $this->style->error($response['result']);
         }
