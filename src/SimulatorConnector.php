@@ -47,7 +47,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
 
         $propData = Libs\Util::jsonDecode(file_get_contents($prop));
 
-        return '\PerspectiveAPI\Property\Types\\'.$propData['type'];
+        return '\PerspectiveAPI\Property\Types\\'.ucfirst($propData['type']);
 
     }//end getPropertyTypeClass()
 
