@@ -1460,6 +1460,10 @@ class SimulatorHandler
     public function getDataRecordByValue(string $storeCode, string $propertyid, string $value)
     {
         list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
+        if (isset($this->properties['data'][$propid]) === false) {
+            return null;
+        }
+
         $property                = $this->properties['data'][$propid];
         $id = ($this->stores['data'][$storeCode]['uniqueMap'][$property['propertyid']][$value] ?? null);
         if ($id === null) {
