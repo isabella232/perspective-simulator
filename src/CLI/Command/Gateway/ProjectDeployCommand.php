@@ -261,8 +261,9 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $tarOutput   = [];
         $tarRC       = -1;
 
-        $projectSrcDir = Libs\FileSystem::getProjectDir();
-        $projectVenDir = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
+        $projectSrcDir   = Libs\FileSystem::getProjectDir();
+        $projectVenDir   = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
+        $projectComposer = str_replace('/src', 'composer', Libs\FileSystem::getProjectDir());
 
         $updateInstructions = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json';
         if (file_exists($updateInstructions) === true) {
@@ -299,6 +300,8 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             );
         }
 
+        copy($projectComposer.'.json', $tarDir.'/'.$project.'/composer.json');
+        copy($projectComposer.'.lock', $tarDir.'/'.$project.'/composer.lock');
         exec('cp -r '.$projectSrcDir.' '.$tarDir.'/'.$project.'/src/');
         exec('cp -r '.$projectVenDir.' '.$tarDir.'/'.$project.'/vendor/');
 
