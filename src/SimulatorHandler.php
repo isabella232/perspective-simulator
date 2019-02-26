@@ -169,14 +169,14 @@ class SimulatorHandler
         $namespace = str_replace('-', '/', $prefix);
         $this->propidSequence++;
         $propertyid = $this->propidSequence.'.1';
-        $this->properties['user'][$namespace.'/__first-name__.text'] = [
+        $this->properties['user'][$namespace.'/__first-name__'] = [
             'propertyid' => $propertyid,
             'type'       => 'text',
         ];
 
         $this->propidSequence++;
         $propertyid = $this->propidSequence.'.1';
-        $this->properties['user'][$namespace.'/__last-name__.text'] = [
+        $this->properties['user'][$namespace.'/__last-name__'] = [
             'propertyid' => $propertyid,
             'type'       => 'text',
         ];
@@ -201,6 +201,21 @@ class SimulatorHandler
                     $prefix     = Bootstrap::generatePrefix($project);
 
                     $this->loadStores($prefix, $projectDir);
+
+                    $namespace = str_replace('-', '/', $requirement);
+                    $this->propidSequence++;
+                    $propertyid = $this->propidSequence.'.1';
+                    $this->properties['user'][$namespace.'/__first-name__'] = [
+                        'propertyid' => $propertyid,
+                        'type'       => 'text',
+                    ];
+
+                    $this->propidSequence++;
+                    $propertyid = $this->propidSequence.'.1';
+                    $this->properties['user'][$namespace.'/__last-name__'] = [
+                        'propertyid' => $propertyid,
+                        'type'       => 'text',
+                    ];
 
                     $perspectiveAPIClassAliases = [
                         'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
@@ -381,16 +396,12 @@ class SimulatorHandler
      */
     public function getReference(string $objectType, string $storeCode, string $id, string $referenceCode)
     {
-        $project       = Bootstrap::getProjectPrefix($storeCode);
-        $prefix        = str_replace('-', '/', $project);
         $reference     = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
         $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
         if ($referenceSide === 'source') {
-            $valueStore = $prefix.'/'.$reference['targetCode'];
             $valueType  = $reference['targetType'];
             $results    = $this->getReferenceValueBySource($reference, $referenceCode, $id);
         } else if ($referenceSide === 'target') {
-            $valueStore = $prefix.'/'.$reference['sourceCode'];
             $valueType  = $reference['sourceType'];
             $results    = $this->getReferenceValueByTarget($reference, $referenceCode, $id);
         }
@@ -407,22 +418,22 @@ class SimulatorHandler
 
         foreach ($results as $result) {
             if ($valueType === 'UserStore') {
-                $userDetails  = $this->getUser($valueStore, $result);
+                list($userDetails, $userStore) = $this->getUserById($result);
                 $references[] = [
                     'id'         => $result,
                     'objectType' => 'user',
-                    'storeCode'  => basename($valueStore),
+                    'storeCode'  => $userStore,
                     'typeClass'  => $userDetails['typeClass'],
                     'username'   => $userDetails['username'],
                     'firstName'  => $userDetails['firstName'],
                     'lastName'   => $userDetails['lastName'],
                 ];
             } else if ($valueType === 'DataStore') {
-                $dataRecord = $this->getDataRecord($valueStore, $result);
+                list($dataRecord, $dataStore) = $this->getDataRecordById($result);
                 $references[]  = [
                     'id'         => $result,
                     'objectType' => 'data',
-                    'storeCode'  => basename($valueStore),
+                    'storeCode'  => $dataStore,
                     'typeClass'  => $dataRecord['typeClass'],
                 ];
             }
@@ -515,10 +526,12 @@ class SimulatorHandler
                 $values = $this->referenceValues[$referenceCode][$sourceValue];
             }
         } else if ($targetValue !== null) {
-            foreach ($this->referenceValues[$referenceCode] as $sVal => $targetValues) {
-                foreach ($targetValue as $tVal) {
-                    if (in_array($tVal, $targetValues) === true) {
-                        $values[] = $sVal;
+            if (isset($this->referenceValues[$referenceCode]) === true) {
+                foreach ($this->referenceValues[$referenceCode] as $sVal => $targetValues) {
+                    foreach ($targetValue as $tVal) {
+                        if (in_array($tVal, $targetValues) === true) {
+                            $values[] = $sVal;
+                        }
                     }
                 }
             }
@@ -846,11 +859,11 @@ class SimulatorHandler
 
         // Categorise the given objects into source and target values depending on their side in relationship.
         foreach ($objects as $object) {
-            $referenceSide = $this->getReferenceSide($reference, $object->getObjectType(), $object->getStorage()->getCode());
+            $referenceSide = $this->getReferenceSide($reference, $object['objectType'], $object['storeCode']);
             if ($referenceSide === 'source') {
-                $sourceValue[] = $object->getId();
+                $sourceValue[] = $object['id'];
             } else if ($referenceSide === 'target') {
-                $targetValue[] = $object->getId();
+                $targetValue[] = $object['id'];
             }
         }
 
@@ -1572,6 +1585,68 @@ class SimulatorHandler
         return $this->stores['user'][$storeCode]['records'][$userid];
 
     }//end getUser()
+
+
+    /**
+     * Gets a user by ID.
+     *
+     * @param string $userid The userid to search for.
+     *
+     * @return mixed
+     */
+    public function getUserById(string $userid)
+    {
+        $user = null;
+        foreach ($this->stores['user'] as $storeCode => $store) {
+            foreach ($this->stores['user'][$storeCode]['records'] as $id => $record) {
+                if ($record['id'] === $userid) {
+                    $user = [
+                        $this->stores['user'][$storeCode]['records'][$id],
+                        $storeCode,
+                    ];
+                    break;
+                }
+            }//end foreach
+
+            if ($user !== null) {
+                break;
+            }
+        }//end foreach
+
+        return $user;
+
+    }//end getUserById()
+
+
+    /**
+     * Gets a data record by ID.
+     *
+     * @param string $recordid The userid to search for.
+     *
+     * @return mixed
+     */
+    public function getDataRecordById(string $recordid)
+    {
+        $dataRecord = null;
+        foreach ($this->stores['data'] as $storeCode => $store) {
+            foreach ($this->stores['data'][$storeCode]['records'] as $id => $record) {
+                if ($record['id'] === $recordid) {
+                    $dataRecord = [
+                        $this->stores['data'][$storeCode]['records'][$id],
+                        $storeCode,
+                    ];
+                    break;
+                }
+            }//end foreach
+
+            if ($dataRecord !== null) {
+                break;
+            }
+        }//end foreach
+
+        return $dataRecord;
+
+    }//end getDataRecordById()
 
 
 }//end class

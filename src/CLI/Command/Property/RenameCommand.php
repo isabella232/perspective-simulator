@@ -158,11 +158,11 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         try {
             $namespace = $input->getOption('project');
             $propType  = $input->getOption('proptype');
-            $code      = $namespace.'/'.$input->getArgument('code');
-            $newCode   = $namespace.'/'.$input->getArgument('newCode');
+            $code      = $input->getArgument('code');
+            $newCode   = $input->getArgument('newCode');
 
-            list($oldPropid, $oldPropType) = \PerspectiveSimulator\Bootstrap::getPropertyInfo($code);
-            list($propid, $propType)       = \PerspectiveSimulator\Bootstrap::getPropertyInfo($newCode);
+            list($oldPropid, $oldPropType) = \PerspectiveSimulator\Bootstrap::getPropertyInfo($namespace.'/'.$code);
+            list($propid, $propType)       = \PerspectiveSimulator\Bootstrap::getPropertyInfo($namespace.'/'.$newCode);
 
             if ($oldPropType !== $propType) {
                 throw new \Exception('Property types must match');
