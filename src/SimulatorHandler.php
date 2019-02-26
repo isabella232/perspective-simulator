@@ -10,6 +10,7 @@
 namespace PerspectiveSimulator;
 
 use \PerspectiveSimulator\Libs;
+use \PerspectiveAPI\Exception\InvalidDataException;
 
 /**
  * SimulatorHandler Class
@@ -81,6 +82,20 @@ class SimulatorHandler
         'project' => [],
     ];
 
+    /**
+     * Local cache of the loaded references.
+     *
+     * @var array
+     */
+    private $references = [];
+
+    /**
+     * Local cache of the loaded references.
+     *
+     * @var array
+     */
+    private $referenceValues = [];
+
 
     /**
      * Constructor function for simulator handler.
@@ -99,6 +114,8 @@ class SimulatorHandler
 
             // Reload created properties if any.
             $this->properties = $savedData['properties'];
+
+            $this->referenceValues = ($savedData['referenceValues'] ?? []);
 
             if (isset($savedData['stores']) === true) {
                 foreach ($savedData['stores'] as $type => $projects) {
@@ -285,7 +302,17 @@ class SimulatorHandler
                     'uniqueMap' => [],
                 ];
             }
-        }
+
+            // Loads the stores references.
+            $refs = glob($dir.'/*.json');
+            foreach ($refs as $ref) {
+                $refContent    = Libs\Util::jsonDecode(file_get_contents($ref));
+                $referenceCode = $namespace.'/'.str_replace('.json', '', basename($ref));
+                if (isset($this->references[$referenceCode]) === false) {
+                    $this->references[$referenceCode] = $refContent;
+                }
+            }
+        }//end foreach
 
         // Add user stores.
         $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
@@ -303,7 +330,17 @@ class SimulatorHandler
                     'groups'      => [],
                 ];
             }
-        }
+
+            // Loads the stores references.
+            $refs = glob($dir.'/*.json');
+            foreach ($refs as $ref) {
+                $refContent    = Libs\Util::jsonDecode(file_get_contents($ref));
+                $referenceCode = $namespace.'/'.str_replace('.json', '', basename($ref));
+                if (isset($this->references[$referenceCode]) === false) {
+                    $this->references[$referenceCode] = $refContent;
+                }
+            }
+        }//end foreach
 
     }//end loadStores()
 
@@ -323,8 +360,10 @@ class SimulatorHandler
                 'propidSequence'     => $this->propidSequence,
                 'stores'             => $this->stores,
                 'properties'         => $this->properties,
+                'referenceValues'    => $this->referenceValues,
             ];
-            file_put_contents($this->saveFile, Libs\Util::jsonEncode($saveData));
+
+            file_put_contents($this->saveFile, Libs\Util::jsonEncode($saveData, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
 
     }//end save()
@@ -342,24 +381,160 @@ class SimulatorHandler
      */
     public function getReference(string $objectType, string $storeCode, string $id, string $referenceCode)
     {
-        if (isset($this->stores[$objectType][$storeCode]['records'][$id]['references']) === true) {
-            if (isset($this->stores[$objectType][$storeCode]['records'][$id]['references'][$referenceCode]) === true) {
-                $ids = array_keys($this->stores[$objectType][$storeCode]['records'][$id]['references'][$referenceCode]);
-                if (count($ids) === 1) {
-                    return $ids[0];
-                } else {
-                    return $ids;
-                }
+        $project       = Bootstrap::getProjectPrefix($storeCode);
+        $prefix        = str_replace('-', '/', $project);
+        $reference     = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
+        $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
+        if ($referenceSide === 'source') {
+            $valueStore = $prefix.'/'.$reference['targetCode'];
+            $valueType  = $reference['targetType'];
+            $results    = $this->getReferenceValueBySource($reference, $referenceCode, $id);
+        } else if ($referenceSide === 'target') {
+            $valueStore = $prefix.'/'.$reference['sourceCode'];
+            $valueType  = $reference['sourceType'];
+            $results    = $this->getReferenceValueByTarget($reference, $referenceCode, $id);
+        }
+
+        if ($results === null) {
+            return null;
+        }
+
+        $references = [];
+        $multiple   = is_array($results);
+        if ($multiple === false) {
+            $results = [$results];
+        }
+
+        foreach ($results as $result) {
+            if ($valueType === 'UserStore') {
+                $userDetails  = $this->getUser($valueStore, $result);
+                $references[] = [
+                    'id'         => $result,
+                    'objectType' => 'user',
+                    'storeCode'  => basename($valueStore),
+                    'typeClass'  => $userDetails['typeClass'],
+                    'username'   => $userDetails['username'],
+                    'firstName'  => $userDetails['firstName'],
+                    'lastName'   => $userDetails['lastName'],
+                ];
+            } else if ($valueType === 'DataStore') {
+                $dataRecord = $this->getDataRecord($valueStore, $result);
+                $references[]  = [
+                    'id'         => $result,
+                    'objectType' => 'data',
+                    'storeCode'  => basename($valueStore),
+                    'typeClass'  => $dataRecord['typeClass'],
+                ];
             }
         }
 
-        return null;
+        if ($multiple === false) {
+            $references = $references[0];
+        }
+
+        return $references;
 
     }//end getReference()
 
 
     /**
-     * Adds/Sets the value of a reference.
+     * Gets the reference values of the source.
+     *
+     * @param array  $reference     The reference details.
+     * @param string $referenceCode The ID of the reference.
+     * @param string $value         The source value.
+     *
+     * @return null|string|array
+     */
+    private function getReferenceValueBySource(array $reference, string $referenceCode, string $value)
+    {
+        $referenceValue = $this->searchReferences($referenceCode, $reference, $value);
+        if (empty($referenceValue) === true) {
+            return null;
+        }
+
+        if ($reference['cardinality'] === '1:1') {
+            return $referenceValue[0];
+        } else {
+            return $referenceValue;
+        }
+
+    }//end getReferenceValueBySource()
+
+
+    /**
+     * Gets the reference values of the target.
+     *
+     * @param array  $reference     The reference details.
+     * @param string $referenceCode The ID of the reference.
+     * @param string $value         The target value.
+     *
+     * @return null|string|array
+     */
+    private function getReferenceValueByTarget(array $reference, string $referenceCode, string $value)
+    {
+        $referenceValue = $this->searchReferences($referenceCode, $reference, null, [$value]);
+        if (empty($referenceValue) === true) {
+            return null;
+        }
+
+        if ($reference['cardinality'] === 'M:M') {
+            foreach ($referenceValue as $targetValue) {
+                $result[] = $targetValue;
+            }
+        } else {
+            $result = $referenceValue[0];
+        }
+
+        return $result;
+
+    }//end getReferenceValueByTarget()
+
+
+    /**
+     * Searches for all references values.
+     *
+     * @param string $referenceCode The reference code.
+     * @param array  $reference     The reference information
+     * @param array  $sourceValue   The source values we are searching for.
+     * @param array  $targetValue   The target values we are searching for.
+     *
+     * @return array
+     */
+    private function searchReferences(
+        string $referenceCode,
+        array $reference,
+        string $sourceValue=null,
+        array $targetValue=null
+    ) {
+        $values = [];
+        $stores = $this->stores;
+
+        if ($sourceValue !== null) {
+            if (isset($this->referenceValues[$referenceCode][$sourceValue]) === true) {
+                $values = $this->referenceValues[$referenceCode][$sourceValue];
+            }
+        } else if ($targetValue !== null) {
+            foreach ($this->referenceValues[$referenceCode] as $sVal => $targetValues) {
+                foreach ($targetValue as $tVal) {
+                    if (in_array($tVal, $targetValues) === true) {
+                        $values[] = $sVal;
+                    }
+                }
+            }
+        }
+
+        if (empty($values) === true) {
+            return null;
+        }
+
+        return $values;
+
+    }//end searchReferences()
+
+
+    /**
+     * Adds the value of a reference.
      *
      * @param string $objectType    Type of the object.
      * @param string $storeCode     The store the object belongs to.
@@ -375,66 +550,205 @@ class SimulatorHandler
             $objects = [$objects];
         }
 
-        if ($this->validateReference($objectType, $storeCode, $id, $referenceCode, $objects) === false) {
-            return;
+        $reference = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
+        list(
+            $referenceid,
+            $sourceValue,
+            $targetValue
+        )          = $this->resolveReferenceArguments($objectType, $id, $storeCode, $referenceCode, $objects);
+
+        if (isset($this->referenceValues[$referenceCode]) === false) {
+            $this->referenceValues[$referenceCode] = [];
         }
 
-        if (strpos($storeCode, $GLOBALS['project']) === 0) {
-            $storageDir = Libs\FileSystem::getProjectDir();
+        $validateRef = function ($source, $target) use ($reference, $referenceCode) {
+            if ($reference['cardinality'] === '1:1' && count($target) > 1) {
+                $cardinalityErrMsg = 'Invalid target value for 1:1 cardinality. Expecting one but got %s';
+                throw new InvalidDataException(sprintf($cardinalityErrMsg, implode(',', $target)));
+            }
+
+            $cardinalityErrMsg = 'Failed to add reference value since the source (%s) already has the value (%s) in %s relationship';
+            $existing          = $this->searchReferences($referenceCode, $reference, $source);
+            if (empty($existing) === false) {
+                $target = array_diff($target, $existing);
+                if (empty($target) === true) {
+                    // The current value includes all values in $target. Nothing else to do here.
+                    return;
+                }
+
+                if ($reference['cardinality'] === '1:1') {
+                    throw new InvalidDataException(
+                        sprintf(
+                            $cardinalityErrMsg,
+                            $source,
+                            implode(',', array_keys($existing)),
+                            $reference['cardinality']
+                        )
+                    );
+
+                }
+            }
+
+            if ($reference['cardinality'] === '1:1' || $reference['cardinality'] === '1:M') {
+                foreach ($target as $tVal) {
+                    $existingTargetValues = $this->getReferenceValueByTarget($reference, $referenceCode, $tVal);
+                    if (empty($existingTargetValues) === false) {
+                        throw new InvalidDataException(
+                            sprintf(
+                                $cardinalityErrMsg,
+                                $existingTargetValues,
+                                $tVal,
+                                $reference['cardinality']
+                            )
+                        );
+                    }
+                }
+            }//end if
+
+            return true;
+        };
+
+        if (is_array($sourceValue) === true) {
+            foreach ($sourceValue as $sVal) {
+                if ($validateRef($sVal, $targetValue) === true) {
+                    if (isset($this->referenceValues[$referenceCode][$sVal]) === false) {
+                        $this->referenceValues[$referenceCode][$sVal] = [];
+                    }
+
+                    $this->referenceValues[$referenceCode][$sVal][] = $targetValue;
+                }
+            }
         } else {
-            $codeParts   = explode('/', $storeCode);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storageDir  = Libs\FileSystem::getRequirementDir($requirement);
-        }
-
-        $filePath = $storageDir.'/Stores/'.ucfirst($objectType).'/'.basename($storeCode).'/'.basename($referenceCode).'.json';
-        if (file_exists($filePath) === true) {
-            $reference     = Libs\Util::jsonDecode(file_get_contents($filePath));
-            $sourceValue   = [];
-            $targetValue   = [];
-            $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
-            if ($referenceSide === 'source') {
-                $sourceValue[] = $id;
-            } else if ($referenceSide === 'target') {
-                $targetValue[] = $id;
-            }
-
-            if ($reference['cardinality'] === '1:1') {
-                if (count($sourceValue) === 1 || count($targetValue) === 1) {
-                    unset($this->stores[$objectType][$storeCode]['records'][$id]['references'][$referenceCode]);
-                }
-            } else if ($reference['cardinality'] === '1:M') {
-                if (count($sourceValue) !== 1) {
-                    unset($this->stores[$objectType][$storeCode]['records'][$id]['references'][$referenceCode]);
-                }
-            }
-        }//end if
-
-        if (isset($this->stores[$objectType][$storeCode]['records'][$id][$referenceCode]) === false) {
-            $this->stores[$objectType][$storeCode]['records'][$id][$referenceCode] = [];
-        }
-
-        foreach ($objects as $object) {
-            $objectid = $object->getId();
-            $this->stores[$objectType][$storeCode]['records'][$id]['references'][$referenceCode][$objectid] = true;
-
-            if ($object->getReference(basename($referenceCode)) === null) {
-                $storeCodeParts = explode('/', $storeCode);
-                $namespace      = '\\'.ucfirst($storeCodeParts[0]).'\\'.ucfirst($storeCodeParts[1]).'\\Framework\\StorageFactory';
-                if ($objectType === 'user') {
-                    $store = $namespace::getUserStore(basename($storeCode));
-                } else {
-                    $store = $namespace::getDataStore(basename($storeCode));
+            if ($validateRef($sourceValue, $targetValue) === true) {
+                if (isset($this->referenceValues[$referenceCode][$sourceValue]) === false) {
+                    $this->referenceValues[$referenceCode][$sourceValue] = [];
                 }
 
-                $object->addReference(
-                    basename($referenceCode),
-                    [new $this->stores[$objectType][$storeCode]['records'][$id]['typeClass']($store, $id)]
-                );
+                foreach ($targetValue as $tVal) {
+                    $this->referenceValues[$referenceCode][$sourceValue][] = $tVal;
+                }
             }
         }//end foreach
 
     }//end addReference()
+
+
+    /**
+     * Adds the value of a reference.
+     *
+     * @param string $objectType    Type of the object.
+     * @param string $storeCode     The store the object belongs to.
+     * @param string $id            The id of the record.
+     * @param string $referenceCode The reference code.
+     * @param mixed  $objects       The objects to store as reference.
+     *
+     * @return void
+     */
+    public function setReference(string $objectType, string $storeCode, string $id, string $referenceCode, $objects)
+    {
+        if (is_array($objects) === false) {
+            $objects = [$objects];
+        }
+
+        $reference = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
+        list(
+            $referenceid,
+            $sourceValue,
+            $targetValue
+        )          = $this->resolveReferenceArguments($objectType, $id, $storeCode, $referenceCode, $objects);
+
+        if (isset($this->referenceValues[$referenceCode]) === false) {
+            $this->referenceValues[$referenceCode] = [];
+        }
+
+        $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
+        if (in_array($referenceSide, ['source', 'target']) === false) {
+            throw new InvalidDataException('Reference side not specified');
+        }
+
+        if (is_array($sourceValue) === false) {
+            $sourceValue = [$sourceValue];
+        }
+
+        $sourceValue = array_unique($sourceValue);
+        $targetValue = array_unique($targetValue);
+        if ($reference['cardinality'] === '1:M' && count($sourceValue) !== 1) {
+            throw new InvalidDataException('Expecting single source value in 1:M or 1:1 relationship');
+        }
+
+        if ($reference['cardinality'] === '1:1' && (count($sourceValue) !== 1 || count($targetValue) !== 1)) {
+            throw new InvalidDataException('Expecting single target value in 1:1 relationship');
+        }
+
+        if ($referenceSide === 'target' && count($targetValue) !== 1) {
+            // Because our API uses object notation, the reference side is always a single value (the ID of the object).
+            throw new InvalidDataException('Expecting single target value in set reference');
+        }
+
+        if ($referenceSide === 'source' && count($sourceValue) !== 1) {
+            // Because our API uses object notation, the reference side is always a single value (the ID of the object).
+            throw new InvalidDataException('Expecting single source value in set reference');
+        }
+
+        $cardinalityErrMsg = 'Failed to add reference value since the source (%s) already has the value (%s) in %s relationship';
+        if ($referenceSide === 'source') {
+            if ($reference['cardinality'] === '1:1' || $reference['cardinality'] === '1:M') {
+                foreach ($targetValue as $tVal) {
+                    $existingTargetValues = $this->getReferenceValueByTarget($reference, $referenceCode, $tVal);
+                    if (empty($existingTargetValues) === false) {
+                        throw new InvalidDataException(
+                            sprintf(
+                                $cardinalityErrMsg,
+                                $existingTargetValues,
+                                $tVal,
+                                $reference['cardinality']
+                            )
+                        );
+                    }
+                }
+            }//end if
+
+            foreach ($sourceValue as $sVal) {
+                $this->referenceValues[$referenceCode][$sVal] = $targetValue;
+            }
+        } else {
+            if ($reference['cardinality'] === '1:1') {
+                $existingSourceValue = $this->getReferenceValueBySource($reference, $referenceCode, $sourceValue[0]);
+                if (empty($existingSourceValue) === false) {
+                    throw new InvalidDataException(
+                        sprintf(
+                            $cardinalityErrMsg,
+                            $sourceValue[0],
+                            $existingSourceValue,
+                            $reference['cardinality']
+                        )
+                    );
+                }
+            }
+
+            $existingTargetValues = $this->getReferenceValueByTarget($reference, $referenceCode, $targetValue[0]);
+            if ($existingTargetValues !== null) {
+                if (is_array($existingTargetValues) === false) {
+                    $existingTargetValues = [$existingTargetValues];
+                }
+
+                foreach ($existingTargetValues as $existingTargetValue) {
+                    $this->referenceValues[$referenceCode][$existingTargetValue] = array_diff($this->referenceValues[$referenceCode][$existingTargetValue], $targetValue);
+                    if (empty($this->referenceValues[$referenceCode][$existingTargetValue]) === true) {
+                        unset($this->referenceValues[$referenceCode][$existingTargetValue]);
+                    }
+                }
+
+            }
+
+            foreach ($sourceValue as $sVal) {
+                $this->referenceValues[$referenceCode][$sVal][] = $targetValue[0];
+            }
+
+            // set
+        }//end if
+
+    }//end setReference()
 
 
     /**
@@ -450,25 +764,28 @@ class SimulatorHandler
      */
     public function deleteReference(string $objectType, string $storeCode, string $id, string $referenceCode, $objects)
     {
+
         if (is_array($objects) === false) {
             $objects = [$objects];
         }
 
-        foreach ($objects as $object) {
-            $id = $object->getId();
-            unset($this->stores[$objectType][$storeCode]['records'][$id]['references'][$referenceCode][$id]);
+        list(
+            $referenceid,
+            $sourceValue,
+            $targetValue
+        ) = self::resolveReferenceArguments($objectType, $id, $storeCode, $referenceCode, $objects);
 
-            if ($objectType === 'user') {
-                $store = $namespace::getUserStore(basename($storeCode));
-            } else {
-                $store = $namespace::getDataStore(basename($storeCode));
+        if (is_array($sourceValue) === true) {
+            foreach ($sourceValue as $sVal) {
+                $this->referenceValues[$referenceCode][$sVal] = array_diff($this->referenceValues[$referenceCode][$sVal], $targetValue);
+                if (empty($this->referenceValues[$referenceCode][$sVal]) === true) {
+                    unset($this->referenceValues[$referenceCode][$sVal]);
+                }
             }
-
-            if ($object->getReference(basename($referenceCode)) === null) {
-                $object->deleteReference(
-                    basename($referenceCode),
-                    [new $this->stores[$objectType][$storeCode]['records'][$id]['typeClass']($store, $id)]
-                );
+        } else {
+            $this->referenceValues[$referenceCode][$sourceValue] = array_diff($this->referenceValues[$referenceCode][$sourceValue], $targetValue);
+            if (empty($this->referenceValues[$referenceCode][$sourceValue]) === true) {
+                unset($this->referenceValues[$referenceCode][$sourceValue]);
             }
         }
 
@@ -476,104 +793,130 @@ class SimulatorHandler
 
 
     /**
-     * Validates if the reference can be set.
+     * Gets the reference definition.
      *
-     * @param object $objectType  The object type we are using to reference.
-     * @param string $storageCode The code of the store.
-     * @param string $id          The id of the data record/user object.
-     * @param string $referenceid The id of the reference we are trying to set.
-     * @param array  $objects     The objects we are setting the reference against, used if we are setting the reference
-     *                             for the other side.
+     * @param string $objectType  The object type we are using to reference.
+     * @param string $storeCode   The code of the store.
+     * @param string $referenceid The id of the reference we getting.
      *
-     * @return boolean.
-     * @throws \Exception When reference is invalid.
+     * @return array
      */
-    private function validateReference(string $objectType, string $storageCode, string $id, string $referenceid, array $objects=[])
+    private function getReferenceDefinition(string $objectType, string $storeCode, string $referenceid)
     {
-        $valid = false;
-        if (strpos($storageCode, $GLOBALS['project']) === 0) {
-            $storageDir = Libs\FileSystem::getProjectDir();
-        } else {
-            $codeParts   = explode('/', $storageCode);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storageDir  = Libs\FileSystem::getRequirementDir($requirement);
+        $reference = [];
+        if (isset($this->references[$referenceid]) === true) {
+            $reference = $this->references[$referenceid];
+            if ($reference['cardinality'] === 'M:1') {
+                $reference['cardinality'] = '1:M';
+                $sourceTypeArg            = $reference['sourceType'];
+                $sourceCodeArg            = $reference['sourceCode'];
+                $reference['sourceType']  = $reference['targetType'];
+                $reference['sourceCode']  = $reference['targetCode'];
+                $reference['targetType']  = $sourceTypeArg;
+                $reference['targetCode']  = $sourceCodeArg;
+            }
         }
 
-        $filePath = $storageDir.'/Stores/'.ucfirst($objectType).'/'.basename($storageCode).'/'.basename($referenceid).'.json';
-        if (file_exists($filePath) === true) {
-            $reference   = \PerspectiveSimulator\Libs\Util::jsonDecode(file_get_contents($filePath));
-            $sourceValue = [];
-            $targetValue = [];
+        return $reference;
 
-            // Categorise the given objects into source and target values depending on their side in relationship.
-            foreach ($objects as $object) {
-                $type = $objectType;
-                if ($object instanceof \PerspectiveAPI\Objects\Types\User) {
-                    $type = 'user';
-                } else if ($object instanceof \PerspectiveAPI\Objects\Types\DataRecord) {
-                    $type = 'data';
-                }
+    }//end getReferenceDefinition()
 
-                $referenceSide = $this->getReferenceSide($reference, $type, $object->getStorage()->getCode());
-                if ($referenceSide === 'source') {
-                    $sourceValue[] = $object->getId();
-                } else if ($referenceSide === 'target') {
-                    $targetValue[] = $object->getId();
-                }
-            }
 
-            $referenceSide = $this->getReferenceSide($reference, $objectType, $storageCode);
+    /**
+     * Resolve reference values.
+     *
+     * The main purpose is to work out which side of the relationship is the source and the target as per the reference
+     * definition. This function also validates the objects in the process.
+     *
+     * @param string $referenceCode The reference code.
+     * @param array  $objects       Set of objects (User or DataRecord).
+     *
+     * @return array
+     * @throws InvalidDataException Thrown when the cardinality and the number of elements in source or target is not valid.
+     */
+    private function resolveReferenceArguments(string $objectType, string $id, string $storeCode, string $referenceCode, array $objects)
+    {
+        $reference = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
+        if (empty($reference) === true) {
+            throw new InvalidDataException(sprintf('Unknown referenceid: %s', $referenceCode));
+        }
+
+        $sourceValue = [];
+        $targetValue = [];
+
+        // Categorise the given objects into source and target values depending on their side in relationship.
+        foreach ($objects as $object) {
+            $referenceSide = $this->getReferenceSide($reference, $object->getObjectType(), $object->getStorage()->getCode());
             if ($referenceSide === 'source') {
-                $sourceValue[] = $id;
+                $sourceValue[] = $object->getId();
             } else if ($referenceSide === 'target') {
-                $targetValue[] = $id;
+                $targetValue[] = $object->getId();
+            }
+        }
+
+        $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
+        if ($referenceSide === 'source') {
+            $sourceValue[] = $id;
+        } else if ($referenceSide === 'target') {
+            $targetValue[] = $id;
+        }
+
+        // Validate the number of source or target based on the cardinality setting.
+        $errorMsg = 'Expecting single %s value in %s cardinality, but %s given';
+        if ($reference['cardinality'] === '1:1') {
+            if (count($sourceValue) !== 1) {
+                throw new InvalidDataException(
+                    sprintf($errorMsg, 'source', $reference['cardinality'], implode(',', $sourceValue))
+                );
             }
 
-            $errorMsg = 'Expecting single %s value in %s cardinality, but %s given';
-            if ($reference['cardinality'] === '1:1') {
-                if (count($sourceValue) !== 1) {
-                    throw new \Exception(
-                        sprintf($errorMsg, 'source', $reference['cardinality'], implode(',', $sourceValue))
-                    );
-                }
+            if (count($targetValue) !== 1) {
+                throw new InvalidDataException(
+                    sprintf($errorMsg, 'target', $reference['cardinality'], implode(',', $targetValue))
+                );
+            }
+        } else if ($reference['cardinality'] === '1:M') {
+            if (count($sourceValue) !== 1) {
+                throw new InvalidDataException(
+                    sprintf($errorMsg, 'source', $reference['cardinality'], implode(',', $sourceValue))
+                );
+            }
+        }
 
-                if (count($targetValue) !== 1) {
-                    throw new \Exception(
-                        sprintf($errorMsg, 'target', $reference['cardinality'], implode(',', $targetValue))
-                    );
-                }
-            } else if ($reference['cardinality'] === '1:M') {
-                if (count($sourceValue) !== 1) {
-                    throw new \Exception(
-                        sprintf($errorMsg, 'source', $reference['cardinality'], implode(',', $sourceValue))
-                    );
-                }
+        if ($referenceSide === 'source') {
+            if ($sourceValue[0] !== $id) {
+                throw new InvalidDataException('The target must be the object itself');
             }
 
-            if ($referenceSide === 'source') {
-                if ($sourceValue[0] !== $id) {
-                    throw new \Exception('The target must be the object itself');
-                }
-
-                $valid = true;
-            } else {
-                if ($targetValue[0] !== $id) {
-                    throw new \Exception('The source must be the object itself');
-                }
-
-                if ($reference['cardinality'] === 'M:M' && count($sourceValue) > 1) {
-                    $valid = true;
-                } else {
-                    $valid = true;
-                }
-            }//end if
+            return [
+                $referenceCode,
+                $id,
+                $targetValue,
+                $referenceSide,
+            ];
         } else {
-            $valid = true;
+            if ($targetValue[0] !== $id) {
+                throw new InvalidDataException('The source must be the object itself');
+            }
+
+            if ($reference['cardinality'] === 'M:M' && count($sourceValue) > 1) {
+                return [
+                    $referenceCode,
+                    $sourceValue,
+                    $targetValue,
+                    $referenceSide,
+                ];
+            } else {
+                return [
+                    $referenceCode,
+                    $sourceValue[0],
+                    $targetValue,
+                    $referenceSide,
+                ];
+            }
         }//end if
 
-        return $valid;
-
-    }//end validateReference()
+    }//end resolveReferenceArguments()
 
 
     /**
@@ -599,15 +942,22 @@ class SimulatorHandler
             );
         }
 
-        $parts                   = explode('/', $storageCode);
-        $reference['sourceCode'] = $parts[0].'/'.$parts[1].'/'.$reference['sourceCode'];
-        $reference['targetCode'] = $parts[0].'/'.$parts[1].'/'.$reference['targetCode'];
-        if ($reference['sourceType'] === $storageClass && $reference['sourceCode'] === $storageCode) {
+        $parts = explode('/', $storageCode);
+
+        if ($reference['sourceCode'] !== null) {
+            $reference['sourceCode'] = $parts[0].'/'.$parts[1].'/'.$reference['sourceCode'];
+        }
+
+        if ($reference['targetCode'] !== null) {
+            $reference['targetCode'] = $parts[0].'/'.$parts[1].'/'.$reference['targetCode'];
+        }
+
+        if ($reference['sourceType'] === $storageClass && ($reference['sourceCode'] === $storageCode || $reference['sourceCode'] === null)) {
             return 'source';
-        } else if ($reference['targetType'] === $storageClass && $reference['targetCode'] === $storageCode) {
+        } else if ($reference['targetType'] === $storageClass && ($reference['targetCode'] === $storageCode || $reference['targetCode'] === null)) {
             return 'target';
         } else {
-            throw new \Exception(sprintf('Invalid referenced object: %s'), $objectType);
+            throw new \Exception(sprintf('Invalid referenced object: %s', $objectType));
         }
 
     }//end getReferenceSide()
@@ -784,8 +1134,8 @@ class SimulatorHandler
             return null;
         }
 
-        $property = $this->properties[$objectType][$propid];
 
+        $property = $this->properties[$objectType][$propid];
         if ($objectType === 'project'
             && isset($this->stores[$objectType][$property['propertyid']]) === true
         ) {
@@ -1033,7 +1383,7 @@ class SimulatorHandler
         if ($customType === null) {
             $customType = '\PerspectiveAPI\Objects\Types\DataRecord';
         } else {
-            if (strpos($storeCode, $GLOBALS['project']) === 0) {
+            if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
                 $customType = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.basename($customType);
             } else {
                 $parts      = explode('/', $storeCode);
@@ -1153,7 +1503,6 @@ class SimulatorHandler
     public function createGroup(string $storeCode, string $groupName, string $type, array $groups=[])
     {
         $this->userGroupSequence++;
-
         $recordid = $this->userGroupSequence.'.1';
 
         $this->stores['user'][$storeCode]['groups'][$recordid] = [

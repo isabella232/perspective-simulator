@@ -80,7 +80,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function setReference(string $objectType, string $id, string $storeCode, string $referenceCode, $objects)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $simulatorHandler->addReference($objectType, $storeCode, $id, $referenceCode, $objects);
+        $simulatorHandler->setReference($objectType, $storeCode, $id, $referenceCode, $objects);
 
     }//end setReference()
 
@@ -310,7 +310,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getDataStoreExists(string $name)
     {
-        if (strpos($name, $GLOBALS['project']) === 0) {
+        if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
             $storeDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.basename($name);
         } else {
             $codeParts   = explode('/', $name);
@@ -336,7 +336,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getUserStoreExists(string $name)
     {
-        if (strpos($name, $GLOBALS['project']) === 0) {
+        if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
             $storeDir = Libs\FileSystem::getProjectDir().'/Stores/User/'.basename($name);
         } else {
             $codeParts   = explode('/', $name);
@@ -619,7 +619,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getCustomTypeClassByName(string $objectType, string $type)
     {
-        if (strpos($type, $GLOBALS['project']) === 0) {
+        if (strpos($type, strtolower($GLOBALS['project'])) === 0) {
             return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         } else {
             $requirement = explode('/', str_replace(basename($type), '', $type));

@@ -58,7 +58,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->setHelp('Renames a Property.');
         $this->addOption(
             'proptype',
-            'pt',
+            't',
             InputOption::VALUE_REQUIRED,
             'Type of property eg, data, project or user.',
             null
@@ -97,14 +97,17 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        if (strtolower($propType) === 'data') {
-            $this->type         = 'data';
+        if (strtolower($propType) === 'datarecord') {
+            $this->storeDir     = $projectDir.'/Properties/Data/';
+            $this->type         = 'DataRecord';
             $this->readableType = 'Data Record';
         } else if (strtolower($propType) === 'project') {
-            $this->type         = 'project';
+            $this->storeDir     = $projectDir.'/Properties/Project/';
+            $this->type         = 'Project';
             $this->readableType = 'Project';
         } else if (strtolower($propType) === 'user') {
-            $this->type         = 'user';
+            $this->storeDir     = $projectDir.'/Properties/User/';
+            $this->type         = 'User';
             $this->readableType = 'User';
         }
 
@@ -176,7 +179,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             $this->logChange(
                 'rename',
-                $propType.'Property',
+                $this->type.'Property',
                 [
                     'from' => $code,
                     'to'   => $newCode,

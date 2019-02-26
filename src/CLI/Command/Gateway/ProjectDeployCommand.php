@@ -264,8 +264,8 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $projectSrcDir = Libs\FileSystem::getProjectDir();
         $projectVenDir = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
 
-        if (file_exists(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json') === true) {
-            copy(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json', $tarDir.'/'.$project.'/instructions.json');
+        if (file_exists(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json') === true) {
+            copy(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json', $tarDir.'/'.$project.'/update.json');
         }
 
         exec('cp -r '.$projectSrcDir.' '.$tarDir.'/'.$project.'/src/');
@@ -306,7 +306,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             $status  = null;
             $headers = [
                 'Content-type: application/x-www-form-urlencoded',
-                'Authentication: Basic '.$this->gateway->getGatewayKey(),
+                'X-Sim-Key: '.$this->gateway->getGatewayKey(),
             ];
             $url     = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
             $options = [
@@ -408,7 +408,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $headers        = [
             'Content-range: bytes '.$this->progress.'-'.$lastBytePos.'/'.$this->size,
             'Content-type: application/x-www-form-urlencoded',
-            'Authentication: Basic '.$this->gateway->getGatewayKey(),
+            'X-Sim-Key: '.$this->gateway->getGatewayKey(),
         ];
         $this->progress = ($lastBytePos + 1);
 

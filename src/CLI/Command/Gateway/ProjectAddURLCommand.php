@@ -82,8 +82,8 @@ class ProjectAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
                 'post',
                 '/url/'.$input->getOption('project').'/project',
                 [
-                    'urlType' => $key,
-                    'url'     => $value,
+                    'type' => $key,
+                    'url'  => $value,
                 ]
             );
 

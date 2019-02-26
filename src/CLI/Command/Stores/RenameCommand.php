@@ -173,8 +173,8 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
                 'rename',
                 $this->type,
                 [
-                    'from' => $code,
-                    'to'   => $newCode,
+                    'from' => $oldName,
+                    'to'   => $newName,
                 ]
             );
         } catch (\Exception $e) {

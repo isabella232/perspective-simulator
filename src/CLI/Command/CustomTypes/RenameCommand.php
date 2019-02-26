@@ -95,7 +95,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         if (strtolower($customType) === 'datatype') {
             $this->storeDir     = $projectDir.'/CustomTypes/Data/';
             $this->type         = 'customdatatype';
-            $this->readableType = 'Custom Data Type';
+            $this->readableType = 'Custom Data Record Type';
             $this->namespace    = $GLOBALS['projectNamespace'].'\\CustomTypes\\Data';
             $this->extends      = 'DataRecord';
         }

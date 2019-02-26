@@ -21,7 +21,6 @@ use \PerspectiveSimulator\Libs;
 class GatewayCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
-
     /**
      * Cache of the gateway object.
      *
@@ -60,14 +59,15 @@ class GatewayCommand extends \PerspectiveSimulator\CLI\Command\Command
      * @return array
      * @throws ChannelException Error occurred.
      */
-    public function sendAPIRequest(string $method, string $uri, array $msg=[], array $options=array())
+    public function sendAPIRequest(string $method, string $uri, array $msg=[], array $options=[])
     {
-        $ch = curl_init();
+        $headers = ['X-Sim-Key: '.$this->gateway->getGatewayKey()];
+        $ch      = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->gateway->getGatewayURL().$uri);
         switch (strtolower($method)) {
             case 'post':
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($msg));
             break;
 
             case 'put':
@@ -86,7 +86,7 @@ class GatewayCommand extends \PerspectiveSimulator\CLI\Command\Command
         }//end switch
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authentication: Basic '.$this->gateway->getGatewayKey()]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
@@ -107,13 +107,14 @@ class GatewayCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $curlinfo = curl_getinfo($ch);
-        $result   = array(
-                     'result'   => $success,
-                     'curlInfo' => $curlinfo,
-                    );
+        $result   = [
+            'result'   => $success,
+            'curlInfo' => $curlinfo,
+        ];
         curl_close($ch);
         return $result;
 
-    }//end sendCURLAPIRequest()
+    }//end sendAPIRequest()
+
 
 }//end class
