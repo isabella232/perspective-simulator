@@ -94,7 +94,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function setReference(string $objectType, string $id, string $storeCode, string $referenceCode, $objects)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $simulatorHandler->addReference($objectType, $storeCode, $id, $referenceCode, $objects);
+        $simulatorHandler->setReference($objectType, $storeCode, $id, $referenceCode, $objects);
 
     }//end setReference()
 

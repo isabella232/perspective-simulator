@@ -183,26 +183,34 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $projectDir     = Libs\FileSystem::getProjectDir();
         $sourceStoreDir = $projectDir.'/Stores/';
-        if (strtolower($sourceType) === 'userstore') {
+        if (strtolower($sourceType) === 'user') {
             $sourceStoreDir .= 'User/';
-        } else if (strtolower($sourceType) === 'datastore') {
+            $sourceType      = 'UserStore';
+        } else if (strtolower($sourceType) === 'data') {
             $sourceStoreDir .= 'Data/';
+            $sourceType      = 'DataStore';
         } else {
             $sourceStoreDir = $this->storeDir;
+            $sourceType     = 'DataStore';
         }
 
-        if (is_dir($sourceStoreDir.$sourceCode) === false) {
-            throw new \Exception(sprintf('%s doesn\'t exist.', $sourceType));
+        $targetType = 'DataStore';
+        if (strtolower($type) === 'user') {
+            $targetType = 'UserStore';
+        }
+
+        if (is_dir($sourceStoreDir.$sourceStore) === false) {
+            throw new \Exception(sprintf('%s doesn\'t exist.', $sourceStore));
         }
 
         try {
             $this->validateReferenceName($referenceName);
             $referneceDetails = [
                 'sourceType'  => $sourceType,
-                'sourceCode'  => $sourceCode,
+                'sourceCode'  => $sourceStore,
                 'targetType'  => $targetType,
                 'targetCode'  => $targetCode,
-                'cardinality' => $cardinatlity,
+                'cardinality' => $cardinality,
             ];
 
             $path = $this->storeDir.$targetCode.'/'.$referenceName.'.json';
