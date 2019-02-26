@@ -34,8 +34,7 @@ class Command extends \Symfony\Component\Console\Command\Command
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         ini_set('error_log', dirname(__DIR__, 6).'/simulator/error_log');
-        $this->style            = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
-        $this->simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+        $this->style = new \Symfony\Component\Console\Style\SymfonyStyle($input, $output);
 
     }//end initialize()
 
@@ -70,6 +69,7 @@ class Command extends \Symfony\Component\Console\Command\Command
                     $project = str_replace('/', '\\', $proj);
                     break;
                 }
+
                 $projects[] = str_replace('/', '\\', $proj);
             }//end foreach
 
@@ -84,15 +84,15 @@ class Command extends \Symfony\Component\Console\Command\Command
                 $project = $helper->ask($input, $output, $question);
                 $output->writeln('The action will be performed on <info>'.$project.'</info>');
             }
-        }
+        }//end if
 
         $project = str_replace('/', '\\', $project);
         \PerspectiveSimulator\Bootstrap::load($project);
         $input->setOption('project', str_replace('\\', '/', $project));
-
+        $this->simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
         return true;
 
-    }//end inProject();
+    }//end inProject()
 
 
     /**
@@ -209,7 +209,7 @@ class Command extends \Symfony\Component\Console\Command\Command
                         } else {
                             $changes[$project][$type]['Stores']['User'][] = $path;
                         }
-                    }
+                    }//end if
                 } else {
                     if (isset($changes[$project][$type]['other']) === false) {
                         $changes[$project][$type]['other'] = [];
@@ -280,18 +280,33 @@ class Command extends \Symfony\Component\Console\Command\Command
     final public function logChange(string $action, string $type, array $data)
     {
         $changeLog = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $GLOBALS['project']).'-update.json';
-        $tasks     = ['tasks' => []];
+        $tasks     = ['current' => []];
+
         if (file_exists($changeLog) === true) {
             $tasks = Libs\Util::jsonDecode(file_get_contents($changeLog));
         }
 
-        $tasks['tasks'][] = [
-            'action' => $action,
-            'type'   => $type,
-            'data'   => $data,
-        ];
+        if (isset($tasks['current'][$action]) === false) {
+            $tasks['current'][$action] = [];
+        }
 
-        file_put_contents($changeLog, Libs\Util::jsonEncode($tasks));
+        if (isset($tasks['current'][$action][$type]) === false) {
+            $tasks['current'][$action][$type] = [];
+        }
+
+        $newRow = true;
+        foreach ($tasks['current'][$action][$type] as $key => $value) {
+            if ($value === $data['from']) {
+                $newRow = false;
+                $tasks['current'][$action][$type][$key] = $data['to'];
+            }
+        }
+
+        if ($newRow === true) {
+            $tasks['current'][$action][$type][$data['from']] = $data['to'];
+        }
+
+        file_put_contents($changeLog, Libs\Util::jsonEncode($tasks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
     }//end logChange()
 

@@ -184,7 +184,6 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
                 'App',
                 'CDN',
                 'CustomTypes',
-                'Properties',
                 'Stores',
                 'Queues',
             ];

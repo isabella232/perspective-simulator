@@ -264,8 +264,39 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $projectSrcDir = Libs\FileSystem::getProjectDir();
         $projectVenDir = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
 
-        if (file_exists(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json') === true) {
-            copy(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json', $tarDir.'/'.$project.'/update.json');
+        $updateInstructions = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json';
+        if (file_exists($updateInstructions) === true) {
+            $updates = Libs\Util::jsonDecode(file_get_contents($updateInstructions));
+            if (array_key_exists($version, $updates) === true) {
+                $updates[$version] = array_merge($updates[$version], $updates['current']);
+                unset($updates['current']);
+            } else {
+                $updates[$version] = $updates['current'];
+                unset($updates['current']);
+            }
+
+            file_put_contents(
+                $tarDir.'/'.$project.'/update.json',
+                Libs\Util::jsonEncode($updates, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+
+            $updates['current'] = [];
+            uksort(
+                $updates,
+                function ($a, $b) {
+                    if ($a === 'current' || $b === 'current') {
+                        return true;
+                    } else if (version_compare($a, $b) <= 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            );
+            file_put_contents(
+                $updateInstructions,
+                Libs\Util::jsonEncode($updates, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
         }
 
         exec('cp -r '.$projectSrcDir.' '.$tarDir.'/'.$project.'/src/');

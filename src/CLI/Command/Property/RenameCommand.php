@@ -129,7 +129,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
             throw new \Exception($eMsg);
         }
 
-        $valid = Libs\Util::isValidStringid($code);
+        $valid = Libs\Util::isValidStringid($code, true);
         if ($valid === false) {
             $eMsg = sprintf('Invalid %s property code provided', $this->readableType);
             throw new \Exception($eMsg);
@@ -170,12 +170,21 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             $this->validatedPropertyCode($propid);
 
-            $properties = $this->simulatorHandler->getProperties($this->type);
+            $propType = 'data';
+            if ($this->type === 'User') {
+                $propType = 'user';
+            } else if ($this->type === 'Project') {
+                $propType = 'project';
+            }
+
+            $properties = $this->simulatorHandler->getProperties($propType);
             if (isset($properties[$oldPropid]) === true) {
                 // Sim has saved data and the old property has values set.
                 $properties[$propid] = $properties[$oldPropid];
                 unset($properties[$oldPropid]);
             }
+
+            $this->simulatorHandler->setProperties($properties, $propType);
 
             $this->logChange(
                 'rename',
