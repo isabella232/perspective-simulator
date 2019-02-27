@@ -198,52 +198,78 @@ class SimulatorHandler
                 foreach ($requirements as $requirement => $version) {
                     $project    = str_replace('/', '\\', $requirement);
                     $projectDir = $path.'/vendor/'.str_replace('\\', '/', $requirement).'/src';
-                    $prefix     = Bootstrap::generatePrefix($project);
 
-                    $this->loadStores($prefix, $projectDir);
-
-                    $namespace = str_replace('-', '/', $requirement);
-                    $this->propidSequence++;
-                    $propertyid = $this->propidSequence.'.1';
-                    $this->properties['user'][$namespace.'/__first-name__'] = [
-                        'propertyid' => $propertyid,
-                        'type'       => 'text',
-                    ];
-
-                    $this->propidSequence++;
-                    $propertyid = $this->propidSequence.'.1';
-                    $this->properties['user'][$namespace.'/__last-name__'] = [
-                        'propertyid' => $propertyid,
-                        'type'       => 'text',
-                    ];
-
-                    $perspectiveAPIClassAliases = [
-                        'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-                        'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
-                        'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
-                        'PerspectiveSimulator\View\ViewBase'      => $project.'\Web\Views\View',
-                    ];
-
-                    if (class_exists($project.'\CustomTypes\Data\DataRecord') === false) {
-                        foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                            class_alias($orignalClass, $aliasClass);
+                    if (is_dir($projectDir) === true) {
+                        // Check its a Perspective project.
+                        if (is_dir($projectDir.'/API') === false
+                            || is_dir($projectDir.'/App') === false
+                            || is_dir($projectDir.'/CDN') === false
+                            || is_dir($projectDir.'/CustomTypes') === false
+                        ) {
+                            continue;
                         }
-                    }
 
-                    $perspectiveAPIClassAliases = [
-                        'PerspectiveAPI\Authentication'                => 'Authentication',
-                        'PerspectiveAPI\Email'                         => 'Email',
-                        'PerspectiveAPI\Request'                       => 'Request',
-                        'PerspectiveAPI\Queue'                         => 'Queue',
-                        'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
-                        'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
-                    ];
-
-                    if (class_exists($project.'\Framework\Authentication') === false) {
-                        foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                            eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
+                        $composerFile = $path.'/vendor/'.$requirement.'/composer.json';
+                        if (file_exists($composerFile) === true) {
+                            $dependencyComposer = Libs\Util::jsonDecode(file_get_contents($composerFile));
+                            foreach ($dependencyComposer['autoload']['psr-4'] as $namespace => $dir) {
+                                if (strpos($dir, 'src') === 0) {
+                                    $GLOBALS['projectDependencies'][$requirement] = $namespace;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // Missing composer file so lets just attempt to use the project with the requirements name.
+                            $GLOBALS['projectDependencies'][$requirement] = $project;
                         }
-                    }
+
+                        $prefix = Bootstrap::generatePrefix($project);
+
+                        $this->loadStores($prefix, $projectDir);
+
+                        $namespace = str_replace('-', '/', $requirement);
+                        $this->propidSequence++;
+                        $propertyid = $this->propidSequence.'.1';
+                        $this->properties['user'][$namespace.'/__first-name__'] = [
+                            'propertyid' => $propertyid,
+                            'type'       => 'text',
+                        ];
+
+                        $this->propidSequence++;
+                        $propertyid = $this->propidSequence.'.1';
+                        $this->properties['user'][$namespace.'/__last-name__'] = [
+                            'propertyid' => $propertyid,
+                            'type'       => 'text',
+                        ];
+
+                        $perspectiveAPIClassAliases = [
+                            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
+                            'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
+                            'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
+                            'PerspectiveSimulator\View\ViewBase'      => $project.'\Web\Views\View',
+                        ];
+
+                        if (class_exists($project.'\CustomTypes\Data\DataRecord') === false) {
+                            foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
+                                class_alias($orignalClass, $aliasClass);
+                            }
+                        }
+
+                        $perspectiveAPIClassAliases = [
+                            'PerspectiveAPI\Authentication'                => 'Authentication',
+                            'PerspectiveAPI\Email'                         => 'Email',
+                            'PerspectiveAPI\Request'                       => 'Request',
+                            'PerspectiveAPI\Queue'                         => 'Queue',
+                            'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
+                            'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
+                        ];
+
+                        if (class_exists($project.'\Framework\Authentication') === false) {
+                            foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
+                                eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
+                            }
+                        }
+                    }//end if
                 }//end foreach
             }//end if
         }//end if
@@ -302,58 +328,63 @@ class SimulatorHandler
      */
     private function loadStores(string $prefix, string $projectDir)
     {
-        $namespace = str_replace('-', '/', $prefix);
-        // Add data stores.
-        $dirs = glob($projectDir.'/Stores/Data/*', GLOB_ONLYDIR);
-        foreach ($dirs as $dir) {
-            $storeName = $namespace.'/'.strtolower(basename($dir));
-            if (isset($this->stores['data']) === false) {
-                $this->stores['data'] = [];
+        if (file_exists($projectDir.'/stores.json') === false) {
+            // No stores
+            return;
+        }
+
+        $namespace  = str_replace('-', '/', $prefix);
+        $storesFile = Libs\Util::jsonDecode(file_get_contents($projectDir.'/stores.json'));
+        $stores     = $storesFile['stores'];
+        $references = $storesFile['references'];
+        // Add stores.
+        foreach ($stores as $storeType => $stores) {
+            if (isset($this->stores[$storeType]) === false) {
+                $this->stores[$storeType] = [];
             }
 
-            if (isset($this->stores['data'][$storeName]) === false) {
-                $this->stores['data'][$storeName] = [
-                    'records'   => [],
-                    'uniqueMap' => [],
-                ];
-            }
-
-            // Loads the stores references.
-            $refs = glob($dir.'/*.json');
-            foreach ($refs as $ref) {
-                $refContent    = Libs\Util::jsonDecode(file_get_contents($ref));
-                $referenceCode = $namespace.'/'.str_replace('.json', '', basename($ref));
-                if (isset($this->references[$referenceCode]) === false) {
-                    $this->references[$referenceCode] = $refContent;
-                }
-            }
+            foreach ($stores as $store) {
+                $storeName = $namespace.'/'.strtolower($store);
+                if ($storeType === 'user') {
+                    if (isset($this->stores[$storeType][$storeName]) === false) {
+                        $this->stores[$storeType][$storeName] = [
+                            'records'     => [],
+                            'uniqueMap'   => [],
+                            'usernameMap' => [],
+                            'groups'      => [],
+                        ];
+                    }
+                } else {
+                    if (isset($this->stores[$storeType][$storeName]) === false) {
+                        $this->stores[$storeType][$storeName] = [
+                            'records'   => [],
+                            'uniqueMap' => [],
+                        ];
+                    }
+                }//end if
+            }//end foreach
         }//end foreach
 
-        // Add user stores.
-        $dirs = glob($projectDir.'/Stores/User/*', GLOB_ONLYDIR);
-        foreach ($dirs as $dir) {
-            $storeName = $namespace.'/'.strtolower(basename($dir));
-            if (isset($this->stores['user']) === false) {
-                $this->stores['user'] = [];
-            }
+        // Add references.
+        foreach ($references as $referenceCode => $reference) {
+            if (isset($this->references[$referenceCode]) === false) {
+                $this->references[$referenceCode] = $reference;
 
-            if (isset($this->stores['user'][$storeName]) === false) {
-                $this->stores['user'][$storeName] = [
-                    'records'     => [],
-                    'uniqueMap'   => [],
-                    'usernameMap' => [],
-                    'groups'      => [],
-                ];
-            }
-
-            // Loads the stores references.
-            $refs = glob($dir.'/*.json');
-            foreach ($refs as $ref) {
-                $refContent    = Libs\Util::jsonDecode(file_get_contents($ref));
-                $referenceCode = $namespace.'/'.str_replace('.json', '', basename($ref));
-                if (isset($this->references[$referenceCode]) === false) {
-                    $this->references[$referenceCode] = $refContent;
+                $cardinality = '';
+                if ($reference['source']['multiple'] === true) {
+                    $cardinality .= '1:';
+                } else {
+                    $cardinality .= 'M:';
                 }
+
+                if ($reference['target']['multiple'] === true) {
+                    $cardinality .= '1';
+                } else {
+                    $cardinality .= 'M';
+                }
+
+                $this->references[$referenceCode]['cardinality'] = $cardinality;
+
             }
         }//end foreach
 
@@ -378,7 +409,7 @@ class SimulatorHandler
                 'referenceValues'    => $this->referenceValues,
             ];
 
-            file_put_contents($this->saveFile, Libs\Util::jsonEncode($saveData, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            file_put_contents($this->saveFile, Libs\Util::jsonEncode($saveData, (JSON_FORCE_OBJECT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
         }
 
     }//end save()
@@ -399,11 +430,11 @@ class SimulatorHandler
         $reference     = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
         $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
         if ($referenceSide === 'source') {
-            $valueType  = $reference['targetType'];
-            $results    = $this->getReferenceValueBySource($reference, $referenceCode, $id);
+            $valueType = $reference['targetType'];
+            $results   = $this->getReferenceValueBySource($reference, $referenceCode, $id);
         } else if ($referenceSide === 'target') {
-            $valueType  = $reference['sourceType'];
-            $results    = $this->getReferenceValueByTarget($reference, $referenceCode, $id);
+            $valueType = $reference['sourceType'];
+            $results   = $this->getReferenceValueByTarget($reference, $referenceCode, $id);
         }
 
         if ($results === null) {
@@ -417,9 +448,9 @@ class SimulatorHandler
         }
 
         foreach ($results as $result) {
-            if ($valueType === 'UserStore') {
+            if ($valueType === 'user') {
                 list($userDetails, $userStore) = $this->getUserById($result);
-                $references[] = [
+                $references[]                  = [
                     'id'         => $result,
                     'objectType' => 'user',
                     'storeCode'  => $userStore,
@@ -428,16 +459,16 @@ class SimulatorHandler
                     'firstName'  => $userDetails['firstName'],
                     'lastName'   => $userDetails['lastName'],
                 ];
-            } else if ($valueType === 'DataStore') {
+            } else if ($valueType === 'data') {
                 list($dataRecord, $dataStore) = $this->getDataRecordById($result);
-                $references[]  = [
+                $references[]                 = [
                     'id'         => $result,
                     'objectType' => 'data',
                     'storeCode'  => $dataStore,
                     'typeClass'  => $dataRecord['typeClass'],
                 ];
             }
-        }
+        }//end foreach
 
         if ($multiple === false) {
             $references = $references[0];
@@ -598,7 +629,6 @@ class SimulatorHandler
                             $reference['cardinality']
                         )
                     );
-
                 }
             }
 
@@ -641,7 +671,7 @@ class SimulatorHandler
                     $this->referenceValues[$referenceCode][$sourceValue][] = $tVal;
                 }
             }
-        }//end foreach
+        }//end if
 
     }//end addReference()
 
@@ -751,7 +781,6 @@ class SimulatorHandler
                         unset($this->referenceValues[$referenceCode][$existingTargetValue]);
                     }
                 }
-
             }
 
             foreach ($sourceValue as $sVal) {
@@ -777,7 +806,6 @@ class SimulatorHandler
      */
     public function deleteReference(string $objectType, string $storeCode, string $id, string $referenceCode, $objects)
     {
-
         if (is_array($objects) === false) {
             $objects = [$objects];
         }
@@ -817,16 +845,22 @@ class SimulatorHandler
     private function getReferenceDefinition(string $objectType, string $storeCode, string $referenceid)
     {
         $reference = [];
+        $referenceid = basename($referenceid);
         if (isset($this->references[$referenceid]) === true) {
             $reference = $this->references[$referenceid];
             if ($reference['cardinality'] === 'M:1') {
                 $reference['cardinality'] = '1:M';
-                $sourceTypeArg            = $reference['sourceType'];
-                $sourceCodeArg            = $reference['sourceCode'];
-                $reference['sourceType']  = $reference['targetType'];
-                $reference['sourceCode']  = $reference['targetCode'];
+                $sourceTypeArg            = $reference['source']['type'];
+                $sourceCodeArg            = $reference['source']['code'];
+                $reference['sourceType']  = $reference['target']['type'];
+                $reference['sourceCode']  = $reference['target']['code'];
                 $reference['targetType']  = $sourceTypeArg;
                 $reference['targetCode']  = $sourceCodeArg;
+            } else {
+                $reference['sourceType'] = $reference['source']['type'];
+                $reference['sourceCode'] = $reference['source']['code'];
+                $reference['targetType'] = $reference['target']['type'];
+                $reference['targetCode'] = $reference['target']['code'];
             }
         }
 
@@ -945,9 +979,9 @@ class SimulatorHandler
     private function getReferenceSide(array $reference, string $objectType, string $storageCode)
     {
         if (ucfirst($objectType) === 'User') {
-            $storageClass = 'UserStore';
+            $storageClass = 'user';
         } else if (ucfirst($objectType) === 'Data') {
-            $storageClass = 'DataStore';
+            $storageClass = 'data';
         } else {
             throw new \Exception(
                 sprintf('Invalid referenced object: invalid object type: %s'),
@@ -1146,7 +1180,6 @@ class SimulatorHandler
         if (isset($this->properties[$objectType][$propid]) === false) {
             return null;
         }
-
 
         $property = $this->properties[$objectType][$propid];
         if ($objectType === 'project'
@@ -1399,8 +1432,9 @@ class SimulatorHandler
             if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
                 $customType = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.basename($customType);
             } else {
-                $parts      = explode('/', $storeCode);
-                $customType = '\\'.ucfirst($parts[0]).'\\'.ucfirst($parts[1]).'\CustomTypes\Data\\'.basename($customType);
+                $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
+                $requirement = $GLOBALS['projectDependencies'][$packageName];
+                $customType  = '\\'.$requirement.'\CustomTypes\Data\\'.basename($customType);
             }
         }
 
@@ -1464,8 +1498,8 @@ class SimulatorHandler
             return null;
         }
 
-        $property                = $this->properties['data'][$propid];
-        $id = ($this->stores['data'][$storeCode]['uniqueMap'][$property['propertyid']][$value] ?? null);
+        $property = $this->properties['data'][$propid];
+        $id       = ($this->stores['data'][$storeCode]['uniqueMap'][$property['propertyid']][$value] ?? null);
         if ($id === null) {
             return null;
         }

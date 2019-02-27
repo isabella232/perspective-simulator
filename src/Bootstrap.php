@@ -65,15 +65,30 @@ class Bootstrap
             }
         );
 
-        $projectParts                = explode('\\', $project);
-        $GLOBALS['projectNamespace'] = ucfirst($projectParts[0]).'\\'.ucfirst($projectParts[1]);
-        $GLOBALS['project']          = str_replace('\\', '/', $project);
-        $GLOBALS['projectPath']      = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $project));
-        $projectDir                  = Libs\FileSystem::getProjectDir();
+        $GLOBALS['project']     = str_replace('\\', '/', $project);
+        $GLOBALS['projectPath'] = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $project));
+        $projectDir             = Libs\FileSystem::getProjectDir();
+
+        $path     = substr($projectDir, 0, -4);
+        $composer = $path.'/composer.json';
+        if (file_exists($composer) === true) {
+            $composerFile = Libs\Util::jsonDecode(file_get_contents($composer));
+
+            foreach ($composerFile['autoload']['psr-4'] as $namespace => $dir) {
+                if (strpos($dir, 'src') === 0) {
+                    $GLOBALS['projectNamespace'] = $namespace;
+                    break;
+                }
+            }
+        } else {
+            // No composer file so we will attempt to use the project that was passed to load.
+            $GLOBALS['projectNamespace'] = $project;
+        }
+
+        $GLOBALS['projectDependencies'] = [];
 
         // Register an autoloader for the project.
-        $loader = include dirname(__DIR__, 3).'/autoload.php';
-        $loader->addPsr4($project.'\\', $projectDir);
+        include dirname(__DIR__, 3).'/autoload.php';
 
         // First, set the connector alias.
         if (class_exists('\PerspectiveAPI\Connector') === false) {
