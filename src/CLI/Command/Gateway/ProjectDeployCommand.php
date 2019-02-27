@@ -265,7 +265,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $projectVenDir   = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
         $projectComposer = str_replace('src', 'composer', Libs\FileSystem::getProjectDir());
 
-        $updateInstructions = Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-update.json';
+        $updateInstructions = str_replace('src', '', Libs\FileSystem::getProjectDir()).'update.json';
         if (file_exists($updateInstructions) === true) {
             $updates = Libs\Util::jsonDecode(file_get_contents($updateInstructions));
             if (array_key_exists($version, $updates) === true) {
