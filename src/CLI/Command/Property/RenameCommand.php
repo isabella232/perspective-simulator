@@ -97,10 +97,10 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        if (strtolower($propType) === 'datarecord') {
+        if (strtolower($propType) === 'data') {
             $this->storeDir     = $projectDir.'/Properties/Data/';
             $this->type         = 'DataRecord';
-            $this->readableType = 'Data Record';
+            $this->readableType = 'Data';
         } else if (strtolower($propType) === 'project') {
             $this->storeDir     = $projectDir.'/Properties/Project/';
             $this->type         = 'Project';
@@ -168,7 +168,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
                 throw new \Exception('Property types must match');
             }
 
-            $this->validatedPropertyCode($propid);
+            $this->validatedPropertyCode(basename($propid));
 
             $propType = 'data';
             if ($this->type === 'User') {
