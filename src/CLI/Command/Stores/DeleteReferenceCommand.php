@@ -54,17 +54,8 @@ class DeleteReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function configure()
     {
-        $this->setDescription('Deletes a refernece between stores.');
-        $this->setHelp('Deletes a refernece between stores.');
-        $this->addOption(
-            'type',
-            't',
-            InputOption::VALUE_REQUIRED,
-            'The type of store, eg, data or user.',
-            null
-        );
-
-        $this->addArgument('storeName', InputArgument::REQUIRED, 'The name of the target store.');
+        $this->setDescription('Deletes a refernece.');
+        $this->setHelp('Deletes a refernece.');
         $this->addArgument('referenceName', InputArgument::REQUIRED, 'The name of the reference.');
 
     }//end configure()
@@ -82,68 +73,36 @@ class DeleteReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->inProject($input, $output);
 
-        $helper    = $this->getHelper('question');
-        $storeType = $input->getOption('type');
-        if (empty($input->getOption('type')) === true) {
-            $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
-                'Please select which store type you are wanting to create.',
-                ['data', 'user'],
-                0
-            );
-
-            $storeType = $helper->ask($input, $output, $question);
-            $input->setOption('type', $storeType);
-            $output->writeln('You have just selected: '.$storeType);
+        $helper  = $this->getHelper('question');
+        $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
+            'This will delete the reference "'.$input->getArgument('referenceName').'" (y/N):',
+            false
+        );
+        if ($helper->ask($input, $output, $confirm) === false) {
+            return;
         }
 
         $projectDir = Libs\FileSystem::getProjectDir();
-        if (strtolower($storeType) === 'data') {
-            $this->storeDir     = $projectDir.'/Stores/Data/';
-            $this->readableType = 'Data Store';
-            $this->type         = 'DataStore';
-        } else if (strtolower($storeType) === 'user') {
-            $this->storeDir     = $projectDir.'/Stores/User/';
-            $this->readableType = 'User Store';
-            $this->type         = 'UserStore';
+        $stores     = $projectDir.'/stores.json';
+        if (file_exists($stores) === false) {
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    [
+                        'stores' => [
+                            'data' => [],
+                            'user' => [],
+                        ],
+                        'references' => [],
+                    ],
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
         }
 
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
-        }
+        $this->stores = Libs\Util::jsonDecode(file_get_contents($stores));
 
     }//end interact()
-
-
-    /**
-     * Validates the name of the reference.
-     *
-     * @param string $name Name of the data store.
-     *
-     * @return string
-     * @throws \Exception When name is invalid.
-     */
-    private function validateReferenceName(string $name)
-    {
-        if ($name === null) {
-            throw new \Exception('Reference name is required.');
-        }
-
-        $valid = Libs\Util::isValidStringid($name);
-        if ($valid === false) {
-            throw new \Exception('Invalid reference name provided');
-        }
-
-        $projectDir = Libs\FileSystem::getProjectDir();
-        $reference  = $this->storeDir.$this->args['targetCode'].'/'.$this->args['referneceName'].'.json';
-        if (file_exists($reference) === true) {
-            throw new \Exception('Reference name is already in use');
-        }
-
-        return $name;
-
-    }//end validateReferenceName()
-
-
     /**
      * Executes the create new project command.
      *
@@ -154,22 +113,19 @@ class DeleteReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $type          = $input->getOption('type');
-        $targetCode    = $input->getArgument('storeName');
         $referenceName = $input->getArgument('referenceName');
 
         try {
-            $ref = $this->storeDir.$targetCode.'/'.$referneceName.'.json';
-            if (file_exists($ref) === false) {
-                throw new \Exception(
-                    sprintf(
-                        '%s doesn\'t exist.',
-                        $referneceName
-                    )
-                );
+            if (in_array($referenceName, array_keys($this->stores['references'])) === false) {
+                throw new \Exception(sprintf('%s doesn\'t exist.', $referneceName));
             }
+            unset($this->stores['references'][$referenceName]);
 
-            Libs\Git::delete($ref);
+            $projectDir = Libs\FileSystem::getProjectDir();
+            $stores     = $projectDir.'/stores.json';
+            file_put_contents($stores, Libs\Util::jsonEncode($this->stores, (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)));
+
+            $this->style->success(sprintf('Refernece %1$s successfully deleted.', $referenceName));
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

@@ -82,7 +82,7 @@ class Bootstrap
             }
         } else {
             // No composer file so we will attempt to use the project that was passed to load.
-            $GLOBALS['projectNamespace'] = $project;
+            $GLOBALS['projectNamespace'] = $project.'\\';
         }
 
         $GLOBALS['projectDependencies'] = [];
@@ -107,26 +107,20 @@ class Bootstrap
 
         // Always alias theses classes if they haven't been already as we might be loading another project.
         $perspectiveAPIClassAliasesProject = [
-            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-            'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
-            'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
+            'PerspectiveAPI\Objects\Types\DataRecord' => $GLOBALS['projectNamespace'].'CustomTypes\Data\DataRecord',
+            'PerspectiveAPI\Objects\Types\User'       => $GLOBALS['projectNamespace'].'CustomTypes\User\User',
+            'PerspectiveAPI\Objects\Types\Group'      => $GLOBALS['projectNamespace'].'CustomTypes\User\Group',
         ];
 
-        if (class_exists($project.'\CustomTypes\User\Group') === false) {
+        if (class_exists($GLOBALS['projectNamespace'].'CustomTypes\User\Group') === false) {
             foreach ($perspectiveAPIClassAliasesProject as $orignalClass => $aliasClass) {
                 class_alias($orignalClass, $aliasClass);
             }
         }
 
-        if (class_exists($project.'\Web\Views\View') === false) {
-            class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
-        }
-
-        if (class_exists($project.'\Framework\Authentication') === false) {
-            class_alias('PerspectiveSimulator\View\ViewBase', '\View');
-
+        if (class_exists($GLOBALS['projectNamespace'].'Framework\Authentication') === false) {
             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
+                eval('namespace '.$GLOBALS['projectNamespace'].'Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
             }
         }
 

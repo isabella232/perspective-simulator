@@ -42,7 +42,6 @@ class ProjectAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
     {
         $this->setDescription('Creates a new project in Gateway.');
         $this->setHelp('Creates a new project in Gateway.');
-        $this->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the project');
 
     }//end configure()
 
@@ -63,10 +62,7 @@ class ProjectAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
         $response = $this->sendAPIRequest(
             'post',
             '/project',
-            [
-                'package'   => strtolower(str_replace('\\', '/', $namespace)),
-                'namespace' => $namespace,
-            ]
+            ['package' => strtolower(str_replace('\\', '/', $namespace))]
         );
 
         if ($response['curlInfo']['http_code'] === 201) {
@@ -75,15 +71,6 @@ class ProjectAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
         } else {
             $this->style->error($response['result']);
         }
-
-        $projectCommand = $this->getApplication()->find('project:add');
-        $projectArgs    = [
-            'command'   => 'project:add',
-            'namespace' => $namespace,
-        ];
-
-        $projectInput = new \Symfony\Component\Console\Input\ArrayInput($projectArgs);
-        $returnCode   = $projectCommand->run($projectInput, $output);
 
     }//end execute()
 

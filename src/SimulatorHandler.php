@@ -220,7 +220,7 @@ class SimulatorHandler
                             }
                         } else {
                             // Missing composer file so lets just attempt to use the project with the requirements name.
-                            $GLOBALS['projectDependencies'][$requirement] = $project;
+                            $GLOBALS['projectDependencies'][$requirement] = $project.'\\';
                         }
 
                         $prefix = Bootstrap::generatePrefix($project);
@@ -243,13 +243,12 @@ class SimulatorHandler
                         ];
 
                         $perspectiveAPIClassAliases = [
-                            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-                            'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
-                            'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
-                            'PerspectiveSimulator\View\ViewBase'      => $project.'\Web\Views\View',
+                            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'CustomTypes\Data\DataRecord',
+                            'PerspectiveAPI\Objects\Types\User'       => $project.'CustomTypes\User\User',
+                            'PerspectiveAPI\Objects\Types\Group'      => $project.'CustomTypes\User\Group',
                         ];
 
-                        if (class_exists($project.'\CustomTypes\Data\DataRecord') === false) {
+                        if (class_exists($project.'CustomTypes\Data\DataRecord') === false) {
                             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
                                 class_alias($orignalClass, $aliasClass);
                             }
@@ -266,7 +265,7 @@ class SimulatorHandler
 
                         if (class_exists($project.'\Framework\Authentication') === false) {
                             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                                eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
+                                eval('namespace '.$project.'Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
                             }
                         }
                     }//end if
@@ -335,8 +334,8 @@ class SimulatorHandler
 
         $namespace  = str_replace('-', '/', $prefix);
         $storesFile = Libs\Util::jsonDecode(file_get_contents($projectDir.'/stores.json'));
-        $stores     = $storesFile['stores'];
-        $references = $storesFile['references'];
+        $stores     = ($storesFile['stores'] ?? []);
+        $references = ($storesFile['references'] ?? []);
         // Add stores.
         foreach ($stores as $storeType => $stores) {
             if (isset($this->stores[$storeType]) === false) {

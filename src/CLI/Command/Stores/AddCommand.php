@@ -96,18 +96,31 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $projectDir = Libs\FileSystem::getProjectDir();
         if (strtolower($storeType) === 'data') {
-            $this->storeDir     = $projectDir.'/Stores/Data/';
             $this->readableType = 'Data Store';
-            $this->type         = 'DataStore';
+            $this->type         = 'data';
         } else if (strtolower($storeType) === 'user') {
-            $this->storeDir     = $projectDir.'/Stores/User/';
             $this->readableType = 'User Store';
-            $this->type         = 'UserStore';
+            $this->type         = 'user';
         }
 
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
+        $stores = $projectDir.'/stores.json';
+        if (file_exists($stores) === false) {
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    [
+                        'stores' => [
+                            'data' => [],
+                            'user' => [],
+                        ],
+                        'references' => [],
+                    ],
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
         }
+
+        $this->stores = Libs\Util::jsonDecode(file_get_contents($stores));
 
     }//end interact()
 
@@ -117,7 +130,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @param string $name Name of the data store.
      *
-     * @return string
+     * @return boolean
      * @throws \Exception When name is invalid.
      */
     private function validateStoreName(string $name)
@@ -136,15 +149,12 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         $projectDir = Libs\FileSystem::getProjectDir();
         $dirs       = glob($this->storeDir.'*', GLOB_ONLYDIR);
 
-        foreach ($dirs as $dir) {
-            $storeName = strtolower(basename($dir));
-            if (strtolower($name) === $storeName) {
-                $eMsg = sprintf('%s name is already in use', $this->readableType);
-                throw new \Exception($eMsg);
-            }
+        if (in_array($name, $this->stores['stores'][$this->type]) === true) {
+            $eMsg = sprintf('%s name is already in use', $this->readableType);
+            throw new \Exception($eMsg);
         }
 
-        return $name;
+        return true;
 
     }//end validateStoreName()
 
@@ -161,11 +171,21 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         try {
             $storeName = $input->getArgument('name');
-
             $this->validateStoreName($storeName);
-            $dataStoreDir = $this->storeDir.$storeName;
-            Libs\FileSystem::mkdir($dataStoreDir, true);
-            touch($dataStoreDir.'/.gitkeep');
+
+            $this->stores['stores'][$this->type][] = strtolower($storeName);
+
+            $projectDir = Libs\FileSystem::getProjectDir();
+            $stores     = $projectDir.'/stores.json';
+            file_put_contents($stores, Libs\Util::jsonEncode($this->stores, (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)));
+
+            $this->style->success(
+                sprintf(
+                    '%1$s %2$s successfully created.',
+                    $this->readableType,
+                    $storeName
+                )
+            );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try
