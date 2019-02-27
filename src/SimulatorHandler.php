@@ -243,12 +243,12 @@ class SimulatorHandler
                         ];
 
                         $perspectiveAPIClassAliases = [
-                            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'CustomTypes\Data\DataRecord',
-                            'PerspectiveAPI\Objects\Types\User'       => $project.'CustomTypes\User\User',
-                            'PerspectiveAPI\Objects\Types\Group'      => $project.'CustomTypes\User\Group',
+                            'PerspectiveAPI\Objects\Types\DataRecord' => $GLOBALS['projectDependencies'][$requirement].'CustomTypes\Data\DataRecord',
+                            'PerspectiveAPI\Objects\Types\User'       => $GLOBALS['projectDependencies'][$requirement].'CustomTypes\User\User',
+                            'PerspectiveAPI\Objects\Types\Group'      => $GLOBALS['projectDependencies'][$requirement].'CustomTypes\User\Group',
                         ];
 
-                        if (class_exists($project.'CustomTypes\Data\DataRecord') === false) {
+                        if (class_exists($GLOBALS['projectDependencies'][$requirement].'CustomTypes\Data\DataRecord') === false) {
                             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
                                 class_alias($orignalClass, $aliasClass);
                             }
@@ -263,9 +263,9 @@ class SimulatorHandler
                             'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
                         ];
 
-                        if (class_exists($project.'\Framework\Authentication') === false) {
+                        if (class_exists($GLOBALS['projectDependencies'][$requirement].'Framework\Authentication') === false) {
                             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                                eval('namespace '.$project.'Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
+                                eval('namespace '.$GLOBALS['projectDependencies'][$requirement].'Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
                             }
                         }
                     }//end if
