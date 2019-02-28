@@ -109,7 +109,29 @@ __ROUTES__
 
 
     /**
-     * Gets the file path for the API function.
+     * Gets the filepath for the API function.
+     *
+     * @param string $project The namespace of the project we want the action from.
+     * @param string $action  The action we want to perform.
+     *
+     * @return string
+     * @throws \Exception When the API operation doesn't exist.
+     */
+    public static function getAPIFunctionFilepath(string $project, string $action)
+    {
+        $project  = str_replace('\\', '/', $project);
+        $filepath = self::getAPIPath($project).'/Operations/'.$action.'.php';
+        if (is_file($filepath) === false) {
+            throw new \Exception('API operation "'.$action.'" does not exist');
+        }
+
+        return $filepath;
+
+    }//end getAPIFunctionFilepath()
+
+
+    /**
+     * Gets the file contents for the API function.
      *
      * @param string $project The namespace of the project we want the action from.
      * @param string $action  The action we want to perform.
@@ -119,14 +141,8 @@ __ROUTES__
      */
     public static function getAPIFunction(string $project, string $action)
     {
-        $project = str_replace('\\', '/', $project);
-        $file    = self::getAPIPath($project).'/Operations/'.$action.'.php';
-        if (is_file($file) === false) {
-            throw new \Exception('API operation "'.$action.'" does not exist');
-        }
-
-        $content = file_get_contents($file);
-        $content = str_replace('<?php', '', $content);
+        $filepath = self::getAPIFunctionFilepath($project, $action);
+        $content  = file_get_contents($filepath);
         return $content;
 
     }//end getAPIFunction()
@@ -532,6 +548,10 @@ __ROUTES__
                 $function .= Util::printCode(
                     2,
                     '$content = \PerspectiveSimulator\API::getAPIFunction(__NAMESPACE__, \''.$api['operationid'].'\');'
+                );
+                $function .= Util::printCode(
+                    2,
+                    '$content = \Perspective\Gateway\Bakers\Cache::bake($content, null, true, __NAMESPACE__);'
                 );
                 $function .= Util::printCode(2, 'return eval($content);');
                 $function .= Util::printCode(1, '}');
