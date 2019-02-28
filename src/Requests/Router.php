@@ -116,7 +116,7 @@ switch ($type) {
 
         try {
             ob_start();
-            $class    = $GLOBALS['projectNamespace'].'\APIRouter';
+            $class    = $GLOBALS['projectNamespace'].'APIRouter';
             $response = $class::process($path, $method, $queryParams);
 
             if ($response === null) {

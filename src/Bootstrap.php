@@ -13,6 +13,7 @@ namespace PerspectiveSimulator;
 use \PerspectiveAPI\Storage\StorageFactory;
 use \PerspectiveSimulator\Libs;
 
+
 /**
  * Bootstrap class
  */
@@ -73,12 +74,15 @@ class Bootstrap
         $composer = $path.'/composer.json';
         if (file_exists($composer) === true) {
             $composerFile = Libs\Util::jsonDecode(file_get_contents($composer));
-
-            foreach ($composerFile['autoload']['psr-4'] as $namespace => $dir) {
-                if (strpos($dir, 'src') === 0) {
-                    $GLOBALS['projectNamespace'] = $namespace;
-                    break;
+            if (isset($composerFile['autoload']) === true) {
+                foreach ($composerFile['autoload']['psr-4'] as $namespace => $dir) {
+                    if (strpos($dir, 'src') === 0) {
+                        $GLOBALS['projectNamespace'] = $namespace;
+                        break;
+                    }
                 }
+            } else {
+                $GLOBALS['projectNamespace'] = $project.'\\';
             }
         } else {
             // No composer file so we will attempt to use the project that was passed to load.
@@ -103,6 +107,7 @@ class Bootstrap
             'PerspectiveAPI\Queue'                         => 'Queue',
             'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
             'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
+            'PerspectiveAPI\Cache'                         => 'Cache',
         ];
 
         // Always alias theses classes if they haven't been already as we might be loading another project.
@@ -299,7 +304,6 @@ class Bootstrap
         $codeParts  = explode('.', $propertyCode);
         $type       = array_pop($codeParts);
         $propertyid = implode('.', $codeParts);
-
         if (in_array($type, $allowedTypes) === false) {
             throw new \Exception('Invalid property type');
         }
@@ -310,6 +314,7 @@ class Bootstrap
         ];
 
     }//end getPropertyInfo()
+
 
 
 }//end class

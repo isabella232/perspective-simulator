@@ -620,12 +620,12 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function getCustomTypeClassByName(string $objectType, string $type)
     {
         if (strpos($type, strtolower($GLOBALS['project'])) === 0) {
-            return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+            return '\\'.$GLOBALS['projectNamespace'].'CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         } else {
             $requirement = explode('/', str_replace(basename($type), '', $type));
             $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
             $requirement = $GLOBALS['projectDependencies'][$packageName];
-            return '\\'.$requirement.'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+            return '\\'.$requirement.'CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         }
 
     }//end getCustomTypeClassByName()

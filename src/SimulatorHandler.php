@@ -261,6 +261,7 @@ class SimulatorHandler
                             'PerspectiveAPI\Queue'                         => 'Queue',
                             'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
                             'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
+                            'PerspectiveAPI\Cache'                         => 'Cache',
                         ];
 
                         if (class_exists($GLOBALS['projectDependencies'][$requirement].'Framework\Authentication') === false) {
@@ -1429,11 +1430,11 @@ class SimulatorHandler
             $customType = '\PerspectiveAPI\Objects\Types\DataRecord';
         } else {
             if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
-                $customType = '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\Data\\'.basename($customType);
+                $customType = '\\'.$GLOBALS['projectNamespace'].'CustomTypes\Data\\'.basename($customType);
             } else {
                 $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
                 $requirement = $GLOBALS['projectDependencies'][$packageName];
-                $customType  = '\\'.$requirement.'\CustomTypes\Data\\'.basename($customType);
+                $customType  = '\\'.$requirement.'CustomTypes\Data\\'.basename($customType);
             }
         }
 
