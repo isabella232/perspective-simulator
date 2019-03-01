@@ -47,6 +47,20 @@ class ProjectAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 
 
     /**
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return void
+     */
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $this->inProject($input, $output);
+
+    }//end interact()
+
+
+    /**
      * Executes the create new project command.
      *
      * @param InputInterface  $input
@@ -56,13 +70,11 @@ class ProjectAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $namespace = $input->getArgument('namespace');
-
         $this->style->title('Adding new project in gateway');
         $response = $this->sendAPIRequest(
             'post',
             '/project',
-            ['package' => strtolower(str_replace('\\', '/', $namespace))]
+            ['package' => strtolower(str_replace('\\', '/', $input->getOption('project')))]
         );
 
         if ($response['curlInfo']['http_code'] === 201) {

@@ -362,8 +362,13 @@ __ROUTES__
      */
     private static function bakeRouter(array $apis, string $project)
     {
+        $namespace = $GLOBALS['projectNamespace'];
+        if ($GLOBALS['project'] !== $project && isset($GLOBALS['projectDependencies'][$project]) === true) {
+            $namespace = $GLOBALS['projectDependencies'][$project];
+        }
+
         $router  = Util::printCode(0, '<?php');
-        $router .= Util::printCode(0, 'namespace '.str_replace('/', '\\', $project).';');
+        $router .= Util::printCode(0, 'namespace '.rtrim($namespace, '\\').';');
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(0, 'class APIRouter {');
         $router .= Util::printCode(0, '');
@@ -450,8 +455,13 @@ __ROUTES__
      */
     private static function bakeAPIFunctions(array $apis, string $project)
     {
+        $namespace = $GLOBALS['projectNamespace'];
+        if ($GLOBALS['project'] !== $project && isset($GLOBALS['projectDependencies'][$project]) === true) {
+            $namespace = $GLOBALS['projectDependencies'][$project];
+        }
+
         $function  = Util::printCode(0, '<?php');
-        $function .= Util::printCode(0, 'namespace '.str_replace('/', '\\', $project).';');
+        $function .= Util::printCode(0, 'namespace '.rtrim($namespace, '\\').';');
         $function .= Util::printCode(0, '');
         $function .= Util::printCode(0, 'class API');
         $function .= Util::printCode(0, '{');
