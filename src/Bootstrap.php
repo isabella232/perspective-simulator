@@ -82,11 +82,11 @@ class Bootstrap
                     }
                 }
             } else {
-                $GLOBALS['projectNamespace'] = $project.'\\';
+                $GLOBALS['projectNamespace'] = str_replace('/', '\\', $project).'\\';
             }
         } else {
             // No composer file so we will attempt to use the project that was passed to load.
-            $GLOBALS['projectNamespace'] = $project.'\\';
+            $GLOBALS['projectNamespace'] = str_replace('/', '\\', $project).'\\';
         }
 
         $GLOBALS['projectDependencies'] = [];
