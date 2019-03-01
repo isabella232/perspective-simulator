@@ -108,7 +108,15 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 if ($bakedLoad === true) {
                     include $path;
                 } else {
-                    $fileContents = \perspective\Gateway\Bakers\Cache::bake(null, $path, true);
+                    $namespace = $GLOBALS['projectNamespace'];
+                    foreach ($GLOBALS['projectDependencies'] as $code => $depNamespace) {
+                        if (strpos($class, $depNamespace) === 0) {
+                            $namespace = $depNamespace;
+                            break;
+                        }
+                    }
+
+                    $fileContents = \perspective\Gateway\Bakers\Cache::bake(null, $path, true, $namespace);
                     eval($fileContents);
                 }
 
