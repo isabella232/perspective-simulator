@@ -310,19 +310,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getDataStoreExists(string $name)
     {
-        if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
-            $storeDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.basename($name);
-        } else {
-            $codeParts   = explode('/', $name);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storeDir    = Libs\FileSystem::getRequirementDir($requirement).'/Stores/Data/'.basename($name);
-        }
-
-        if (is_dir($storeDir) === true) {
-            return true;
-        }
-
-        return false;
+        return self::storeExists('data', $name);
 
     }//end getDataStoreExists()
 
@@ -336,21 +324,44 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getUserStoreExists(string $name)
     {
+        return self::storeExists('user', $name);
+
+    }//end getUserStoreExists()
+
+
+    /**
+     * Checks if the store exists.
+     *
+     * @param string $type Type of the store, 'data' or 'user'.
+     * @param string $name Name of the store.
+     *
+     * @return boolean
+     */
+    private static function storeExists(string $type, string $name)
+    {
         if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
-            $storeDir = Libs\FileSystem::getProjectDir().'/Stores/User/'.basename($name);
+            $storeJSONPath = Libs\FileSystem::getProjectDir().'/stores.json';
         } else {
-            $codeParts   = explode('/', $name);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storeDir    = Libs\FileSystem::getRequirementDir($requirement).'/Stores/User/'.basename($name);
+            $codeParts     = explode('/', $name);
+            $requirement   = $codeParts[0].'/'.$codeParts[1];
+            $storeJSONPath = Libs\FileSystem::getRequirementDir($requirement).'/stores.json';
         }
 
-        if (is_dir($storeDir) === true) {
+        if (file_exists($storeJSONPath) === false) {
+            return false;
+        }
+
+        $storeJSON = json_decode(file_get_contents($storeJSONPath), true);
+        if (isset($storeJSON['stores']) === true
+            && isset($storeJSON['stores'][$type]) === true
+            && in_array(basename($name), $storeJSON['stores'][$type]) === true
+        ) {
             return true;
         }
 
         return false;
 
-    }//end getUserStoreExists()
+    }//end storeExists()
 
 
     /**
