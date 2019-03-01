@@ -96,10 +96,11 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
             }
 
             $vendorProject = $composerInfo['name'];
-            \PerspectiveSimulator\Bootstrap::load($vendorProject);
 
             $projects[$vendorProject] = str_replace('composer.json', 'src', $path);
             file_put_contents($simulatorDir.'/projects.json', Libs\Util::jsonEncode($projects));
+
+            \PerspectiveSimulator\Bootstrap::load($vendorProject);
 
             if (is_dir($simulatorDir.'/'.$GLOBALS['projectPath']) === false) {
                 Libs\FileSystem::mkdir($simulatorDir.'/'.$GLOBALS['projectPath'], true);
