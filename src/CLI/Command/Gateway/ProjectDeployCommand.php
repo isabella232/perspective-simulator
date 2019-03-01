@@ -272,7 +272,9 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
                 $updates[$version] = array_merge($updates[$version], $updates['current']);
                 unset($updates['current']);
             } else {
-                $updates[$version] = $updates['current'];
+                if (empty($updates['current']) === false) {
+                    $updates[$version] = $updates['current'];
+                }
                 unset($updates['current']);
             }
 
