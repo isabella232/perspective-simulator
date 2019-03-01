@@ -151,7 +151,7 @@ class RenameReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             $this->logChange(
                 'rename',
-                lcfirst($this->type).'Reference',
+                'Reference',
                 [
                     'from' => $referenceName,
                     'to'   => $newReferenceName,

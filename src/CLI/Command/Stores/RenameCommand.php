@@ -190,7 +190,7 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 
             $this->logChange(
                 'rename',
-                $this->type,
+                ucfirst($this->type).'Store',
                 [
                     'from' => $oldName,
                     'to'   => $newName,
