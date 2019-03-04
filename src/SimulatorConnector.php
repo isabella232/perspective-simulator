@@ -802,4 +802,26 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     }//end isActiveLanguage()
 
 
+    /**
+     * Returns the project context of the project.
+     *
+     * @param string $namespace The namespace of the class trying to get the project context of.
+     *
+     * @return string
+     */
+    public static function getProjectContext(string $namespace)
+    {
+        $namespaceMap = [];
+        $namespaceMap[$GLOBALS['project']] = $GLOBALS['projectNamespace'];
+        $namespaceMap = array_flip(array_merge($namespaceMap, $GLOBALS['projectDependencies']));
+
+        if (isset($namespaceMap[$namespace]) === true) {
+            return $namespaceMap[$namespace];
+        }
+
+        return str_replace('\\', '/', $namespace);
+
+    }//end getProjectContext()
+
+
 }//end class
