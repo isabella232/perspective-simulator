@@ -808,6 +808,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      * @param string $namespace The namespace of the class trying to get the project context of.
      *
      * @return string
+     * @throws InvalidDataException When the project doesn't exist.
      */
     public static function getProjectContext(string $namespace)
     {
@@ -819,9 +820,27 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
             return $namespaceMap[$namespace];
         }
 
-        return str_replace('\\', '/', $namespace);
+        throw new \PerspectiveAPI\Exception\InvalidDataException('Project doesn\'t exist.');
 
     }//end getProjectContext()
+
+
+    /**
+     * Finds if the project exists.
+     *
+     * @param string $projectCode The namespace of the class trying to get the project context of.
+     *
+     * @return boolean
+     */
+    public static function projectExists(string $projectCode)
+    {
+        $namespaceMap = [];
+        $namespaceMap[$GLOBALS['project']] = $GLOBALS['projectNamespace'];
+        $namespaceMap = array_merge($namespaceMap, $GLOBALS['projectDependencies']);
+
+       return in_array($projectCode, $namespaceMap);
+
+    }//end projectExists()
 
 
 }//end class
