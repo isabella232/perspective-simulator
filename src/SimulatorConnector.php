@@ -844,4 +844,16 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     }//end projectExists()
 
 
+    /**
+     * Returns list of files that have been autoloaded.
+     *
+     * @return array
+     */
+    public static function getAutoloadedFilepaths()
+    {
+        return Autoload::getAutoloadedFilepaths();
+
+    }//end getAutoloadedFilepaths()
+
+
 }//end class

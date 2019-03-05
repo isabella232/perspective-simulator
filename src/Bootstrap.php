@@ -63,6 +63,9 @@ class Bootstrap
             function () {
                 $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
                 $simulatorHandler->save();
+
+                // Simulate getting the cache report at the end of the request.
+                \PerspectiveAPI\Cache::getCacheReport();
             }
         );
 

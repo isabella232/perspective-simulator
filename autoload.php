@@ -13,6 +13,13 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
          */
         private static $composerAutoloader = null;
 
+        /**
+         * The list of files that have been autoloaded.
+         *
+         * @var array
+         */
+        private static $autoloadedFiles = [];
+
 
         /**
          * Loads a class.
@@ -105,6 +112,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
             }
 
             if ($path !== false && is_file($path) === true) {
+                self::$autoloadedFiles[] = realpath($path);
                 if ($bakedLoad === true) {
                     include $path;
                 } else {
@@ -126,6 +134,19 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
             return false;
 
         }//end load()
+
+
+        /**
+         * Returns list of files that have been autoloaded.
+         *
+         * @return array
+         */
+        public static function getAutoloadedFilepaths()
+        {
+            return self::$autoloadedFiles;
+
+        }//end getAutoloadedFilepaths()
+
 
     }//end class
 
