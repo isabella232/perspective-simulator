@@ -97,18 +97,31 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $projectDir = Libs\FileSystem::getProjectDir();
         if (strtolower($storeType) === 'data') {
-            $this->storeDir     = $projectDir.'/Stores/Data/';
             $this->readableType = 'Data Store';
-            $this->type         = 'DataStore';
+            $this->type         = 'data';
         } else if (strtolower($storeType) === 'user') {
-            $this->storeDir     = $projectDir.'/Stores/User/';
             $this->readableType = 'User Store';
-            $this->type         = 'UserStore';
+            $this->type         = 'user';
         }
 
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
+        $stores = $projectDir.'/stores.json';
+        if (file_exists($stores) === false) {
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    [
+                        'stores' => [
+                            'data' => [],
+                            'user' => [],
+                        ],
+                        'references' => [],
+                    ],
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
         }
+
+        $this->stores = Libs\Util::jsonDecode(file_get_contents($stores));
 
     }//end interact()
 
@@ -118,8 +131,8 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @param string $name Name of the data store.
      *
-     * @return string
-     * @throws CLIException When name is invalid.
+     * @return boolean
+     * @throws \Exception When name is invalid.
      */
     private function validateStoreName(string $name)
     {
@@ -137,15 +150,12 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
         $projectDir = Libs\FileSystem::getProjectDir();
         $dirs       = glob($this->storeDir.'*', GLOB_ONLYDIR);
 
-        foreach ($dirs as $dir) {
-            $storeName = strtolower(basename($dir));
-            if (strtolower($name) === $storeName) {
-                $eMsg = sprintf('%s name is already in use', $this->readableType);
-                throw new \Exception($eMsg);
-            }
+        if (in_array($name, $this->stores['stores'][$this->type]) === true) {
+            $eMsg = sprintf('%s name is already in use', $this->readableType);
+            throw new \Exception($eMsg);
         }
 
-        return $name;
+        return true;
 
     }//end validateStoreName()
 
@@ -161,21 +171,39 @@ class RenameCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $oldName = $input->getArgument('name');
-            $newName = $input->getArgument('newName');
-
+            $oldName = strtolower($input->getArgument('name'));
+            $newName = strtolower($input->getArgument('newName'));
             $this->validateStoreName($newName);
-            $oldDir = $this->storeDir.$oldName;
-            $newDir = $this->storeDir.$newName;
-            Libs\Git::move($oldDir, $newDir);
+
+            $this->stores['stores'][$this->type]   = array_diff($this->stores['stores'][$this->type], [$oldName]);
+            $this->stores['stores'][$this->type][] = $newName;
+
+            $projectDir = Libs\FileSystem::getProjectDir();
+            $stores     = $projectDir.'/stores.json';
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    $this->stores,
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
 
             $this->logChange(
                 'rename',
-                $this->type,
+                ucfirst($this->type).'Store',
                 [
-                    'from' => $code,
-                    'to'   => $newCode,
+                    'from' => $oldName,
+                    'to'   => $newName,
                 ]
+            );
+
+            $this->style->success(
+                sprintf(
+                    '%1$s %2$s successfully renamed to %3$s.',
+                    $this->readableType,
+                    $oldName,
+                    $newName
+                )
             );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

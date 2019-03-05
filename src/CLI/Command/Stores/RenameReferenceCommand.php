@@ -54,17 +54,9 @@ class RenameReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function configure()
     {
-        $this->setDescription('Deletes a refernece between stores.');
-        $this->setHelp('Deletes a refernece between stores.');
-        $this->addOption(
-            'type',
-            't',
-            InputOption::VALUE_REQUIRED,
-            'The type of store, eg, data or user.',
-            null
-        );
+        $this->setDescription('Renames a refernece.');
+        $this->setHelp('Renames a refernece.');
 
-        $this->addArgument('storeName', InputArgument::REQUIRED, 'The name of the target store.');
         $this->addArgument('referenceName', InputArgument::REQUIRED, 'The name of the reference.');
         $this->addArgument('newReferenceName', InputArgument::REQUIRED, 'The new name of the reference.');
 
@@ -83,34 +75,25 @@ class RenameReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
     {
         $this->inProject($input, $output);
 
-        $helper    = $this->getHelper('question');
-        $storeType = $input->getOption('type');
-        if (empty($input->getOption('type')) === true) {
-            $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
-                'Please select which store type you are wanting to create.',
-                ['data', 'user'],
-                0
-            );
-
-            $storeType = $helper->ask($input, $output, $question);
-            $input->setOption('type', $storeType);
-            $output->writeln('You have just selected: '.$storeType);
-        }
-
         $projectDir = Libs\FileSystem::getProjectDir();
-        if (strtolower($storeType) === 'data') {
-            $this->storeDir     = $projectDir.'/Stores/Data/';
-            $this->readableType = 'Data Store';
-            $this->type         = 'DataStore';
-        } else if (strtolower($storeType) === 'user') {
-            $this->storeDir     = $projectDir.'/Stores/User/';
-            $this->readableType = 'User Store';
-            $this->type         = 'UserStore';
+        $stores     = $projectDir.'/stores.json';
+        if (file_exists($stores) === false) {
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    [
+                        'stores' => [
+                            'data' => [],
+                            'user' => [],
+                        ],
+                        'references' => [],
+                    ],
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
         }
 
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
-        }
+        $this->stores = Libs\Util::jsonDecode(file_get_contents($stores));
 
     }//end interact()
 
@@ -120,7 +103,7 @@ class RenameReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @param string $name Name of the data store.
      *
-     * @return string
+     * @return boolean
      * @throws \Exception When name is invalid.
      */
     private function validateReferenceName(string $name)
@@ -134,13 +117,11 @@ class RenameReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
             throw new \Exception('Invalid reference name provided');
         }
 
-        $projectDir = Libs\FileSystem::getProjectDir();
-        $reference  = $this->storeDir.$this->args['targetCode'].'/'.$this->args['referneceName'].'.json';
-        if (file_exists($reference) === true) {
+        if (in_array($name, array_keys($this->stores['references'])) === true) {
             throw new \Exception('Reference name is already in use');
         }
 
-        return $name;
+        return true;
 
     }//end validateReferenceName()
 
@@ -155,34 +136,38 @@ class RenameReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $type             = $input->getOption('type');
-        $targetCode       = $input->getArgument('storeName');
-        $referenceName    = $input->getArgument('referenceName');
-        $newReferenceName = $input->getArgument('referenceName');
+        $referenceName    = strtolower($input->getArgument('referenceName'));
+        $newReferenceName = strtolower($input->getArgument('newReferenceName'));
 
         try {
-            $oldRef = $this->storeDir.$targetCode.'/'.$referneceName.'.json';
-            $newRef = $this->storeDir.$targetCode.'/'.$newReferenceName.'.json';
-            if (file_exists($oldRef) === false) {
-                throw new \Exception(
-                    sprintf(
-                        '%s doesn\'t exist.',
-                        $referneceName
-                    )
-                );
+            if (in_array($referenceName, array_keys($this->stores['references'])) === false) {
+                throw new \Exception(sprintf('%s doesn\'t exist.', $referenceName));
             }
 
             $this->validateReferenceName($newReferenceName);
 
-            Libs\Git::move($oldRef, $newRef);
+            $this->stores['references'][$newReferenceName] = $this->stores['references'][$referenceName];
+            unset($this->stores['references'][$referenceName]);
 
             $this->logChange(
                 'rename',
-                lcfirst($this->type).'Reference',
+                'Reference',
                 [
-                    'from' => $referneceName,
+                    'from' => $referenceName,
                     'to'   => $newReferenceName,
                 ]
+            );
+
+            $projectDir = Libs\FileSystem::getProjectDir();
+            $stores     = $projectDir.'/stores.json';
+            file_put_contents($stores, Libs\Util::jsonEncode($this->stores, (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)));
+
+            $this->style->success(
+                sprintf(
+                    'Refernece %1$s successfully renamed to %2$s.',
+                    $referenceName,
+                    $newReferenceName
+                )
             );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

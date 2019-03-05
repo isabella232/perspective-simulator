@@ -13,6 +13,7 @@ namespace PerspectiveSimulator;
 use \PerspectiveAPI\Storage\StorageFactory;
 use \PerspectiveSimulator\Libs;
 
+
 /**
  * Bootstrap class
  */
@@ -62,18 +63,39 @@ class Bootstrap
             function () {
                 $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
                 $simulatorHandler->save();
+
+                // Simulate getting the cache report at the end of the request.
+                \PerspectiveAPI\Cache::getCacheReport();
             }
         );
 
-        $projectParts                = explode('\\', $project);
-        $GLOBALS['projectNamespace'] = ucfirst($projectParts[0]).'\\'.ucfirst($projectParts[1]);
-        $GLOBALS['project']          = str_replace('\\', '/', $project);
-        $GLOBALS['projectPath']      = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $project));
-        $projectDir                  = Libs\FileSystem::getProjectDir();
+        $GLOBALS['project']     = str_replace('\\', '/', $project);
+        $GLOBALS['projectPath'] = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $project));
+        $projectDir             = Libs\FileSystem::getProjectDir();
+
+        $path     = substr($projectDir, 0, -4);
+        $composer = $path.'/composer.json';
+        if (file_exists($composer) === true) {
+            $composerFile = Libs\Util::jsonDecode(file_get_contents($composer));
+            if (isset($composerFile['autoload']) === true) {
+                foreach ($composerFile['autoload']['psr-4'] as $namespace => $dir) {
+                    if (strpos($dir, 'src') === 0) {
+                        $GLOBALS['projectNamespace'] = $namespace;
+                        break;
+                    }
+                }
+            } else {
+                $GLOBALS['projectNamespace'] = str_replace('/', '\\', $project).'\\';
+            }
+        } else {
+            // No composer file so we will attempt to use the project that was passed to load.
+            $GLOBALS['projectNamespace'] = str_replace('/', '\\', $project).'\\';
+        }
+
+        $GLOBALS['projectDependencies'] = [];
 
         // Register an autoloader for the project.
-        $loader = include dirname(__DIR__, 3).'/autoload.php';
-        $loader->addPsr4($project.'\\', $projectDir);
+        include dirname(__DIR__, 3).'/autoload.php';
 
         // First, set the connector alias.
         if (class_exists('\PerspectiveAPI\Connector') === false) {
@@ -88,30 +110,25 @@ class Bootstrap
             'PerspectiveAPI\Queue'                         => 'Queue',
             'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
             'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
+            'PerspectiveAPI\Cache'                         => 'Cache',
         ];
 
         // Always alias theses classes if they haven't been already as we might be loading another project.
         $perspectiveAPIClassAliasesProject = [
-            'PerspectiveAPI\Objects\Types\DataRecord' => $project.'\CustomTypes\Data\DataRecord',
-            'PerspectiveAPI\Objects\Types\User'       => $project.'\CustomTypes\User\User',
-            'PerspectiveAPI\Objects\Types\Group'      => $project.'\CustomTypes\User\Group',
+            'PerspectiveAPI\Objects\Types\DataRecord' => $GLOBALS['projectNamespace'].'CustomTypes\Data\DataRecord',
+            'PerspectiveAPI\Objects\Types\User'       => $GLOBALS['projectNamespace'].'CustomTypes\User\User',
+            'PerspectiveAPI\Objects\Types\Group'      => $GLOBALS['projectNamespace'].'CustomTypes\User\Group',
         ];
 
-        if (class_exists($project.'\CustomTypes\User\Group') === false) {
+        if (class_exists($GLOBALS['projectNamespace'].'CustomTypes\User\Group') === false) {
             foreach ($perspectiveAPIClassAliasesProject as $orignalClass => $aliasClass) {
                 class_alias($orignalClass, $aliasClass);
             }
         }
 
-        if (class_exists($project.'\Web\Views\View') === false) {
-            class_alias('PerspectiveSimulator\View\ViewBase', $project.'\Web\Views\View');
-        }
-
-        if (class_exists($project.'\Framework\Authentication') === false) {
-            class_alias('PerspectiveSimulator\View\ViewBase', '\View');
-
+        if (class_exists($GLOBALS['projectNamespace'].'Framework\Authentication') === false) {
             foreach ($perspectiveAPIClassAliases as $orignalClass => $aliasClass) {
-                eval('namespace '.$project.'\\Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
+                eval('namespace '.$GLOBALS['projectNamespace'].'Framework; class '.$aliasClass.' extends \\'.$orignalClass.' {}');
             }
         }
 
@@ -248,62 +265,59 @@ class Bootstrap
 
 
     /**
-     * Queues a save for later.
+     * Gets the project prefix from a code/name
      *
-     * @param object $object Object to be added to the save queue
+     * @param string $code The name/code to get the project prefix of
      *
-     * @return void
+     * @return string
      */
-    public static function queueSave($object)
-    {
-        self::$saveQueue[] = $object;
-
-    }//end queueSave
-
-
-    /**
-     * Process the save queue.
-     *
-     * @return void
-     */
-    public static function processSave()
-    {
-        if (empty(self::$saveQueue) === true) {
-            return;
-        }
-
-        // Only need to save when write is enabled.
-        if (self::$writeEnabled === true) {
-            foreach (self::$saveQueue as $object) {
-                if (method_exists($object, 'save') === true) {
-                    $object->save();
-                }
-            }
-        }
-
-        self::clearSaveQueue();
-
-    }//end processSave()
-
-
-    /**
-     * Clears the save queue
-     *
-     * @return void
-     */
-    public static function clearSaveQueue()
-    {
-        self::$saveQueue = [];
-
-    }//end clearSaveQueue()
-
-
     public static function getProjectPrefix(string $code)
     {
         $parts = explode('/', $code);
         return Bootstrap::generatePrefix($parts[0].'\\'.$parts[1]);
 
     }//end getProjectPrefix()
+
+
+    /**
+     * Gets the property id and type from the code.
+     *
+     * @param string $propertyCode The property code we want the id and type from.
+     *
+     * @return array
+     */
+    public static function getPropertyInfo(string $propertyCode)
+    {
+        $allowedTypes = [
+            'unique',
+            'boolean',
+            'datetime',
+            'html',
+            'integer',
+            'number',
+            'pageid',
+            'recordset',
+            'selection',
+            'text',
+            'userid',
+            'image',
+            'file',
+        ];
+
+        $codeParts  = explode('.', $propertyCode);
+        $type       = array_pop($codeParts);
+        $propertyid = implode('.', $codeParts);
+        if (in_array($type, $allowedTypes) === false) {
+            throw new \Exception('Invalid property type');
+        }
+
+        return [
+            strtolower($propertyid),
+            strtolower($type),
+        ];
+
+    }//end getPropertyInfo()
+
 
 
 }//end class

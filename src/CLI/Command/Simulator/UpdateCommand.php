@@ -95,13 +95,12 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
                 $section->writeln('Installing project from "'.$path.'"');
             }
 
-            $vendorProject               = $composerInfo['name'];
-            $GLOBALS['projectNamespace'] = str_replace('/', '\\', $vendorProject);
-            $GLOBALS['project']          = $vendorProject;
-            $GLOBALS['projectPath']      = strtolower($vendorProject);
+            $vendorProject = $composerInfo['name'];
 
             $projects[$vendorProject] = str_replace('composer.json', 'src', $path);
             file_put_contents($simulatorDir.'/projects.json', Libs\Util::jsonEncode($projects));
+
+            \PerspectiveSimulator\Bootstrap::load($vendorProject);
 
             if (is_dir($simulatorDir.'/'.$GLOBALS['projectPath']) === false) {
                 Libs\FileSystem::mkdir($simulatorDir.'/'.$GLOBALS['projectPath'], true);
@@ -132,10 +131,9 @@ class UpdateCommand extends \PerspectiveSimulator\CLI\Command\Command
             }
 
             foreach ($requirements as $requirement => $version) {
-                $proj = str_replace('/', '\\', $requirement);
-                \PerspectiveSimulator\API::installAPI($proj);
-                \PerspectiveSimulator\Queue\Queue::installQueues($proj);
-                \PerspectiveSimulator\View\View::installViews($proj);
+                \PerspectiveSimulator\API::installAPI($requirement);
+                \PerspectiveSimulator\Queue\Queue::installQueues($requirement);
+                \PerspectiveSimulator\View\View::installViews($requirement);
             }
 
             $projectPath = str_replace('/composer.json', '', $path);

@@ -39,9 +39,7 @@ class DeployPreFlightCheckCommand extends \PerspectiveSimulator\CLI\Command\Comm
         'app',
         'cdn',
         'customtypes',
-        'properties',
         'queues',
-        'stores',
     ];
 
 

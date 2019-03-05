@@ -98,6 +98,12 @@ class ServerCommand extends \PerspectiveSimulator\CLI\Command\Command
         $latency = ($input->getOption('latency') ?? false);
         $failure = ($input->getOption('failure') ?? false);
         $host    = ($input->getArgument('host') ?? '0.0.0.0:8000');
+
+        if (isset($_SERVER['API_PORT']) === true) {
+            $hostParts = explode(':', $host);
+            $host      = $hostParts[0].':'.$_SERVER['API_PORT'];
+        }
+
         $this->style->title('Perspecitve Simulator running.');
         $this->style->section('listening on: http://'.$host);
         $this->style->block('Press Ctrl-C to quit.', null, 'fg=yellow', ' ! ');

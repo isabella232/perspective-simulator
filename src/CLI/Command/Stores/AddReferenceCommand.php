@@ -57,24 +57,49 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->setDescription('Adds a new refernece between stores.');
         $this->setHelp('Adds a new refernece between stores.');
         $this->addOption(
-            'type',
-            't',
+            'targetType',
+            null,
             InputOption::VALUE_REQUIRED,
             'The type of store, eg, data or user.',
             null
         );
         $this->addOption(
             'sourceType',
-            'st',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The type of store, eg, data or user.',
+            null
+        );
+
+        $this->addOption(
+            'targetCode',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The type of store, eg, data or user.',
+            null
+        );
+        $this->addOption(
+            'sourceCode',
+            null,
             InputOption::VALUE_OPTIONAL,
             'The type of store, eg, data or user.',
             null
         );
 
-        $this->addArgument('storeName', InputArgument::REQUIRED, 'The name of the target store.');
+        $this->addOption(
+            'targetMultiple',
+            null,
+            InputOption::VALUE_NONE,
+            'Allow multiple of the target.'
+        );
+        $this->addOption(
+            'sourceMultiple',
+            null,
+            InputOption::VALUE_NONE,
+            'Allow multiple of source.'
+        );
+
         $this->addArgument('referenceName', InputArgument::REQUIRED, 'The name of the reference.');
-        $this->addArgument('sourceStore', InputArgument::REQUIRED, 'The type of store, eg, data or user.');
-        $this->addArgument('cardinality', InputArgument::OPTIONAL, 'The cardinality of the reference, eg. 1:1, 1:M or M:M');
 
     }//end configure()
 
@@ -92,8 +117,8 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
         $this->inProject($input, $output);
 
         $helper    = $this->getHelper('question');
-        $storeType = $input->getOption('type');
-        if (empty($input->getOption('type')) === true) {
+        $storeType = $input->getOption('targetType');
+        if (empty($input->getOption('targetType')) === true) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select which store type you are wanting to create.',
                 ['data', 'user'],
@@ -101,7 +126,7 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
             );
 
             $storeType = $helper->ask($input, $output, $question);
-            $input->setOption('type', $storeType);
+            $input->setOption('targetType', $storeType);
             $output->writeln('You have just selected: '.$storeType);
         }
 
@@ -112,20 +137,29 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $projectDir = Libs\FileSystem::getProjectDir();
         if (strtolower($storeType) === 'data') {
-            $this->storeDir     = $projectDir.'/Stores/Data/';
-            $this->readableType = 'Data Store';
-            $this->type         = 'DataStore';
+            $this->type = 'data';
         } else if (strtolower($storeType) === 'user') {
-            $this->storeDir     = $projectDir.'/Stores/User/';
-            $this->readableType = 'User Store';
-            $this->type         = 'UserStore';
+            $this->type = 'user';
         }
 
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
+        $stores = $projectDir.'/stores.json';
+        if (file_exists($stores) === false) {
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    [
+                        'stores' => [
+                            'data' => [],
+                            'user' => [],
+                        ],
+                        'references' => [],
+                    ],
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
         }
 
-        $this->targetCode = $input->addArgument('storeName');
+        $this->stores = Libs\Util::jsonDecode(file_get_contents($stores));
 
     }//end interact()
 
@@ -135,7 +169,7 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      *
      * @param string $name Name of the data store.
      *
-     * @return string
+     * @return boolean
      * @throws \Exception When name is invalid.
      */
     private function validateReferenceName(string $name)
@@ -149,13 +183,11 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
             throw new \Exception('Invalid reference name provided');
         }
 
-        $projectDir = Libs\FileSystem::getProjectDir();
-        $reference  = $this->storeDir.$this->targetCode.'/'.$name.'.json';
-        if (file_exists($reference) === true) {
+        if (in_array($name, array_keys($this->stores['references'])) === true) {
             throw new \Exception('Reference name is already in use');
         }
 
-        return $name;
+        return true;
 
     }//end validateReferenceName()
 
@@ -170,43 +202,44 @@ class AddReferenceCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $type          = $input->getOption('type');
-        $sourceType    = $input->getOption('sourceType');
-        $targetCode    = $input->getArgument('storeName');
-        $referenceName = $input->getArgument('referenceName');
-        $sourceStore   = $input->getArgument('sourceStore');
-        $cardinality   = ($input->getArgument('cardinality') ?? 'M:M');
+        $referenceName  = strtolower($input->getArgument('referenceName'));
+        $sourceType     = $input->getOption('sourceType');
+        $sourceCode     = ($input->getOption('sourceCode') ?? null);
+        $sourceMultiple = ($input->getOption('sourceMultiple') ?? false);
+        $targetType     = $input->getOption('targetType');
+        $targetCode     = $input->getOption('targetCode');
+        $targetMultiple = ($input->getOption('targetMultiple') ?? false);
 
-        if (is_dir($this->storeDir.$targetCode) === false) {
-            throw new \Exception(sprintf('%s doesn\'t exist.', $this->readableType));
+        // Validate the source and target types.
+        if ($targetType !== 'user' && $targetType !== 'data') {
+            throw new \Exception('Target type must be data or user');
         }
-
-        $projectDir     = Libs\FileSystem::getProjectDir();
-        $sourceStoreDir = $projectDir.'/Stores/';
-        if (strtolower($sourceType) === 'userstore') {
-            $sourceStoreDir .= 'User/';
-        } else if (strtolower($sourceType) === 'datastore') {
-            $sourceStoreDir .= 'Data/';
-        } else {
-            $sourceStoreDir = $this->storeDir;
-        }
-
-        if (is_dir($sourceStoreDir.$sourceCode) === false) {
-            throw new \Exception(sprintf('%s doesn\'t exist.', $sourceType));
+        if ($sourceType !== 'user' && $sourceType !== 'data') {
+            throw new \Exception('Source type must be data or user');
         }
 
         try {
             $this->validateReferenceName($referenceName);
-            $referneceDetails = [
-                'sourceType'  => $sourceType,
-                'sourceCode'  => $sourceCode,
-                'targetType'  => $targetType,
-                'targetCode'  => $targetCode,
-                'cardinality' => $cardinatlity,
+            $reference = [
+                'source' => [
+                    'type'     => $sourceType,
+                    'code'     => $sourceCode,
+                    'multiple' => $sourceMultiple,
+                ],
+                'target' => [
+                    'type'     => $targetType,
+                    'code'     => $targetCode,
+                    'multiple' => $targetMultiple,
+                ],
             ];
 
-            $path = $this->storeDir.$targetCode.'/'.$referenceName.'.json';
-            file_put_contents($path, Libs\Util::jsonEncode($referneceDetails));
+            $this->stores['references'][$referenceName] = $reference;
+
+            $projectDir = Libs\FileSystem::getProjectDir();
+            $stores     = $projectDir.'/stores.json';
+            file_put_contents($stores, Libs\Util::jsonEncode($this->stores, (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)));
+
+            $this->style->success(sprintf('Reference %s successfully created.', $referenceName));
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

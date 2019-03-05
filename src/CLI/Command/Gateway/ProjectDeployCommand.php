@@ -262,11 +262,50 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $tarOutput   = [];
         $tarRC       = -1;
 
-        $projectSrcDir = Libs\FileSystem::getProjectDir();
-        $projectVenDir = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
+        $projectSrcDir   = Libs\FileSystem::getProjectDir();
+        $projectVenDir   = str_replace('src', 'vendor', Libs\FileSystem::getProjectDir());
+        $projectComposer = str_replace('src', 'composer', Libs\FileSystem::getProjectDir());
 
-        if (file_exists(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json') === true) {
-            copy(Libs\FileSystem::getExportDir().'/'.str_replace('/', '-', $project).'-instructions.json', $tarDir.'/'.$project.'/instructions.json');
+        $updateInstructions = str_replace('src', '', Libs\FileSystem::getProjectDir()).'update.json';
+        if (file_exists($updateInstructions) === true) {
+            $updates = Libs\Util::jsonDecode(file_get_contents($updateInstructions));
+            if (array_key_exists($version, $updates) === true) {
+                $updates[$version] = array_merge($updates[$version], $updates['current']);
+                unset($updates['current']);
+            } else {
+                if (empty($updates['current']) === false) {
+                    $updates[$version] = $updates['current'];
+                }
+                unset($updates['current']);
+            }
+
+            file_put_contents(
+                $tarDir.'/'.$project.'/update.json',
+                Libs\Util::jsonEncode($updates, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+
+            $updates['current'] = [];
+            uksort(
+                $updates,
+                function ($a, $b) {
+                    if ($a === 'current' || $b === 'current') {
+                        return true;
+                    } else if (version_compare($a, $b) <= 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            );
+            file_put_contents(
+                $updateInstructions,
+                Libs\Util::jsonEncode($updates, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        copy($projectComposer.'.json', $tarDir.'/'.$project.'/composer.json');
+        if (file_exists($projectComposer.'.lock') === true) {
+            copy($projectComposer.'.lock', $tarDir.'/'.$project.'/composer.lock');
         }
 
         exec('cp -r '.$projectSrcDir.' '.$tarDir.'/'.$project.'/src/');

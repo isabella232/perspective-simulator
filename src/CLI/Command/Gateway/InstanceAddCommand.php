@@ -56,6 +56,8 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
+        $this->inProject($input, $output);
+
         $helper = $this->getHelper('question');
         $name   = ($input->getArgument('name') ?? null);
         if (empty($input->getArgument('name')) === true) {
@@ -64,14 +66,7 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
             $input->setArgument('name', $name);
         }
 
-        $project = ($input->getOption('project') ?? null);
-        if (empty($project) === true) {
-            $question   = new \Symfony\Component\Console\Question\Question('Please enter the project: ');
-            $instanceid = $helper->ask($input, $output, $question);
-            $input->setOption('project', $project);
-        }
-
-        $question = sprintf('This will create a new instance "%s" in the project "%s": ', $name, $project);
+        $question = sprintf('This will create a new instance "%s" in the project "%s": ', $name, $input->getOption('project'));
         $confirm  = new \Symfony\Component\Console\Question\ConfirmationQuestion($question, false);
         if ($helper->ask($input, $output, $confirm) === false) {
             exit(1);

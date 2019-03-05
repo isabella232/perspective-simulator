@@ -95,7 +95,7 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
         }
 
         $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
-            'This will delete Custom type "'.$input->getArgument('cpPath').'"',
+            'This will delete the store "'.$input->getArgument('name').'" (y/N)',
             false
         );
         if ($helper->ask($input, $output, $confirm) === false) {
@@ -104,18 +104,31 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $projectDir = Libs\FileSystem::getProjectDir();
         if (strtolower($storeType) === 'data') {
-            $this->storeDir     = $projectDir.'/Stores/Data/';
             $this->readableType = 'Data Store';
-            $this->type         = 'DataStore';
+            $this->type         = 'data';
         } else if (strtolower($storeType) === 'user') {
-            $this->storeDir     = $projectDir.'/Stores/User/';
             $this->readableType = 'User Store';
-            $this->type         = 'UserStore';
+            $this->type         = 'user';
         }
 
-        if (is_dir($this->storeDir) === false) {
-            Libs\FileSystem::mkdir($this->storeDir, true);
+        $stores = $projectDir.'/stores.json';
+        if (file_exists($stores) === false) {
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    [
+                        'stores' => [
+                            'data' => [],
+                            'user' => [],
+                        ],
+                        'references' => [],
+                    ],
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
         }
+
+        $this->stores = Libs\Util::jsonDecode(file_get_contents($stores));
 
     }//end interact()
 
@@ -131,19 +144,27 @@ class DeleteCommand extends \PerspectiveSimulator\CLI\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $storeName = $input->getArgument('name');
+            $storeName = strtolower($input->getArgument('name'));
 
-            $dataStoreDir = $this->storeDir.$storeName;
-            if (is_dir($dataStoreDir) === false) {
-                throw new \Exception(
-                    sprintf(
-                        '%s directory doesn\'t exist.',
-                        $this->readableType
-                    )
-                );
-            }
+            $this->stores['stores'][$this->type] = array_diff($this->stores['stores'][$this->type], [$storeName]);
 
-            Libs\Git::delete($dataStoreDir);
+            $projectDir = Libs\FileSystem::getProjectDir();
+            $stores     = $projectDir.'/stores.json';
+            file_put_contents(
+                $stores,
+                Libs\Util::jsonEncode(
+                    $this->stores,
+                    (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+                )
+            );
+
+            $this->style->success(
+                sprintf(
+                    '%1$s %2$s successfully deleted.',
+                    $this->readableType,
+                    $storeName
+                )
+            );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }//end try

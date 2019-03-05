@@ -10,7 +10,8 @@
         "perspective/api": "dev-platform",
         "nikic/fast-route": "^1.3",
         "symfony/yaml": "^4.2",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "perspective/cache-baker": "dev-master"
     },
     "suggest": {
         "openssl": "*"

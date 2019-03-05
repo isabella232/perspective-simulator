@@ -31,27 +31,9 @@ class Property
     {
         $simDir    = Libs\FileSystem::getStorageDir().'/properties';
         $filePath  = $simDir.'/'.urldecode($path);
-        $pathParts = explode('/', $filePath);
-        $file      = array_pop($pathParts);
-        $type      = array_pop($pathParts);
-        $fileParts = explode('-', $file);
-        $project   = strtolower($fileParts[0].'/'.$fileParts[1]);
-        array_shift($fileParts);
-        array_shift($fileParts);
-        if ($project === strtolower($GLOBALS['project'])) {
-            $defaultPath = Libs\FileSystem::getProjectDir().'/Properties/'.$type.'/'.implode('-', $fileParts);
-        } else {
-            $defaultPath = substr(Libs\FileSystem::getProjectDir(), 0, -4).'/vendor/'.$project.'/src/Properties/'.$type.'/'.implode('-', $fileParts);
-        }
 
-
-
-        if (file_exists($filePath) === false && file_exists($defaultPath) === false) {
+        if (file_exists($filePath) === false) {
             Libs\Web::send404();
-        } else if (file_exists($filePath) === false && file_exists($defaultPath) === true) {
-            // We don't have a value but we do have a default file.
-            Libs\FileSystem::serveFile($defaultPath);
-            return $defaultPath;
         } else if (file_exists($filePath) === true) {
             // We have a value lets serve that.
             Libs\FileSystem::serveFile($filePath);

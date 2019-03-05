@@ -32,22 +32,8 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getPropertyTypeClass(string $objectType, string $propertyCode)
     {
-        $objectType = ucfirst($objectType);
-        if (strpos($propertyCode, strtolower($GLOBALS['project'])) === 0) {
-            $prop = Libs\FileSystem::getProjectDir().'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
-        } else {
-            $codeParts   = explode('/', $propertyCode);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $prop = Libs\FileSystem::getRequirementDir($requirement).'/Properties/'.$objectType.'/'.basename($propertyCode).'.json';
-        }
-
-        if (file_exists($prop) === false) {
-            return null;
-        }
-
-        $propData = Libs\Util::jsonDecode(file_get_contents($prop));
-
-        return '\PerspectiveAPI\Property\Types\\'.$propData['type'];
+        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyCode);
+        return '\PerspectiveAPI\Property\Types\\'.ucfirst($propType);
 
     }//end getPropertyTypeClass()
 
@@ -94,7 +80,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function setReference(string $objectType, string $id, string $storeCode, string $referenceCode, $objects)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $simulatorHandler->addReference($objectType, $storeCode, $id, $referenceCode, $objects);
+        $simulatorHandler->setReference($objectType, $storeCode, $id, $referenceCode, $objects);
 
     }//end setReference()
 
@@ -324,19 +310,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getDataStoreExists(string $name)
     {
-        if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
-            $storeDir = Libs\FileSystem::getProjectDir().'/Stores/Data/'.basename($name);
-        } else {
-            $codeParts   = explode('/', $name);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storeDir    = Libs\FileSystem::getRequirementDir($requirement).'/Stores/Data/'.basename($name);
-        }
-
-        if (is_dir($storeDir) === true) {
-            return true;
-        }
-
-        return false;
+        return self::storeExists('data', $name);
 
     }//end getDataStoreExists()
 
@@ -350,21 +324,44 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getUserStoreExists(string $name)
     {
+        return self::storeExists('user', $name);
+
+    }//end getUserStoreExists()
+
+
+    /**
+     * Checks if the store exists.
+     *
+     * @param string $type Type of the store, 'data' or 'user'.
+     * @param string $name Name of the store.
+     *
+     * @return boolean
+     */
+    private static function storeExists(string $type, string $name)
+    {
         if (strpos($name, strtolower($GLOBALS['project'])) === 0) {
-            $storeDir = Libs\FileSystem::getProjectDir().'/Stores/User/'.basename($name);
+            $storeJSONPath = Libs\FileSystem::getProjectDir().'/stores.json';
         } else {
-            $codeParts   = explode('/', $name);
-            $requirement = $codeParts[0].'/'.$codeParts[1];
-            $storeDir    = Libs\FileSystem::getRequirementDir($requirement).'/Stores/User/'.basename($name);
+            $codeParts     = explode('/', $name);
+            $requirement   = $codeParts[0].'/'.$codeParts[1];
+            $storeJSONPath = Libs\FileSystem::getRequirementDir($requirement).'/stores.json';
         }
 
-        if (is_dir($storeDir) === true) {
+        if (file_exists($storeJSONPath) === false) {
+            return false;
+        }
+
+        $storeJSON = json_decode(file_get_contents($storeJSONPath), true);
+        if (isset($storeJSON['stores']) === true
+            && isset($storeJSON['stores'][$type]) === true
+            && in_array(basename($name), $storeJSON['stores'][$type]) === true
+        ) {
             return true;
         }
 
         return false;
 
-    }//end getUserStoreExists()
+    }//end storeExists()
 
 
     /**
@@ -634,10 +631,12 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function getCustomTypeClassByName(string $objectType, string $type)
     {
         if (strpos($type, strtolower($GLOBALS['project'])) === 0) {
-            return '\\'.$GLOBALS['projectNamespace'].'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+            return '\\'.$GLOBALS['projectNamespace'].'CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         } else {
             $requirement = explode('/', str_replace(basename($type), '', $type));
-            return '\\'.ucfirst($requirement[0]).'\\'.ucfirst($requirement[1]).'\CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
+            $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
+            $requirement = $GLOBALS['projectDependencies'][$packageName];
+            return '\\'.$requirement.'CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         }
 
     }//end getCustomTypeClassByName()
@@ -801,6 +800,60 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
         // TODO!
 
     }//end isActiveLanguage()
+
+
+    /**
+     * Returns the project context of the project.
+     *
+     * @param string $namespace The namespace of the class trying to get the project context of.
+     *
+     * @return string
+     * @throws InvalidDataException When the project doesn't exist.
+     */
+    public static function getProjectContext(string $namespace)
+    {
+        $namespace   .= '\\';
+        $namespaceMap = [];
+        $namespaceMap[$GLOBALS['project']] = $GLOBALS['projectNamespace'];
+        $namespaceMap = array_flip(array_merge($namespaceMap, $GLOBALS['projectDependencies']));
+
+        if (isset($namespaceMap[$namespace]) === true) {
+            return $namespaceMap[$namespace];
+        }
+
+        throw new \PerspectiveAPI\Exception\InvalidDataException('Project doesn\'t exist.');
+
+    }//end getProjectContext()
+
+
+    /**
+     * Finds if the project exists.
+     *
+     * @param string $projectCode The namespace of the class trying to get the project context of.
+     *
+     * @return boolean
+     */
+    public static function projectExists(string $projectCode)
+    {
+        $namespaceMap = [];
+        $namespaceMap[$GLOBALS['project']] = $GLOBALS['projectNamespace'];
+        $namespaceMap = array_merge($namespaceMap, $GLOBALS['projectDependencies']);
+
+       return in_array($projectCode, $namespaceMap);
+
+    }//end projectExists()
+
+
+    /**
+     * Returns list of files that have been autoloaded.
+     *
+     * @return array
+     */
+    public static function getAutoloadedFilepaths()
+    {
+        return Autoload::getAutoloadedFilepaths();
+
+    }//end getAutoloadedFilepaths()
 
 
 }//end class

@@ -13,6 +13,13 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
          */
         private static $composerAutoloader = null;
 
+        /**
+         * The list of files that have been autoloaded.
+         *
+         * @var array
+         */
+        private static $autoloadedFiles = [];
+
 
         /**
          * Loads a class.
@@ -43,7 +50,6 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                         self::$composerAutoloader = include $projectAutoloader;
                         if (self::$composerAutoloader instanceof \Composer\Autoload\ClassLoader) {
                             self::$composerAutoloader->unregister();
-                            self::$composerAutoloader->register();
                         } else {
                             // Something went wrong, so keep going without the autoloader.
                             self::$composerAutoloader = false;
@@ -99,16 +105,48 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                 } else if (file_exists(dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php') === true) {
                     $path = dirname(__DIR__, 3).'/simulator/'.$projectPath.'/'.$prefix.'.php';
                 }
+
+                $bakedLoad = true;
+            } else {
+                $bakedLoad = false;
             }
 
             if ($path !== false && is_file($path) === true) {
-                include $path;
+                self::$autoloadedFiles[] = realpath($path);
+                if ($bakedLoad === true) {
+                    include $path;
+                } else {
+                    $namespace = $GLOBALS['projectNamespace'];
+                    foreach ($GLOBALS['projectDependencies'] as $code => $depNamespace) {
+                        if (strpos($class, $depNamespace) === 0) {
+                            $namespace = $depNamespace;
+                            break;
+                        }
+                    }
+
+                    $fileContents = \perspective\Gateway\Bakers\Cache::bake(null, $path, true, $namespace);
+                    eval($fileContents);
+                }
+
                 return true;
             }
 
             return false;
 
         }//end load()
+
+
+        /**
+         * Returns list of files that have been autoloaded.
+         *
+         * @return array
+         */
+        public static function getAutoloadedFilepaths()
+        {
+            return self::$autoloadedFiles;
+
+        }//end getAutoloadedFilepaths()
+
 
     }//end class
 

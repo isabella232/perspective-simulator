@@ -22,6 +22,11 @@ use \PerspectiveSimulator\Libs;
 class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 {
 
+    /**
+     * The name of the command
+     *
+     * @var string
+     */
     protected static $defaultName = 'project:add';
 
     /**
@@ -39,8 +44,9 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function configure()
     {
-        $this->setDescription('Adds a new Project to the export.');
-        $this->setHelp('Creates a new Project.');
+        $this->setDescription('Creates a new Project.');
+        $this->setHelp('Adds a new Project to the export.');
+        $this->addArgument('packageName', InputArgument::REQUIRED, 'The package name for the project');
         $this->addArgument('namespace', InputArgument::REQUIRED, 'The namespace for the project');
 
     }//end configure()
@@ -72,7 +78,7 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
      * @param string $namespace The namespace string.
      *
      * @return void
-     * @throws Exception When namespace is invalid.
+     * @throws \Exception When namespace is invalid.
      */
     private function validateProjectNamespace(string $namespace)
     {
@@ -90,41 +96,10 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
 
     /**
-     * Validates the path of a project.
+     * Interact with the console command.
      *
-     * @param string $path The path for the project.
-     *
-     * @return void
-     * @throws Exception When path is invalid.
-     */
-    private function validateProjectPath(string $path)
-    {
-        $projectPath = Libs\FileSystem::getExportDir().'/projects/';
-        $projectDirs = scandir($projectPath);
-        foreach ($projectDirs as $project) {
-            $path = $projectPath.$project;
-            if (is_dir($path) === true && $project[0] !== '.' && file_exists($path.'/project.json') === true) {
-                $settings = Libs\Util::jsonDecode(file_get_contents($path.'/project.json'));
-                foreach ($settings['url'] as $url) {
-                    if ($url['type'] === 'author') {
-                        $urlParts = explode('/', $url['url']);
-                        $baseURL  = array_shift($urlParts);
-                        $urlPath  = implode('/', $urlParts);
-                        if (strtolower($urlPath) === $path) {
-                            throw new \Exception(sprintf('Duplicate project path (%s)', $path));
-                        }
-                    }
-                }
-            }//end if
-        }//end foreach
-
-    }//end validateProjectPath()
-
-
-    /**
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @param InputInterface  $input  Symfony consoles input interface.
+     * @param OutputInterface $output Symfony consoles output interface.
      *
      * @return void
      */
@@ -138,9 +113,15 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
 
         $helper = $this->getHelper('question');
 
+        if (empty($input->getArgument('packageName')) === true) {
+            $question    = new \Symfony\Component\Console\Question\Question('Please enter a package name: ');
+            $packageName = $helper->ask($input, $output, $question);
+            $input->setArgument('packageName', $packageName);
+        }
+
         if (empty($input->getArgument('namespace')) === true) {
-            $question   = new \Symfony\Component\Console\Question\Question('Please enter a Project namespace: ');
-            $namespace  = $helper->ask($input, $output, $question);
+            $question  = new \Symfony\Component\Console\Question\Question('Please enter a Project namespace: ');
+            $namespace = $helper->ask($input, $output, $question);
             $input->setArgument('namespace', $namespace);
         }
 
@@ -150,10 +131,11 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
     /**
      * Executes the create new project command.
      *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @param InputInterface  $input  Symfony consoles input interface.
+     * @param OutputInterface $output Symfony consoles output interface.
      *
      * @return void
+     * @throws \Exception When error occurs.
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -162,21 +144,22 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         try {
             $namespace = $input->getArgument('namespace');
             $this->validateProjectNamespace($namespace);
-            $packageName = strtolower(str_replace('\\', '/', $namespace));
+            $packageName = strtolower(str_replace('\\', '/', $input->getArgument('packageName')));
 
             $composer = [
                 'name'        => $packageName,
-                'description' => 'Project for '.$namespace,
+                'description' => 'Project for '.$packageName,
                 'autoload'    => [
-                    'psr-4' => [
-                        $namespace.'\\' => 'src/',
-                    ],
+                    'psr-4' => [$namespace.'\\' => 'src/'],
                 ],
             ];
 
             $projectDir = Libs\FileSystem::getProjectDir($packageName);
             Libs\FileSystem::mkdir($projectDir, true);
-            file_put_contents(dirname($projectDir).'/composer.json', Libs\Util::jsonEncode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            file_put_contents(
+                dirname($projectDir).'/composer.json',
+                Libs\Util::jsonEncode($composer, (JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT))
+            );
 
             $folders = [
                 'API',
@@ -184,14 +167,28 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
                 'App',
                 'CDN',
                 'CustomTypes',
-                'Properties',
-                'Stores',
                 'Queues',
             ];
             foreach ($folders as $folder) {
                 if (is_dir($projectDir.'/'.$folder) === false) {
                     Libs\FileSystem::mkdir($projectDir.'/'.$folder);
                 }
+            }
+
+            $stores = $projectDir.'/stores.json';
+            if (file_exists($stores) === false) {
+                file_put_contents(
+                    $stores,
+                    Libs\Util::jsonEncode(
+                        [
+                            'stores' => [
+                                'data' => [],
+                                'user' => [],
+                            ],
+                            'references' => [],
+                        ]
+                    )
+                );
             }
 
             $testDir = dirname($projectDir).'/tests';
@@ -210,10 +207,9 @@ class AddCommand extends \PerspectiveSimulator\CLI\Command\Command
         }//end try
 
         $this->style->section('New Project created');
-        $this->style->note('Namespace: '.$namespace);
         $this->style->note('Pacakge Name: '.$packageName);
+        $this->style->note('Namespace: '.$namespace);
         $this->style->note('Project direcrtory: '.$projectDir);
-
 
     }//end execute()
 
