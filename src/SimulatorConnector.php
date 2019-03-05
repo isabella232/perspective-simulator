@@ -812,6 +812,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function getProjectContext(string $namespace)
     {
+        $namespace   .= '\\';
         $namespaceMap = [];
         $namespaceMap[$GLOBALS['project']] = $GLOBALS['projectNamespace'];
         $namespaceMap = array_flip(array_merge($namespaceMap, $GLOBALS['projectDependencies']));
