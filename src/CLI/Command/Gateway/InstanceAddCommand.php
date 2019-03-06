@@ -66,7 +66,8 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
             $input->setArgument('name', $name);
         }
 
-        $question = sprintf('This will create a new instance "%s" in the project "%s": ', $name, $input->getOption('project'));
+        $question = 'This will create a new instance "%s" in the project "%s". Continue? (y/N) ';
+        $question = sprintf($question, $name, $input->getOption('project'));
         $confirm  = new \Symfony\Component\Console\Question\ConfirmationQuestion($question, false);
         if ($helper->ask($input, $output, $confirm) === false) {
             exit(1);
