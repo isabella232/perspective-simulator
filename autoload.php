@@ -72,7 +72,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
             }
 
             if ($path === false && isset($GLOBALS['projectNamespace']) === true) {
-                $projectNs   = strtolower($GLOBALS['projectNamespace']);
+                $projectNs   = rtrim(strtolower($GLOBALS['projectNamespace']), '\\');
                 $projectPath = $GLOBALS['projectPath'];
                 $prefix      = strtolower(str_replace('\\', '-', $class));
 

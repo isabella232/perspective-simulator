@@ -160,7 +160,7 @@ class SimulatorHandler
      */
     public function load()
     {
-        $prefix     = Bootstrap::generatePrefix($GLOBALS['projectNamespace']);
+        $prefix     = Bootstrap::generatePrefix($GLOBALS['project']);
         $projectDir = Libs\FileSystem::getProjectDir();
 
         $this->loadStores($prefix, $projectDir);
@@ -367,6 +367,7 @@ class SimulatorHandler
 
         // Add references.
         foreach ($references as $referenceCode => $reference) {
+            $referenceCode = $namespace.'/'.strtolower($referenceCode);
             if (isset($this->references[$referenceCode]) === false) {
                 $this->references[$referenceCode] = $reference;
 
@@ -845,7 +846,6 @@ class SimulatorHandler
     private function getReferenceDefinition(string $objectType, string $storeCode, string $referenceid)
     {
         $reference = [];
-        $referenceid = basename($referenceid);
         if (isset($this->references[$referenceid]) === true) {
             $reference = $this->references[$referenceid];
             if ($reference['cardinality'] === 'M:1') {
