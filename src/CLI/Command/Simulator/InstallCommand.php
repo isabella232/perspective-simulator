@@ -94,7 +94,7 @@ class InstallCommand extends \PerspectiveSimulator\CLI\Command\Command
             }//end if
         }//end if
 
-        if (Libs\FileSystem::isDirEmpty($simulatorDir) === false) {
+        if (Libs\FileSystem::isDirEmpty($simulatorDir) === false && is_dir($simulatorDir.'/certs') === true) {
             exec('which c_rehash 2>/dev/null', $execOutput, $rc);
             if ($rc === 0) {
                 exec('find '.$simulatorDir.'/certs -type l -delete; c_rehash '.$simulatorDir.'/certs');
