@@ -175,11 +175,11 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             $input->setArgument('newVersion', $newVersion);
         }
 
-        $re      = '/^\d+(\.\d+)*$/';
+        $re      = '/^\bv?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z-]+(?:\.[\da-z-]+)*)?(?:\+[\da-z-]+(?:\.[\da-z-]+)*)?\b/';
         $matches = [];
         preg_match($re, $newVersion, $matches);
         if (empty($matches) === true) {
-            $this->style->error('Invalid version number. Version number can only contain . or intergers.');
+            $this->style->error('Invalid version number. Version number must follow the semantic versioning format.');
             exit(1);
         }
 

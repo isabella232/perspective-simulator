@@ -42,6 +42,13 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
     {
         $this->setDescription('Registers the instance to a Gateway.');
         $this->setHelp('Registers the instance to a Gateway.');
+        $this->addOption(
+            'upgrade',
+            'u',
+            InputOption::VALUE_OPTIONAL,
+            'Flag for which upgrades this instance should receive.',
+            'stable'
+        );
         $this->addArgument('name', InputArgument::REQUIRED);
 
     }//end configure()
@@ -66,11 +73,17 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
             $input->setArgument('name', $name);
         }
 
-        $question = 'This will create a new instance "%s" in the project "%s". Continue? (y/N) ';
-        $question = sprintf($question, $name, $input->getOption('project'));
-        $confirm  = new \Symfony\Component\Console\Question\ConfirmationQuestion($question, false);
-        if ($helper->ask($input, $output, $confirm) === false) {
-            exit(1);
+        $upgradeOptions = ['test', 'stable'];
+        $upgrade        = $input->getOption('upgrade');
+        if (in_array($upgrade, $upgradeOptions) === false) {
+            $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
+                'Please select one of the following upgrade rules:',
+                $upgradeOptions,
+                0
+            );
+
+            $upgrade = $helper->ask($input, $output, $question);
+            $input->setOption('upgrade', $upgrade);
         }
 
     }//end interact()
@@ -90,7 +103,10 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
         $response = $this->sendAPIRequest(
             'post',
             '/instance/'.$input->getOption('project'),
-            ['name' => $input->getArgument('name')]
+            [
+                'name'    => $input->getArgument('name'),
+                'upgrade' => $input->getOption('upgrade'),
+            ]
         );
 
         if ($response['curlInfo']['http_code'] === 201) {

@@ -67,6 +67,14 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
             'Deactivates the instance.'
         );
 
+        $this->addOption(
+            'upgrade',
+            'u',
+            InputOption::VALUE_OPTIONAL,
+            'Flag for which upgrades this instance should receive.',
+            null
+        );
+
     }//end configure()
 
 
@@ -92,13 +100,15 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
         $projectVersion = $input->getOption('projectVersion');
         $activate       = $input->getOption('activate');
         $deactivate     = $input->getOption('deactivate');
-        if ($projectVersion === null && $activate === false && $deactivate === false) {
+        $upgrade        = $input->getOption('upgrade');
+        if ($projectVersion === null && $activate === false && $deactivate === false && $upgrade === null) {
             $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
                 'Please select the action to perform on the instance (default: <comment>0</comment>)',
                 [
                     'Set the project version',
                     'Activate the instance',
                     'Deactivate the instance',
+                    'Set upgrade rule'
                 ],
                 0
             );
@@ -118,12 +128,27 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
                 case 'Deactivate the instance':
                     $input->setOption('deactivate', true);
                 break;
+
+                case 'Set upgrade rule':
+                    $upgradeOptions = ['test', 'stable'];
+                    if (in_array($upgrade, $upgradeOptions) === false) {
+                        $question = new \Symfony\Component\Console\Question\ChoiceQuestion(
+                            'Please select one of the following upgrade rules:',
+                            $upgradeOptions,
+                            0
+                        );
+
+                        $upgrade = $helper->ask($input, $output, $question);
+                        $input->setOption('upgrade', $upgrade);
+                    }
+                break;
             }//end switch
         } else {
             $errorMsg = 'Please select only one option';
-            if (($projectVersion !== null && ($activate === true || $deactivate === true))
-                || ($activate === true && ($projectVersion !== null || $deactivate === true))
-                || ($deactivate === true && ($projectVersion !== null && $activate === true))
+            if (($projectVersion !== null && ($activate === true || $deactivate === true || $upgrade !== null))
+                || ($activate === true && ($projectVersion !== null || $deactivate === true || $upgrade !== null))
+                || ($deactivate === true && ($projectVersion !== null && $activate === true || $upgrade !== null))
+                || ($upgrade !== null && ($projectVersion !== null && $activate === true || $deactivate === true))
             ) {
                 $this->style->error($errorMsg);
                 exit(1);
@@ -148,6 +173,7 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
         $projectVersion = $input->getOption('projectVersion');
         $activate       = $input->getOption('activate');
         $deactivate     = $input->getOption('deactivate');
+        $upgrade        = $input->getOption('upgrade');
         if ($projectVersion !== null) {
             $response = $this->sendAPIRequest(
                 'post',
@@ -162,6 +188,11 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
             $response = $this->sendAPIRequest(
                 'post',
                 '/instance/'.$project.'/'.$instanceid.'/status/deactivate'
+            );
+        } else if ($upgrade !== null) {
+            $response = $this->sendAPIRequest(
+                'post',
+                '/instance/'.$project.'/'.$instanceid.'/upgrade/'.$upgrade
             );
         }
 
