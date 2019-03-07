@@ -52,7 +52,7 @@ __ROUTES__
                 $handler     = $routeInfo[1];
                 $vars        = $routeInfo[2];
                 $requestBody = file_get_contents(\'php://input\');
-                $contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? \'\');
+                $contentType = ($_SERVER[\'HTTP_CONTENT_TYPE\'] ?? $_SERVER[\'CONTENT_TYPE\'] ?? null);
 
                 if (strpos($contentType, \'application/json\') !== false) {
                     $requestBody = json_decode($requestBody, true);
@@ -68,8 +68,17 @@ __ROUTES__
                 $api    = new API;
                 $output = call_user_func_array([$api, $handler], $vars);
 
-                header(\'Content-Type: application/json\');
-                return json_encode($output);
+                if (is_string($output) === false) {
+                    header(\'Content-Type: application/json\');
+                    $output = json_encode($output);
+                } else {
+                    if ($contentType === null) {
+                        header(\'Content-Type: text/plain\');
+                    }
+                }//end if
+
+                return $output;
+
             break;
         }//end switch';
 
@@ -436,8 +445,7 @@ __ROUTES__
         $router .= Util::printCode(0, '');
         $router .= Util::printCode(0, '}//end class');
 
-        $prefix     = Bootstrap::generatePrefix($project);
-        $project    = strtolower($project);
+        $prefix     = Bootstrap::generatePrefix($namespace);
         $routerFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-apirouter.php';
 
         file_put_contents($routerFile, $router);
@@ -557,7 +565,7 @@ __ROUTES__
                 $function .= Util::printCode(1, '{');
                 $function .= Util::printCode(
                     2,
-                    '$content = \PerspectiveSimulator\API::getAPIFunction(__NAMESPACE__, \''.$api['operationid'].'\');'
+                    '$content = \PerspectiveSimulator\API::getAPIFunction(\''.$project.'\', \''.$api['operationid'].'\');'
                 );
                 $function .= Util::printCode(
                     2,
@@ -572,8 +580,7 @@ __ROUTES__
 
         $function .= Util::printCode(0, '}//end class');
 
-        $prefix       = Bootstrap::generatePrefix($project);
-        $project      = strtolower($project);
+        $prefix       = Bootstrap::generatePrefix($namespace);
         $functionFile = \PerspectiveSimulator\Libs\FileSystem::getSimulatorDir().'/'.$GLOBALS['projectPath'].'/'.$prefix.'-api.php';
 
         file_put_contents($functionFile, $function);

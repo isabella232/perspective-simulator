@@ -124,6 +124,12 @@ switch ($type) {
             }
 
             ob_end_clean();
+        } catch (\TypeError $e) {
+            // Request failed so don't worry about saving, so disable the writes.
+            \PerspectiveSimulator\Bootstrap::disableWrite();
+            ob_end_clean();
+            header('HTTP/1.1 500 Internal Server Error');
+            throw new \PerspectiveAPI\Exception\InvalidArgumentException($e->getMessage());
         } catch (\Throwable $e) {
             // Request failed so don't worry about saving, so disable the writes.
             \PerspectiveSimulator\Bootstrap::disableWrite();

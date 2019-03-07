@@ -259,6 +259,7 @@ class Bootstrap
     {
         $project = str_replace('\\', '-', $project);
         $project = str_replace('/', '-', $project);
+        $project = rtrim($project, '-');
         return strtolower($project);
 
     }//end generatePrefix()

@@ -634,7 +634,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
             return '\\'.$GLOBALS['projectNamespace'].'CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         } else {
             $requirement = explode('/', str_replace(basename($type), '', $type));
-            $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
+            $packageName = str_replace('/'.basename($type), '', $type);
             $requirement = $GLOBALS['projectDependencies'][$packageName];
             return '\\'.$requirement.'CustomTypes\\'.ucfirst($objectType).'\\'.basename($type);
         }
@@ -839,7 +839,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
         $namespaceMap[$GLOBALS['project']] = $GLOBALS['projectNamespace'];
         $namespaceMap = array_merge($namespaceMap, $GLOBALS['projectDependencies']);
 
-       return in_array($projectCode, $namespaceMap);
+       return isset($namespaceMap[$projectCode]);
 
     }//end projectExists()
 
