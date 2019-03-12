@@ -1,6 +1,6 @@
 <?php
 /**
- * InstanceAPISettingsCommand for Perspective Simulator CLI.
+ * InstanceSettingsCommand for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -18,12 +18,12 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * InstanceAPISettingsCommand Class
+ * InstanceSettingsCommand Class
  */
-class InstanceAPISettingsCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
+class InstanceSettingsCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 {
 
-    protected static $defaultName = 'gateway:instance:apiSettings';
+    protected static $defaultName = 'gateway:instance:settings';
 
     /**
      * The direcrtory where the export stores the data.
@@ -40,8 +40,8 @@ class InstanceAPISettingsCommand extends \PerspectiveSimulator\CLI\Command\Gatew
      */
     protected function configure()
     {
-        $this->setDescription('Sets the API settings on an instance.');
-        $this->setHelp('Sets the API settings on an instance.');
+        $this->setDescription('Sets the settings on an instance.');
+        $this->setHelp('Sets the settings on an instance.');
 
         $this->addOption(
             'instanceid',
@@ -50,7 +50,7 @@ class InstanceAPISettingsCommand extends \PerspectiveSimulator\CLI\Command\Gatew
             'The instanceid of the instance we are setting the property value for.'
         );
 
-        $this->addArgument('settings', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The API settings seperate values with spaces (in format key:value).');
+        $this->addArgument('settings', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The settings seperate values with spaces (in format key:value).');
 
     }//end configure()
 
@@ -79,24 +79,24 @@ class InstanceAPISettingsCommand extends \PerspectiveSimulator\CLI\Command\Gatew
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->style->title('Setting the instance API settings');
+        $this->style->title('Setting the instance settings');
 
-        // Prepare the apiSettings array the input is in the format key:value key:value.
+        // Prepare the settings array the input is in the format key:value key:value.
         $settings    = $input->getArgument('settings');
-        $apiSettings = [];
+        $settings = [];
         foreach ($settings as $setting) {
             list($key, $value) = explode(':', $setting);
-            $apiSettings[$key] = $value;
+            $settings[$key] = $value;
         }
 
         $response = $this->sendAPIRequest(
             'post',
-            '/instance/'.$input->getOption('project').'/'.$input->getOption('instanceid').'/apiSettings',
-            ['apiSettings' => json_encode($apiSettings),]
+            '/instance/'.$input->getOption('project').'/'.$input->getOption('instanceid').'/settings',
+            ['settings' => json_encode($settings),]
         );
 
         if ($response['curlInfo']['http_code'] === 201) {
-            $this->style->success(sprintf('Updated API settings on instance %s', $input->getOption('instanceid')));
+            $this->style->success(sprintf('Updated settings on instance %s', $input->getOption('instanceid')));
         } else {
             $this->style->error($response['result']);
         }

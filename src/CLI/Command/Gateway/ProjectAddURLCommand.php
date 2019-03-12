@@ -74,7 +74,7 @@ class ProjectAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
     {
         $this->style->title('Setting project URLs');
 
-        // Prepare the apiSettings array the input is in the format key:value key:value.
+        // Prepare the settings array the input is in the format key:value key:value.
         $URLs = $input->getArgument('urls');
         foreach ($URLs as $URL) {
             list($key, $value) = explode(':', $URL);

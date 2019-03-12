@@ -81,7 +81,7 @@ class InstanceAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
     {
         $this->style->title('Setting instance URLs');
 
-        // Prepare the apiSettings array the input is in the format key:value key:value.
+        // Prepare the settings array the input is in the format key:value key:value.
         $URLs = $input->getArgument('urls');
         foreach ($URLs as $URL) {
             list($key, $value) = explode(':', $URL);
