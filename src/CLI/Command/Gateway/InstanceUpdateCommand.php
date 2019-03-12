@@ -196,6 +196,10 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
             );
         }
 
+        if ($response['curlInfo']['http_code'] !== 200) {
+            $this->style->error($response['result']);
+        }
+
     }//end execute()
 
 
