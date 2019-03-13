@@ -111,7 +111,7 @@ class InstanceAddCommand extends \PerspectiveSimulator\CLI\Command\GatewayComman
 
         if ($response['curlInfo']['http_code'] === 201) {
             $response['result'] = json_decode($response['result'], true);
-            $this->style->success(sprintf('Instance successfully created: %s', $response['result']['instanceid']));
+            $this->style->success(sprintf('Instance successfully created: %s %s', $response['result']['instanceid'], $response['result']['appKey']));
         } else {
             $this->style->error($response['result']);
         }
