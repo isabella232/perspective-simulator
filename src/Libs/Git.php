@@ -97,4 +97,19 @@ class Git
     }//end getDiff()
 
 
+    /**
+     * Gets all the tags in the current repo.
+     *
+     * @return array
+     */
+    public static function getTags()
+    {
+        $tags     = shell_exec('git tag');
+        $tagArray = explode("\n", $tags);
+        array_pop($tagArray);
+        return $tagArray;
+
+    }//end getTags()
+
+
 }//end class

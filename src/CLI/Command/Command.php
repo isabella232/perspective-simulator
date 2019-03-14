@@ -279,6 +279,12 @@ class Command extends \Symfony\Component\Console\Command\Command
      */
     final public function logChange(string $action, string $type, array $data)
     {
+        $tags = Libs\Git::getTags();
+        if (empty($tags) === true) {
+            // Must be in predepolyment.
+            return;
+        }
+
         $changeLog = str_replace('src', '', Libs\FileSystem::getProjectDir()).'update.json';
         $tasks     = ['current' => []];
 
