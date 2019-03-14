@@ -40,6 +40,15 @@ session_start();
 
 register_shutdown_function(
     function () {
+        // Access log.
+        $accessLog = dirname(__DIR__, 5).'/simulator/access.log';
+        file_put_contents(
+            $accessLog,
+            '['.date('d/M/Y H:i:s O', $_SERVER['REQUEST_TIME']).'] "'.$_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.($_SERVER['SERVER_PROTOCOL'] ?? '').'" '.http_response_code().'" "'.($_SERVER['HTTP_USER_AGENT'] ?? '').'" "'.($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '')."\"\n",
+            FILE_APPEND
+        );
+
+        // Fix the session.
         $usersSession                = $_SESSION;
         $_SESSION                    = $GLOBALS['SIM_SESSION'];
         $_SESSION['SANDBOX_SESSION'] = $usersSession;
