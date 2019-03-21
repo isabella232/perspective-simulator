@@ -856,4 +856,42 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     }//end getAutoloadedFilepaths()
 
 
+    /**
+     * Returns ID of object pending remap to (Redis).
+     *
+     * @param string $objectType The object type.
+     * @param string $storeCode  The store code.
+     * @param string $id         The object ID.
+     *
+     * @return string
+     */
+    public static function getRemappingid(string $objectType, string $storeCode, string $id)
+    {
+        $remappingid = null;
+        return $remappingid;
+
+    }//end getRemappingid()
+
+
+    /**
+     * Returns ID of object pending remap to (Redis) and finished remapping to (DB).
+     *
+     * @param string $objectType The object type.
+     * @param string $storeCode  The store code.
+     * @param string $id         The object ID.
+     *
+     * @return array
+     */
+    public static function getRemaps(string $objectType, string $storeCode, string $id)
+    {
+        $remaps = [
+           'remappedid'  => null,
+           'remappingid' => null,
+        ];
+
+        return $remaps;
+
+    }//end getRemaps()
+
+
 }//end class
