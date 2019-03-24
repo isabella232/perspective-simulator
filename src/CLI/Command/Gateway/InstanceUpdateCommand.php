@@ -200,6 +200,9 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
             $this->style->error($response['result']);
         }
 
+        $response['result'] = json_decode($response['result'], true);
+        $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
+
     }//end execute()
 
 

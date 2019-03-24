@@ -238,7 +238,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         $maxSteps          = 1;
         $this->progressBar = new \Symfony\Component\Console\Helper\ProgressBar($output, $maxSteps);
         $this->progressBar->setFormat(
-            "%titleMessage%\n %current%/%max% [%bar%] <info>%progressMessage%</info> %percent:3s%% %memory:6s%\n"
+            "%publishingJobId%\n%titleMessage%\n %current%/%max% [%bar%] <info>%progressMessage%</info> %percent:3s%% %memory:6s%\n"
         );
         $this->progressBar->setMessage('<comment>Preparing to deploy: '.$project.'</comment>', 'titleMessage');
         $this->progressBar->setMessage('', 'progressMessage');
@@ -336,6 +336,10 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         // Cleanup the deploy files as the depolyment was successful.
         Libs\FileSystem::delete($versionFile);
         Libs\FileSystem::delete($tarDir.'/'.$project);
+
+        if ($this->publishingJobId !== null) {
+            $this->progressBar->setMessage('<comment>'.sprintf('Publishing Job ID for this task is: %s', $this->publishingJobId).'</comment>', 'publishingJobId');
+        }
 
         // Only get the progress if receipt is received.
         if ($this->receipt !== null) {
@@ -475,8 +479,9 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             }
         }//end if
 
-        $this->deploymentid = $result['versionid'];
-        $this->receipt      = $result['receipt'];
+        $this->deploymentid    = $result['versionid'];
+        $this->receipt         = $result['receipt'];
+        $this->publishingJobId = $result['publishingJobId'];
         if ($result === false || ($this->progress !== $this->size)) {
             return false;
         }

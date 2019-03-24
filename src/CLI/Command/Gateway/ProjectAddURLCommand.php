@@ -88,6 +88,8 @@ class ProjectAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             );
 
             if ($response['curlInfo']['http_code'] === 200) {
+                $response['result'] = json_decode($response['result'], true);
+                $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
                 $this->style->success(sprintf('Project URL set: %1$s - %2$s', $key, $value));
             } else {
                 $this->style->error($response['result']);

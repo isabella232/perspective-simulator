@@ -1,6 +1,6 @@
 <?php
 /**
- * URLDeleteCommand for Perspective Simulator CLI.
+ * PublishingStatusCommand for Perspective Simulator CLI.
  *
  * @package    Perspective
  * @subpackage Simulator
@@ -18,12 +18,12 @@ use \Symfony\Component\Console\Input\InputOption;
 use \PerspectiveSimulator\Libs;
 
 /**
- * URLDeleteCommand Class
+ * PublishingStatusCommand Class
  */
-class URLDeleteCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
+class PublishingStatusCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
 {
 
-    protected static $defaultName = 'gateway:url:delete';
+    protected static $defaultName = 'gateway:publishing:status';
 
     /**
      * The direcrtory where the export stores the data.
@@ -40,9 +40,9 @@ class URLDeleteCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
      */
     protected function configure()
     {
-        $this->setDescription('Deletes a URL based on URL ID.');
-        $this->setHelp('Deletes a URL based on URL ID.');
-        $this->addArgument('urlids', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The URL IDs in the format seperated by spaces.');
+        $this->setDescription('Gets the publishing status of a task.');
+        $this->setHelp('Gets the publishing status of a task.');
+        $this->addArgument('publishingJobID', InputArgument::REQUIRED, 'ID Returned from Gateway for the publishing job.');
 
     }//end configure()
 
@@ -71,24 +71,25 @@ class URLDeleteCommand extends \PerspectiveSimulator\CLI\Command\GatewayCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->style->title('Deleting URLs');
+        $this->style->title('Publishing status');
+        $response = $this->sendAPIRequest(
+            'get',
+            '/publishing/progress/'.$publishingJobId,
+            []
+        );
 
-        $URLIds = $input->getArgument('urlids');
-        foreach ($URLIds as $URLId) {
-            $response = $this->sendAPIRequest(
-                'delete',
-                '/url/'.$input->getOption('project').'/url/'.$URLId,
-                []
-            );
+        $response['result'] = json_decode($response['result'], true);
 
-            if ($response['curlInfo']['http_code'] === 200) {
-                $response['result'] = json_decode($response['result'], true);
-                $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
-                $this->style->success(sprintf('URL successfully deleted (%s)', $URLId));
-            } else {
-                $this->style->error(sprintf('Failed to delete URL (%1$s): %2$s', $URLId, $response['result']));
-            }
-        }
+        $this->style->table(
+            ['Job ID', 'Status', 'Attempts'],
+            [
+                [
+                    $response['result']['publishingJobId'],
+                    $response['result']['status'],
+                    $response['result']['attempts'],
+                ]
+            ]
+        );
 
     }//end execute()
 

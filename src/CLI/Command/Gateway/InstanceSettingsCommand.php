@@ -96,6 +96,8 @@ class InstanceSettingsCommand extends \PerspectiveSimulator\CLI\Command\GatewayC
         );
 
         if ($response['curlInfo']['http_code'] === 201) {
+            $response['result'] = json_decode($response['result'], true);
+            $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
             $this->style->success(sprintf('Updated settings on instance %s', $input->getOption('instanceid')));
         } else {
             $this->style->error($response['result']);

@@ -109,6 +109,9 @@ class InstancePropertyCommand extends \PerspectiveSimulator\CLI\Command\GatewayC
             $this->style->error($response['result']);
         }
 
+        $response['result'] = json_decode($response['result'], true);
+        $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
+
     }//end execute()
 
 

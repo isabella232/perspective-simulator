@@ -138,6 +138,7 @@ class InstanceUpgradeCommand extends \PerspectiveSimulator\CLI\Command\GatewayCo
         }
 
         $response['result'] = json_decode($response['result'], true);
+        $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
         $this->style->success('The following instances ('.implode(', ', $response['result']['upgraded']).') were upgraded to version '.$response['result']['version']);
 
     }//end execute()

@@ -95,7 +95,9 @@ class InstanceAddURLCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
                 ]
             );
 
+            $response['result'] = json_decode($response['result'], true);
             if ($response['curlInfo']['http_code'] === 200) {
+                $this->style->text('<comment>'.sprintf('Publishing Job ID for this task is: %s', $response['result']['publishingJobId']).'</comment>');
                 $this->style->success(sprintf('Instance URL set: %1$s - %2$s', $key, $value));
             } else {
                 $this->style->error($response['result']);
