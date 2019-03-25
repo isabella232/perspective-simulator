@@ -413,13 +413,27 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     /**
      * Return the data record type object that has the unique property value.
      *
+     * The result object should include 'id' & 'typeClass' for dataRecord objectType.
+     * The result object should include 'id', 'username', 'firstName' & 'lastName' for user objectType.
+     * The result object should include 'id' & 'groupName' for group objectType.
+     *
+     * @param string $objectType Getting a dataRecord|user|group.
+     * @param string $storeCode  The store code.
      * @param string $propertyid The ID of the unique property.
      * @param string $value      The value of the unique property.
      *
      * @return null|array
+     * @throws InvalidArgumentException Thrown when value is not valid.
+     * @throws InvalidDataException     Thrown when property code is not found.
+     * @throws InvalidDataException     Thrown when non-unique property type is used.
+     * @throws InvalidDataException     Thrown when store code is not found.
      */
-    public static function getDataRecordByValue(string $storeCode, string $propertyid, string $value)
-    {
+    public static function getObjectInfoByUniquePropertyValue(
+        string $objectType,
+        string $storeCode,
+        string $propertyid,
+        string $value
+    ) {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
         $dataRecord       = $simulatorHandler->getDataRecordByValue($storeCode, $propertyid, $value);
 
@@ -427,12 +441,13 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
             return null;
         }
 
+        // TODO: @pete complete this.
         return [
             'id'        => $dataRecord['id'],
             'typeClass' => $dataRecord['typeClass'],
         ];
 
-    }//end getDataRecordByValue()
+    }//end getObjectInfoByUniquePropertyValue()
 
 
     /**
