@@ -90,6 +90,18 @@ class DeployPreFlightCheckCommand extends \PerspectiveSimulator\CLI\Command\Comm
             }
         }
 
+        if (file_exists($projectDir.'/CustomTypes/Data/DataRecord.php') === true) {
+            throw new \Exception('Unable to have a Custom Data Type called DataRecord');
+        }
+
+        if (file_exists($projectDir.'/CustomTypes/User/User.php') === true) {
+            throw new \Exception('Unable to have a Custom User Type called User');
+        }
+
+        if (file_exists($projectDir.'/CustomTypes/User/Group.php') === true) {
+            throw new \Exception('Unable to have a Custom User Type called Group');
+        }
+
     }//end execute()
 
 

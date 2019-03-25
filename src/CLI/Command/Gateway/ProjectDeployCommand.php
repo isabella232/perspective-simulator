@@ -92,7 +92,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
      *
      * @var integer
      */
-    private $receipt = 0;
+    private $publishingJobId = null;
 
     /**
      * Number of seconds between checking the status.
@@ -339,10 +339,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
 
         if ($this->publishingJobId !== null) {
             $this->progressBar->setMessage('<comment>'.sprintf('Publishing Job ID for this task is: %s', $this->publishingJobId).'</comment>', 'publishingJobId');
-        }
 
-        // Only get the progress if receipt is received.
-        if ($this->receipt !== null) {
             $maxSteps = ($maxSteps + 6);
             $this->progressBar->setMaxSteps($maxSteps);
             $this->progressBar->setMessage('<comment>Waiting</comment>', 'titleMessage');
@@ -352,7 +349,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
                 'Content-type: application/x-www-form-urlencoded',
                 'X-Sim-Key: '.$this->gateway->getGatewayKey(),
             ];
-            $url        = $this->gateway->getGatewayURL().'/deployment/progress/'.$this->receipt;
+            $url        = $this->gateway->getGatewayURL().'/publishing/progress/'.$this->publishingJobId;
             $prevStatus = null;
             while ($status !== 'Complete' && strpos($status, 'Error') !== 0) {
                 $request    = new RequestHandler();
@@ -361,6 +358,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
                     ->setHeaders($headers)
                     ->execute()
                     ->getResult();
+
                 if ($response['result'] === false) {
                     $status = 'Error: '.$response['error'];
                 } else {
@@ -369,7 +367,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
                     $status     = ($result['status'] ?? 'Error: status not returned.');
                 }//end if
 
-                if (strpos($status, 'Error') !== 0) {
+                if (strpos($status, 'Error') !== 0 && strpos($status, 'Failed') !== 0) {
                     $this->progressBar->setMessage('<comment>'.$status.'</comment>', 'titleMessage');
                     if ($prevStatus !== $status) {
                         $this->progressBar->advance();
@@ -480,7 +478,6 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
         }//end if
 
         $this->deploymentid    = $result['versionid'];
-        $this->receipt         = $result['receipt'];
         $this->publishingJobId = $result['publishingJobId'];
         if ($result === false || ($this->progress !== $this->size)) {
             return false;
