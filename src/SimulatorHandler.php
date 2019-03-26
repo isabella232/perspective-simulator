@@ -1701,25 +1701,20 @@ class SimulatorHandler
 
 
     /**
-     * Returns the incremented value of the property.
+     * Increment a property value.
      *
-     * @param string $propertyCode The property code we are incrementing.
+     * @param string $objectType   The object type eg, data, user.
      * @param string $storeCode    The store code.
-     * @param string $objectType   The object type.
-     * @param mixed  $value        Integer|Float to increment by.
+     * @param string $id           The id of the data record.
+     * @param string $propertyCode The property we are setting.
+     * @param mixed  $value        The value of the property.
      *
-     * @return integer|float
+     * @return void
      */
-    public static function incrementPropertyValue(string $propertyCode, string $storeCode, string $objectType, $value)
+    public function incrementPropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode, $value)
     {
-        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
-
-        $propertyType = $objectType;
-        if ($objectType === 'group') {
-            $propertyType = 'user';
-        }
-
-        if (isset($this->properties[$propertyType][$propid]) === false) {
+        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyCode);
+        if (isset($this->properties[$objectType][$propid]) === false) {
             $this->propidSequence++;
             $propertyid = $this->propidSequence.'.1';
             $this->properties[$objectType][$propid] = [
@@ -1728,7 +1723,12 @@ class SimulatorHandler
             ];
         }
 
-        $property = $this->properties[$propertyType][$propid];
+        $property = $this->properties[$objectType][$propid];
+
+        if ($property['type'] !== $propType) {
+            throw new \Exception(sprintf('Invalid property type expected "%1$s" got "%2$s"', $property['type'], $propType));
+        }
+
         if ($objectType === 'project') {
             $this->stores[$objectType][$property['propertyid']] = ($this->stores[$objectType][$property['propertyid']] + $value);
         } else {
@@ -1739,25 +1739,20 @@ class SimulatorHandler
 
 
     /**
-     * Returns the decremented value of the property.
+     * Decrement a property value.
      *
-     * @param string $propertyCode The property code we are incrementing.
+     * @param string $objectType   The object type eg, data, user.
      * @param string $storeCode    The store code.
-     * @param string $objectType   The object type.
-     * @param mixed  $value        Integer|Float to increment by.
+     * @param string $id           The id of the data record.
+     * @param string $propertyCode The property we are setting.
+     * @param mixed  $value        The value of the property.
      *
-     * @return integer|float
+     * @return void
      */
-    public static function decrementPropertyValue(string $propertyCode, string $storeCode, string $objectType, $value)
+    public function decrementPropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode, $value)
     {
-        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
-
-        $propertyType = $objectType;
-        if ($objectType === 'group') {
-            $propertyType = 'user';
-        }
-
-        if (isset($this->properties[$propertyType][$propid]) === false) {
+        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyCode);
+        if (isset($this->properties[$objectType][$propid]) === false) {
             $this->propidSequence++;
             $propertyid = $this->propidSequence.'.1';
             $this->properties[$objectType][$propid] = [
@@ -1766,7 +1761,12 @@ class SimulatorHandler
             ];
         }
 
-        $property = $this->properties[$propertyType][$propid];
+        $property = $this->properties[$objectType][$propid];
+
+        if ($property['type'] !== $propType) {
+            throw new \Exception(sprintf('Invalid property type expected "%1$s" got "%2$s"', $property['type'], $propType));
+        }
+
         if ($objectType === 'project') {
             $this->stores[$objectType][$property['propertyid']] = ($this->stores[$objectType][$property['propertyid']] - $value);
         } else {
