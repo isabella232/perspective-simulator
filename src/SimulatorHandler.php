@@ -1785,7 +1785,7 @@ class SimulatorHandler
      *
      * @return void
      */
-    public function castDataRecord(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    public function setCustomType(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
     {
         if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
             $customType = '\\'.$GLOBALS['projectNamespace'].'CustomTypes\Data\\'.basename($customType);
@@ -1797,7 +1797,7 @@ class SimulatorHandler
 
         $this->stores['data'][$storeCode]['records'][$dataRecordid]['typeClass'] = $customType;
 
-    }//end castDataRecord()
+    }//end setCustomType()
 
 
     /**

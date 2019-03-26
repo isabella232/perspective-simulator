@@ -953,12 +953,12 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      *
      * @return void
      */
-    public function castDataRecord(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    public function setCustomType(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        return $simulatorHandler->castDataRecord($dataRecordid, $dataRecordTypeCode, $storeCode);
+        return $simulatorHandler->setCustomType($dataRecordid, $dataRecordTypeCode, $storeCode);
 
-    }//end castDataRecord()
+    }//end setCustomType()
 
 
     /**
