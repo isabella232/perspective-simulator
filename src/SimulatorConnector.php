@@ -953,7 +953,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      *
      * @return void
      */
-    public function setCustomType(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    public static function setCustomType(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
         return $simulatorHandler->setCustomType($dataRecordid, $dataRecordTypeCode, $storeCode);
