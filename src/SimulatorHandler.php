@@ -1485,26 +1485,39 @@ class SimulatorHandler
     /**
      * Gets unique data record value.
      *
+     * @param string $objectType Getting a dataRecord|user|group.
      * @param string $storeCode  The store we are looking in.
      * @param string $propertyid The unique property code.
      * @param string $value      The value.
      *
      * @return mixed.
      */
-    public function getDataRecordByValue(string $storeCode, string $propertyid, string $value)
+    public function getObjectInfoByUniquePropertyValue(string $objectType, string $storeCode, string $propertyid, string $value)
     {
         list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
-        if (isset($this->properties['data'][$propid]) === false) {
+
+        $propertyType = $objectType;
+        if ($objectType === 'group') {
+            $propertyType = 'user';
+        }
+
+        if (isset($this->properties[$propertyType][$propid]) === false) {
             return null;
         }
 
-        $property = $this->properties['data'][$propid];
-        $id       = ($this->stores['data'][$storeCode]['uniqueMap'][$property['propertyid']][$value] ?? null);
+        $property = $this->properties[$propertyType][$propid];
+        $id       = ($this->stores[$propertyType][$storeCode]['uniqueMap'][$property['propertyid']][$value] ?? null);
         if ($id === null) {
             return null;
         }
 
-        return $this->getDataRecord($storeCode, $id);
+        if ($objectType === 'user') {
+            return $this->getUser ($storeCode, $id);
+        } else if ($objectType === 'group') {
+            return $this->getGroup($storeCode, $id);
+        } else {
+            return $this->getDataRecord($storeCode, $id);
+        }
 
     }//end getDataRecordByValue()
 
@@ -1685,6 +1698,122 @@ class SimulatorHandler
         return $dataRecord;
 
     }//end getDataRecordById()
+
+
+    /**
+     * Returns the incremented value of the property.
+     *
+     * @param string $propertyCode The property code we are incrementing.
+     * @param string $storeCode    The store code.
+     * @param string $objectType   The object type.
+     * @param mixed  $value        Integer|Float to increment by.
+     *
+     * @return integer|float
+     */
+    public static function incrementPropertyValue(string $propertyCode, string $storeCode, string $objectType, $value)
+    {
+        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
+
+        $propertyType = $objectType;
+        if ($objectType === 'group') {
+            $propertyType = 'user';
+        }
+
+        if (isset($this->properties[$propertyType][$propid]) === false) {
+            $this->propidSequence++;
+            $propertyid = $this->propidSequence.'.1';
+            $this->properties[$objectType][$propid] = [
+                'propertyid' => $propertyid,
+                'type'       => $propType,
+            ];
+        }
+
+        $property = $this->properties[$propertyType][$propid];
+        if ($objectType === 'project') {
+            $this->stores[$objectType][$property['propertyid']] = ($this->stores[$objectType][$property['propertyid']] + $value);
+        } else {
+            $this->stores[$objectType][$storeCode]['records'][$id][$property['propertyid']] = ($this->stores[$objectType][$storeCode]['records'][$id][$property['propertyid']] + $value);
+        }
+
+    }//end incrementPropertyValue()
+
+
+    /**
+     * Returns the decremented value of the property.
+     *
+     * @param string $propertyCode The property code we are incrementing.
+     * @param string $storeCode    The store code.
+     * @param string $objectType   The object type.
+     * @param mixed  $value        Integer|Float to increment by.
+     *
+     * @return integer|float
+     */
+    public static function decrementPropertyValue(string $propertyCode, string $storeCode, string $objectType, $value)
+    {
+        list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
+
+        $propertyType = $objectType;
+        if ($objectType === 'group') {
+            $propertyType = 'user';
+        }
+
+        if (isset($this->properties[$propertyType][$propid]) === false) {
+            $this->propidSequence++;
+            $propertyid = $this->propidSequence.'.1';
+            $this->properties[$objectType][$propid] = [
+                'propertyid' => $propertyid,
+                'type'       => $propType,
+            ];
+        }
+
+        $property = $this->properties[$propertyType][$propid];
+        if ($objectType === 'project') {
+            $this->stores[$objectType][$property['propertyid']] = ($this->stores[$objectType][$property['propertyid']] - $value);
+        } else {
+            $this->stores[$objectType][$storeCode]['records'][$id][$property['propertyid']] = ($this->stores[$objectType][$storeCode]['records'][$id][$property['propertyid']] - $value);
+        }
+
+    }//end decrementPropertyValue()
+
+
+    /**
+     * Cast data record.
+     *
+     * @param string $dataRecordid       The data record object id.
+     * @param string $dataRecordTypeCode The data record type code.
+     * @param string $storeCode    The store code.
+     *
+     * @return void
+     */
+    public function castDataRecord(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    {
+        if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
+            $customType = '\\'.$GLOBALS['projectNamespace'].'CustomTypes\Data\\'.basename($customType);
+        } else {
+            $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
+            $requirement = $GLOBALS['projectDependencies'][$packageName];
+            $customType  = '\\'.$requirement.'CustomTypes\Data\\'.basename($customType);
+        }
+
+        $this->stores['data'][$storeCode]['records'][$dataRecordid]['typeClass'] = $customType;
+
+    }//end castDataRecord()
+
+
+    /**
+     * Moves a data record between parents.
+     *
+     * @param string $dataRecordid       The data recordid of the record we are changing the parent of.
+     * @param string $parentDataRecordid The new partent id of the data record.
+     * @param string $storeCode          The store code.
+     *
+     * @return void
+     */
+    public static function moveDataRecord(string $dataRecordid, string $parentDataRecordid, string $storeCode)
+    {
+        $this->stores['data'][$storeCode]['records'][$dataRecordid]['parent'] = $parentDataRecordid;
+
+    }//end moveDataRecord()
 
 
 }//end class

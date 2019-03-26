@@ -435,16 +435,15 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
         string $value
     ) {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $dataRecord       = $simulatorHandler->getDataRecordByValue($storeCode, $propertyid, $value);
+        $object           = $simulatorHandler->getObjectInfoByUniquePropertyValue($objectType, $storeCode, $propertyid, $value);
 
-        if ($dataRecord === null) {
+        if ($object === null) {
             return null;
         }
 
-        // TODO: @pete complete this.
         return [
-            'id'        => $dataRecord['id'],
-            'typeClass' => $dataRecord['typeClass'],
+            'id'        => $object['id'],
+            'typeClass' => $object['typeClass'],
         ];
 
     }//end getObjectInfoByUniquePropertyValue()
@@ -907,6 +906,76 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
         return $remaps;
 
     }//end getRemaps()
+
+
+    /**
+     * Returns the incremented value of the property.
+     *
+     * @param string $propertyCode The property code we are incrementing.
+     * @param string $storeCode    The store code.
+     * @param string $objectType   The object type.
+     * @param mixed  $value        Integer|Float to increment by.
+     *
+     * @return integer|float
+     */
+    public static function incrementPropertyValue(string $propertyCode, string $storeCode, string $objectType, $value)
+    {
+        $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+        return $simulatorHandler->incrementPropertyValue($propertyCode, $storeCode, $objectType, $value);
+
+    }//end incrementPropertyValue()
+
+
+    /**
+     * Returns the decremented value of the property.
+     *
+     * @param string $propertyCode The property code we are incrementing.
+     * @param string $storeCode    The store code.
+     * @param string $objectType   The object type.
+     * @param mixed  $value        Integer|Float to increment by.
+     *
+     * @return integer|float
+     */
+    public static function decrementPropertyValue(string $propertyCode, string $storeCode, string $objectType, $value)
+    {
+        $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+        return $simulatorHandler->decrementPropertyValue($propertyCode, $storeCode, $objectType, $value);
+
+    }//end decrementPropertyValue()
+
+
+    /**
+     * Cast data record.
+     *
+     * @param string $dataRecordid       The data record object id.
+     * @param string $dataRecordTypeCode The data record type code.
+     * @param string $storeCode    The store code.
+     *
+     * @return void
+     */
+    public function castDataRecord(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    {
+        $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+        return $simulatorHandler->castDataRecord($dataRecordid, $dataRecordTypeCode, $storeCode);
+
+    }//end castDataRecord()
+
+
+    /**
+     * Moves a data record between parents.
+     *
+     * @param string $dataRecordid       The data recordid of the record we are changing the parent of.
+     * @param string $parentDataRecordid The new partent id of the data record.
+     * @param string $storeCode          The store code.
+     *
+     * @return void
+     */
+    public static function moveDataRecord(string $dataRecordid, string $parentDataRecordid, string $storeCode)
+    {
+        $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
+        return $simulatorHandler->moveDataRecord($dataRecordid, $parentDataRecordid, $storeCode);
+
+    }//end moveDataRecord()
 
 
 }//end class
