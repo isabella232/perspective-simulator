@@ -959,18 +959,19 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
 
 
     /**
-     * Cast data record.
+     * Set custom type.
      *
-     * @param string $dataRecordid       The data record object id.
-     * @param string $dataRecordTypeCode The data record type code.
-     * @param string $storeCode    The store code.
+     * @param string $objectType The object type.
+     * @param string $storeCode  The store code.
+     * @param string $id         The object ID.
+     * @param string $typeCode   The custom type code.
      *
      * @return void
      */
-    public static function setCustomType(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    public static function setCustomType(string $objectType, string $storeCode, string $id, string $typeCode)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        return $simulatorHandler->setCustomType($dataRecordid, $dataRecordTypeCode, $storeCode);
+        return $simulatorHandler->setCustomType($storeCode, $id, $typeCode);
 
     }//end setCustomType()
 
@@ -978,16 +979,16 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     /**
      * Moves a data record between parents.
      *
-     * @param string $dataRecordid       The data recordid of the record we are changing the parent of.
-     * @param string $parentDataRecordid The new partent id of the data record.
-     * @param string $storeCode          The store code.
+     * @param string $storeCode The store code.
+     * @param string $id        The data recordid of the record we are changing the parent of.
+     * @param string $parentid  The new partent id of the data record.
      *
      * @return void
      */
-    public static function moveDataRecord(string $dataRecordid, string $parentDataRecordid, string $storeCode)
+    public static function moveDataRecord(string $storeCode, string $id, string $parentid)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        return $simulatorHandler->moveDataRecord($dataRecordid, $parentDataRecordid, $storeCode);
+        return $simulatorHandler->moveDataRecord($storeCode, $id, $parentid);
 
     }//end moveDataRecord()
 

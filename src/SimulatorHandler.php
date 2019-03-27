@@ -1777,25 +1777,25 @@ class SimulatorHandler
 
 
     /**
-     * Cast data record.
+     * Set custom type.
      *
-     * @param string $dataRecordid       The data record object id.
-     * @param string $dataRecordTypeCode The data record type code.
-     * @param string $storeCode    The store code.
+     * @param string $storeCode  The store code.
+     * @param string $id         The object ID.
+     * @param string $typeCode   The custom type code.
      *
      * @return void
      */
-    public function setCustomType(string $dataRecordid, string $dataRecordTypeCode, string $storeCode)
+    public function setCustomType(string $storeCode, string $id, string $typeCode)
     {
         if (strpos($storeCode, strtolower($GLOBALS['project'])) === 0) {
-            $customType = '\\'.$GLOBALS['projectNamespace'].'CustomTypes\Data\\'.basename($customType);
+            $customType = '\\'.$GLOBALS['projectNamespace'].'CustomTypes\Data\\'.basename($typeCode);
         } else {
             $packageName = str_replace('/'.basename($storeCode), '', $storeCode);
             $requirement = $GLOBALS['projectDependencies'][$packageName];
-            $customType  = '\\'.$requirement.'CustomTypes\Data\\'.basename($customType);
+            $customType  = '\\'.$requirement.'CustomTypes\Data\\'.basename($typeCode);
         }
 
-        $this->stores['data'][$storeCode]['records'][$dataRecordid]['typeClass'] = $customType;
+        $this->stores['data'][$storeCode]['records'][$id]['typeClass'] = $customType;
 
     }//end setCustomType()
 
@@ -1803,15 +1803,15 @@ class SimulatorHandler
     /**
      * Moves a data record between parents.
      *
-     * @param string $dataRecordid       The data recordid of the record we are changing the parent of.
-     * @param string $parentDataRecordid The new partent id of the data record.
-     * @param string $storeCode          The store code.
+     * @param string $storeCode The store code.
+     * @param string $id        The data recordid of the record we are changing the parent of.
+     * @param string $parentid  The new partent id of the data record.
      *
      * @return void
      */
-    public static function moveDataRecord(string $dataRecordid, string $parentDataRecordid, string $storeCode)
+    public function moveDataRecord(string $storeCode, string $id, string $parentid)
     {
-        $this->stores['data'][$storeCode]['records'][$dataRecordid]['parent'] = $parentDataRecordid;
+        $this->stores['data'][$storeCode]['records'][$id]['parent'] = $parentid;
 
     }//end moveDataRecord()
 
