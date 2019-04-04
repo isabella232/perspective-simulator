@@ -116,20 +116,25 @@ class SimulatorHandler
             $this->properties = $savedData['properties'];
 
             $this->referenceValues = ($savedData['referenceValues'] ?? []);
-
             if (isset($savedData['stores']) === true) {
                 foreach ($savedData['stores'] as $type => $projects) {
-                    foreach ($projects as $projectid => $stores) {
-                        if (isset($this->stores[$type][$projectid]) === false) {
-                            $this->stores[$type][$projectid] = [];
+                    if ($type === 'project') {
+                        foreach ($projects as $propertyid => $value) {
+                            $this->stores[$type][$propertyid] = $value;
                         }
-
-                        foreach ($stores as $storeCode => $storeData) {
-                            if (isset($this->stores[$type][$projectid][$storeCode]) === false) {
-                                $this->stores[$type][$projectid][$storeCode] = $storeData;
+                    } else {
+                        foreach ($projects as $projectid => $stores) {
+                            if (isset($this->stores[$type][$projectid]) === false) {
+                                $this->stores[$type][$projectid] = [];
                             }
+
+                            foreach ($stores as $storeCode => $storeData) {
+                                if (isset($this->stores[$type][$projectid][$storeCode]) === false) {
+                                    $this->stores[$type][$projectid][$storeCode] = $storeData;
+                                }
+                            }//end foreach
                         }//end foreach
-                    }//end foreach
+                    }//end if
                 }//end foreach
             }//end if
         }//end if
