@@ -1500,10 +1500,11 @@ class SimulatorHandler
     public function getObjectInfoByUniquePropertyValue(string $objectType, string $storeCode, string $propertyid, string $value)
     {
         list($propid, $propType) = Bootstrap::getPropertyInfo($propertyid);
-
         $propertyType = $objectType;
         if ($objectType === 'group') {
             $propertyType = 'user';
+        } else if ($objectType === 'dataRecord') {
+            $propertyType = 'data';
         }
 
         if (isset($this->properties[$propertyType][$propid]) === false) {
