@@ -1342,15 +1342,21 @@ class SimulatorHandler
      *
      * @param string  $objectType The object type.
      * @param string  $storeCode  The store the object belongs to.
-     * @param string  $id         The id of the record.
+     * @param string  $id         The id of the record. When null, it starts from the root object in the store.
      * @param integer $depth      The depth to get.
      *
      * @return array
      */
-    public function getChildren(string $objectType, string $storeCode, string $id, int $depth=null)
+    public function getChildren(string $objectType, string $storeCode, string $id=null, int $depth=null)
     {
-        if (isset($this->stores[$objectType][$storeCode]['records'][$id]) === false) {
-            return [];
+        if ($id === null) {
+            if (isset($this->stores[$objectType][$storeCode]['records']) === false) {
+                return [];
+            }
+        } else {
+            if (isset($this->stores[$objectType][$storeCode]['records'][$id]) === false) {
+                return [];
+            }
         }
 
         if ($depth !== null) {
@@ -1362,16 +1368,34 @@ class SimulatorHandler
         }
 
         $children = [];
-        foreach ($this->stores[$objectType][$storeCode]['records'][$id]['children'] as $childid => $child) {
-            $children[$childid] = [
-                'depth'    => $this->stores[$objectType][$storeCode]['records'][$childid]['depth'],
-                'children' => [],
-            ];
+        if ($id === null) {
+            foreach ($this->stores[$objectType][$storeCode]['records'] as $childid => $child) {
+                if ($child['depth'] !== 1) {
+                    continue;
+                }
 
-            if ($depth !== 0) {
-                $children[$childid]['children'] = $this->getChildren($objectType, $storeCode, $childid, $depth);
+                $children[$childid] = [
+                    'depth'    => 1,
+                    'children' => [],
+                ];
+
+                if ($depth !== 0) {
+                    $children[$childid]['children'] = $this->getChildren($objectType, $storeCode, $childid, $depth);
+                }
             }
-        }
+        } else {
+            $children = [];
+            foreach ($this->stores[$objectType][$storeCode]['records'][$id]['children'] as $childid => $child) {
+                $children[$childid] = [
+                    'depth'    => $this->stores[$objectType][$storeCode]['records'][$childid]['depth'],
+                    'children' => [],
+                ];
+
+                if ($depth !== 0) {
+                    $children[$childid]['children'] = $this->getChildren($objectType, $storeCode, $childid, $depth);
+                }
+            }
+        }//end if
 
         return $children;
 

@@ -270,7 +270,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      *
      * @return array
      */
-    public static function getChildren(string $objectType, string $storeCode, string $id, int $depth=null)
+    public static function getChildren(string $objectType, string $storeCode, string $id=null, int $depth=null)
     {
         if ($objectType !== 'data') {
             return [];
