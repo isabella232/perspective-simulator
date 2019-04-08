@@ -124,7 +124,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                         }
                     }
 
-                    $fileContents = \perspective\Gateway\Bakers\Cache::bake(null, $path, true, $namespace);
+                    $fileContents = \Perspective\Gateway\Bakers\Cache::bake(null, $path, true, $namespace);
                     eval($fileContents);
                 }
 
