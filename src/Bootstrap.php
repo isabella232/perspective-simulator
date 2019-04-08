@@ -107,6 +107,7 @@ class Bootstrap
             'PerspectiveAPI\Authentication'                => 'Authentication',
             'PerspectiveAPI\Email'                         => 'Email',
             'PerspectiveAPI\Request'                       => 'Request',
+            'PerspectiveAPI\Response'                      => 'Response',
             'PerspectiveAPI\Queue'                         => 'Queue',
             'PerspectiveAPI\Storage\StorageFactory'        => 'StorageFactory',
             'PerspectiveAPI\Objects\Types\ProjectInstance' => 'ProjectInstance',
