@@ -96,9 +96,16 @@ class InstanceUpgradeCommand extends \PerspectiveSimulator\CLI\Command\GatewayCo
 
         $this->style->listing($this->instances);
 
-        $helper  = $this->getHelper('question');
-        $confirm = new \Symfony\Component\Console\Question\ConfirmationQuestion(
-            'The above instances will be upgraded to the latest available version. Do you wish to continue? (y/N)',
+        $response = $this->sendAPIRequest('post', '/instance/'.$input->getOption('project').'/latest/version', ['testInstances' => $testInstances]);
+        if ($response['curlInfo']['http_code'] !== 200) {
+            $this->style->error($response['result']);
+            exit(1);
+        }
+
+        $latestVersion = json_decode($response['result'], true);
+        $helper        = $this->getHelper('question');
+        $confirm       = new \Symfony\Component\Console\Question\ConfirmationQuestion(
+            'The above instances will be upgraded to the latest available version (<comment>'.($latestVersion['simulator_version'] ?? '').'</comment>). Do you wish to continue? (y/N)',
             false
         );
 
