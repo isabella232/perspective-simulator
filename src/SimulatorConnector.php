@@ -140,7 +140,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function setUsername(string $id, string $storeCode, string $username)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $simulatorHandler->setGroupName($storeCode, $id, $username);
+        $simulatorHandler->setUsername($storeCode, $id, $username);
         return true;
 
     }//end setUsername()
@@ -156,7 +156,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function setUserFirstName(string $id, string $storeCode, string $firstName)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $simulatorHandler->setGroupName($storeCode, $id, $firstName);
+        $simulatorHandler->setUserFirstName($storeCode, $id, $firstName);
         return true;
 
     }//end setUserFirstName()
@@ -172,7 +172,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
     public static function setUserLastName(string $id, string $storeCode, string $lastName)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
-        $simulatorHandler->setGroupName($storeCode, $id, $lastName);
+        $simulatorHandler->setUserLastName($storeCode, $id, $lastName);
         return true;
 
     }//end setUserLastName()
