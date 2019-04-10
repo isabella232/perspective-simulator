@@ -372,7 +372,7 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      *
      * @return string
      */
-    public static function createDataRecord(string $storeCode, string $customType, string $parent=null)
+    public static function createDataRecord(string $storeCode, string $customType=null, string $parent=null)
     {
         $simulatorHandler = \PerspectiveSimulator\SimulatorHandler::getSimulator();
         $dataRecord       = $simulatorHandler->createDataRecord($storeCode, $customType, $parent);

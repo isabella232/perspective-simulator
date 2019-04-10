@@ -1453,7 +1453,7 @@ class SimulatorHandler
      *
      * @return mixed
      */
-    public function createDataRecord(string $storeCode, string $customType, string $parent=null)
+    public function createDataRecord(string $storeCode, string $customType=null, string $parent=null)
     {
         if ($customType === null) {
             $customType = '\PerspectiveAPI\Objects\Types\DataRecord';
