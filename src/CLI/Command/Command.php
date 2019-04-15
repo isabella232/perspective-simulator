@@ -65,7 +65,8 @@ class Command extends \Symfony\Component\Console\Command\Command
             $projects          = [];
 
             if (count($installedProjects) === 1) {
-                $project = str_replace('/', '\\', $installedProjects[0]);
+                $installedProject = array_keys($installedProjects);
+                $project = str_replace('/', '\\', $installedProject[0]);
             } else {
                 foreach ($installedProjects as $proj => $path) {
                     $baseProjectPath = str_replace('/src', '', $path);
