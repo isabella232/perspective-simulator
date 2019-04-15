@@ -82,9 +82,9 @@ class InstanceSettingsCommand extends \PerspectiveSimulator\CLI\Command\GatewayC
         $this->style->title('Setting the instance settings');
 
         // Prepare the settings array the input is in the format key:value key:value.
-        $settings    = $input->getArgument('settings');
-        $settings = [];
-        foreach ($settings as $setting) {
+        $inputSettings = $input->getArgument('settings');
+        $settings      = [];
+        foreach ($inputSettings as $setting) {
             list($key, $value) = explode(':', $setting);
             $settings[$key] = $value;
         }
