@@ -63,15 +63,20 @@ class Command extends \Symfony\Component\Console\Command\Command
 
             $installedProjects = Libs\Util::jsonDecode(file_get_contents(Libs\FileSystem::getSimulatorDir().'/projects.json'));
             $projects          = [];
-            foreach ($installedProjects as $proj => $path) {
-                $baseProjectPath = str_replace('/src', '', $path);
-                if (strrpos($cwd, $baseProjectPath) !== false) {
-                    $project = str_replace('/', '\\', $proj);
-                    break;
-                }
 
-                $projects[] = str_replace('/', '\\', $proj);
-            }//end foreach
+            if (count($installedProjects) === 1) {
+                $project = str_replace('/', '\\', $installedProjects[0]);
+            } else {
+                foreach ($installedProjects as $proj => $path) {
+                    $baseProjectPath = str_replace('/src', '', $path);
+                    if (strrpos($cwd, $baseProjectPath) !== false) {
+                        $project = str_replace('/', '\\', $proj);
+                        break;
+                    }
+
+                    $projects[] = str_replace('/', '\\', $proj);
+                }//end foreach
+            }
 
             if (empty($project) === true) {
                 $helper   = $this->getHelper('question');
