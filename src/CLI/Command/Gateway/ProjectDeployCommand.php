@@ -460,7 +460,7 @@ class ProjectDeployCommand extends \PerspectiveSimulator\CLI\Command\GatewayComm
             'checksum'     => $this->checksum,
             'deploymentid' => $this->deploymentid,
         ];
-        $url      = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '/', $this->project).'/'.$this->version;
+        $url      = $this->gateway->getGatewayURL().'/deployment/'.str_replace('\\', '/', $this->project).'/'.urlencode($this->version);
         $request  = new RequestHandler();
         $response = $request->setMethod('post')
             ->setURL($url)
