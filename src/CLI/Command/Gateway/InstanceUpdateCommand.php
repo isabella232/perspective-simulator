@@ -177,7 +177,7 @@ class InstanceUpdateCommand extends \PerspectiveSimulator\CLI\Command\GatewayCom
         if ($projectVersion !== null) {
             $response = $this->sendAPIRequest(
                 'post',
-                '/instance/'.$project.'/'.$instanceid.'/version/'.$projectVersion
+                '/instance/'.$project.'/'.$instanceid.'/version/'.urlencode($projectVersion)
             );
         } else if ($activate === true) {
             $response = $this->sendAPIRequest(
