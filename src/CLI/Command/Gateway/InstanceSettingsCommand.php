@@ -86,7 +86,15 @@ class InstanceSettingsCommand extends \PerspectiveSimulator\CLI\Command\GatewayC
         $settings      = [];
         foreach ($inputSettings as $setting) {
             list($key, $value) = explode(':', $setting);
-            $settings[$key] = $value;
+            if ($key === 'api_domains') {
+                if (isset($settings[$key]) === false) {
+                    $settings[$key] = [];
+                }
+
+                $settings[$key][] = $value;
+            } else {
+                $settings[$key] = $value;
+            }
         }
 
         $response = $this->sendAPIRequest(
