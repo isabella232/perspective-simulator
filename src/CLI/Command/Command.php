@@ -69,7 +69,7 @@ class Command extends \Symfony\Component\Console\Command\Command
                 $project = str_replace('/', '\\', $installedProject[0]);
             } else {
                 foreach ($installedProjects as $proj => $path) {
-                    $baseProjectPath = str_replace('/src', '', $path);
+                    $baseProjectPath = substr($path, 0, -4);
                     if (strrpos($cwd, $baseProjectPath) !== false) {
                         $project = str_replace('/', '\\', $proj);
                         break;

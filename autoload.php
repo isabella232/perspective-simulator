@@ -43,7 +43,7 @@ if (class_exists('PerspectiveSimulator\Autoload', false) === false) {
                     $project           = strtolower(str_replace('\\', '/', $GLOBALS['project']));
                     $projectAutoloader = null;
                     if (isset($projects[$project]) === true) {
-                        $projectAutoloader = str_replace('/src', '/vendor/autoload.php', $projects[$project]);
+                        $projectAutoloader = substr($projects[$project], 0, -3).'vendor/autoload.php';
                     }
 
                     if ($projectAutoloader !== null && file_exists($projectAutoloader) === true) {

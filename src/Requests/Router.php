@@ -165,7 +165,7 @@ switch ($type) {
     break;
 
     case 'tests':
-        $dir = str_replace('/src', '', $installedProjects[strtolower($GLOBALS['project'])]).'/tests/'.$path;
+        $dir = substr($installedProjects[strtolower($GLOBALS['project'])], 0, -3).'tests/'.$path;
 
         if (file_exists($dir) === false) {
             \PerspectiveSimulator\Libs\Web::send404();
