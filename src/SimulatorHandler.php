@@ -1065,7 +1065,7 @@ class SimulatorHandler
      *
      * @return void
      */
-    public static function setUsername(string $id, string $storeCode, string $username)
+    public function setUsername(string $id, string $storeCode, string $username)
     {
         if (isset($this->stores['user'][$storeCode]['records'][$id]) === true) {
             $this->stores['user'][$storeCode]['records'][$id]['username'] = $username;
@@ -1083,7 +1083,7 @@ class SimulatorHandler
      *
      * @return void
      */
-    public static function setUserFirstName(string $id, string $storeCode, string $firstName)
+    public function setUserFirstName(string $id, string $storeCode, string $firstName)
     {
         if (isset($this->stores['user'][$storeCode]['records'][$id]) === true) {
             $this->stores['user'][$storeCode]['records'][$id]['properties']['__first-name__'] = $firstName;
@@ -1101,7 +1101,7 @@ class SimulatorHandler
      *
      * @return void
      */
-    public static function setUserLastName(string $id, string $storeCode, string $lastName)
+    public function setUserLastName(string $id, string $storeCode, string $lastName)
     {
         if (isset($this->stores['user'][$storeCode]['records'][$id]) === true) {
             $this->stores['user'][$storeCode]['records'][$id]['properties']['__last-name__'] = $lastName;
@@ -1138,7 +1138,7 @@ class SimulatorHandler
      *
      * @return void
      */
-    public static function addUserToGroup(string $id, string $storeCode, string $groupid)
+    public function addUserToGroup(string $id, string $storeCode, string $groupid)
     {
         if (isset($this->stores['user'][$storeCode]['records'][$id]) === true) {
             $this->stores['user'][$storeCode]['records'][$id]['groups'][$groupid] = true;
@@ -1157,7 +1157,7 @@ class SimulatorHandler
      *
      * @return void
      */
-    public static function removeUserFromGroup(string $id, string $storeCode, string $groupid)
+    public function removeUserFromGroup(string $id, string $storeCode, string $groupid)
     {
         if (isset($this->stores['user'][$storeCode]['records'][$id]) === true) {
             unset($this->stores['user'][$storeCode]['records'][$id]['groups'][$groupid]);
