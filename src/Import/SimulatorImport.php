@@ -22,10 +22,9 @@ abstract class SimulatorImport
 
     public function __construct(string $projectNamespace)
     {
-        $projectNamespace = rtrim($projectNamespace, '\\');
         \PerspectiveSimulator\Bootstrap::enableWrite();
         \PerspectiveSimulator\Bootstrap::disableNotifications();
-        \PerspectiveSimulator\Bootstrap::load($projectNamespace);
+        \PerspectiveSimulator\Bootstrap::load(rtrim($projectNamespace, '\\'));
         $apiClassname = '\\'.$projectNamespace.'API';
         $this->api = new $apiClassname();
 
