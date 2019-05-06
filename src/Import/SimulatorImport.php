@@ -22,6 +22,7 @@ abstract class SimulatorImport
 
     public function __construct(string $projectNamespace)
     {
+        $projectNamespace = rtrim($projectNamespace, '\\');
         \PerspectiveSimulator\Bootstrap::enableWrite();
         \PerspectiveSimulator\Bootstrap::disableNotifications();
         \PerspectiveSimulator\Bootstrap::load($projectNamespace);
