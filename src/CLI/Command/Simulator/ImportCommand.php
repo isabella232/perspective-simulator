@@ -72,10 +72,16 @@ class ImportCommand extends \PerspectiveSimulator\CLI\Command\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $projectDir = Libs\FileSystem::getProjectDir();
-        $importDir = dirname($projectDir).'/import';
+        $projectDir     = Libs\FileSystem::getProjectDir();
         $importFileName = $input->getArgument('importFile');
-        $importFilePath = $importDir.'/'.$importFileName.'.php';
+        if (strpos($importFileName, '.php') === false) {
+            $importDir      = dirname($projectDir).'/import';
+            $importFilePath = $importDir.'/'.$importFileName.'.php';
+        } else {
+            $importFilePath = $importFileName;
+            $importFileName = str_replace('.php', '', basename($importFileName));
+        }
+
         if (file_exists($importFilePath) === false) {
             throw new \Exception(sprintf('Import file does not exist: %s', $importFilePath));
         }
