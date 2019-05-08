@@ -130,12 +130,16 @@ class RequestHandler
         switch ($this->_method) {
             case 'post':
                 curl_setopt($this->_ch, CURLOPT_POST, 1);
-                curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_data);
+                if (empty($this->_data) === false) {
+                    curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_data);
+                }
             break;
 
             case 'put':
                 curl_setopt($this->_ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-                curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_data);
+                if (empty($this->_data) === false) {
+                    curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_data);
+                }
             break;
 
             case 'delete':
