@@ -24,7 +24,7 @@ abstract class SimulatorImport
     {
         \PerspectiveSimulator\Bootstrap::enableWrite();
         \PerspectiveSimulator\Bootstrap::disableNotifications();
-        \PerspectiveSimulator\Bootstrap::load($projectNamespace);
+        \PerspectiveSimulator\Bootstrap::load(rtrim($projectNamespace, '\\'));
         $apiClassname = '\\'.$projectNamespace.'API';
         $this->api = new $apiClassname();
 
