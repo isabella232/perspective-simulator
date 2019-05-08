@@ -668,6 +668,10 @@ class SimulatorConnector implements \PerspectiveAPI\ConnectorInterface
      */
     public static function addQueueJob($queueNames, $data, callable $successCallback=null, callable $failedCallback=null)
     {
+        // TODO: remove when implementing dependancy support
+        foreach ($queueNames as &$queueName) {
+            $queueName = basename($queueName);
+        }
         \PerspectiveSimulator\Queue\Queue::addJob($queueNames, $data, $successCallback, $failedCallback);
 
     }//end addQueueJob()
