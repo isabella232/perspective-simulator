@@ -342,6 +342,7 @@ class SimulatorHandler
         $storesFile = Libs\Util::jsonDecode(file_get_contents($projectDir.'/stores.json'));
         $stores     = ($storesFile['stores'] ?? []);
         $references = ($storesFile['references'] ?? []);
+
         // Add stores.
         foreach ($stores as $storeType => $stores) {
             if (isset($this->stores[$storeType]) === false) {
@@ -390,7 +391,6 @@ class SimulatorHandler
                 }
 
                 $this->references[$referenceCode]['cardinality'] = $cardinality;
-
             }
         }//end foreach
 
@@ -419,6 +419,38 @@ class SimulatorHandler
         }
 
     }//end save()
+
+
+    /**
+     * Resets the simulator data.
+     *
+     * @return void
+     */
+    public function reset()
+    {
+        $this->dataRecordSequence = 0;
+        $this->references         =  [];
+        $this->referenceValues    = [];
+        $this->properties         = [
+            'data'    => [],
+            'user'    => [],
+            'project' => [],
+        ];
+
+        // TODO: Figure out why these variables cannot be reset..
+        // self::$simulator = null;
+        // $this->userSequence       = 0;
+        // $this->userSequence       = 0;
+        // $this->userGroupSequence  = 0;
+        // $this->propidSequence     = 0;
+
+        // $this->stores             = [
+        //     'data'    => [],
+        //     'user'    => [],
+        //     'project' => [],
+        // ];
+
+    }//end reset()
 
 
     /**
