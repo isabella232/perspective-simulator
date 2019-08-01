@@ -147,9 +147,14 @@ class SimulatorHandler
      *
      * @return object
      */
-    public static function getSimulator()
+    public static function getSimulator(bool $reload=false)
     {
-        if (isset(self::$simulator) === false) {
+        if ($reload === true) {
+            // Get a new simulator handler.
+            self::$simulator = null;
+        }
+
+        if (self::$simulator === null) {
             self::$simulator = new SimulatorHandler();
         }
 
@@ -467,6 +472,7 @@ class SimulatorHandler
     {
         $reference     = $this->getReferenceDefinition($objectType, $storeCode, $referenceCode);
         $referenceSide = $this->getReferenceSide($reference, $objectType, $storeCode);
+        $results       = null;
         if ($referenceSide === 'source') {
             $valueType = $reference['targetType'];
             $results   = $this->getReferenceValueBySource($reference, $referenceCode, $id);
@@ -1015,6 +1021,10 @@ class SimulatorHandler
      */
     private function getReferenceSide(array $reference, string $objectType, string $storageCode)
     {
+        if (empty($reference) === true) {
+            return null;
+        }
+
         if (ucfirst($objectType) === 'User') {
             $storageClass = 'user';
         } else if (ucfirst($objectType) === 'Data') {
