@@ -1312,7 +1312,11 @@ class SimulatorHandler
     public function deletePropertyValue(string $objectType, string $storeCode, string $id, string $propertyCode)
     {
         list($propid, $propType) = Bootstrap::getPropertyInfo($propertyCode);
-        $property                = $this->properties[$objectType][$propid];
+        if (isset($this->properties[$objectType][$propid]) === false) {
+            return;
+        }
+
+        $property = $this->properties[$objectType][$propid];
 
         if ($objectType === 'project'
             && isset($this->stores[$objectType][$property['propertyid']]) === true
